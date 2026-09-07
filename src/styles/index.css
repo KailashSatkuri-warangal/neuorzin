@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================== 
+     # Clean Reset & Responsive Theme Styles
+=================================================================== */
+
+:root {
+  --color-primary: #0070ba;
+  --bg-gradient: linear-gradient(90deg, #0070ba 0%, #00c6ff 100%);
+  --bg-gray: #f4f7fb;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Light & Dark Modes */
+html.light body {
+  background-color: #ffffff;
+  color: #1e293b;
+}
+
+html.dark body {
+  background-color: #070913;
+  color: #f1f5f9;
+}
+
+/* Animation Float */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Preloader Animation */
+@keyframes letters-loading {
+  0%, 75%, 100% {
+    opacity: 0.2;
+    transform: rotateY(-90deg);
+  }
+  25%, 50% {
+    opacity: 1;
+    transform: rotateY(0deg);
+    color: #0070ba;
+  }
+}
+
+.txt-loading .letters-loading {
+  font-family: 'Kanit', 'Inter', sans-serif;
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  display: inline-block;
+  animation: letters-loading 1.8s infinite ease-in-out;
+  color: rgba(0, 0, 0, 0.2);
+}
+
+.dark .txt-loading .letters-loading {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.tanda-preloader .animation-preloader .spinner {
+  border-radius: 50%;
+  border: 3px solid rgba(0, 112, 186, 0.2);
+  border-top-color: #0070ba;
+  height: 90px;
+  width: 90px;
+  margin: 0 auto 24px auto;
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Slim Elegant Modal Scrollbars */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
