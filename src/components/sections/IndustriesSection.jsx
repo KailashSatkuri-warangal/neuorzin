@@ -1,130 +1,86 @@
-import React, { useState } from 'react';
-import { SectionHeader } from '../common/SectionHeader';
-import { industriesData } from '../../data/industriesData';
-import { Building, HeartPulse, ShoppingBag, Bot, Shield, CheckCircle2, ArrowRight } from 'lucide-react';
-
-const iconMap = {
-  Building,
-  HeartPulse,
-  ShoppingBag,
-  Bot,
-  Shield
-};
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { 
+  CinematicReveal, 
+  StaggerContainer, 
+  StaggerItem 
+} from '../animations';
+import { ArrowUpRight } from 'lucide-react';
 
 export function IndustriesSection({ onOpenBooking }) {
-  const [activeTab, setActiveTab] = useState(industriesData[0].id);
-  const activeIndustry = industriesData.find((i) => i.id === activeTab) || industriesData[0];
+  const industries = [
+    { number: '01', title: 'Fintech', href: '/industries' },
+    { number: '02', title: 'Healthcare', href: '/industries' },
+    { number: '03', title: 'Manufacturing', href: '/industries' },
+    { number: '04', title: 'Research & Innovation Labs', href: '/industries' },
+    { number: '05', title: 'Enterprises & Education', href: '/industries' },
+  ];
 
   return (
-    <section id="industries" className="py-24 relative bg-slate-50 dark:bg-background transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <SectionHeader
-          badge="Domain Engineering"
-          badgeVariant="purple"
-          title="Engineered for"
-          highlightText="Regulated & High-Growth Sectors"
-          description="Tailored digital architectures with built-in compliance, high throughput, and industry-specific intelligence."
-        />
+    <section id="industries" className="py-16 sm:py-24 bg-white overflow-hidden border-b border-slate-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          {/* Left Column: Heading & Illustration (Image 4 Left) */}
+          <div className="lg:col-span-5 space-y-6 text-left">
+            <CinematicReveal intensity="subtle">
+              <div className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold uppercase tracking-wider">
+                Solutions for Every Industry
+              </div>
+            </CinematicReveal>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Industry Selection Column */}
-          <div className="lg:col-span-4 space-y-3">
-            {industriesData.map((ind) => {
-              const Icon = iconMap[ind.icon] || Building;
-              const isActive = activeTab === ind.id;
+            <CinematicReveal intensity="medium" delay={0.1}>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 font-display tracking-tight">
+                Industries We Serve
+              </h2>
+            </CinematicReveal>
 
-              return (
-                <button
-                  key={ind.id}
-                  onClick={() => setActiveTab(ind.id)}
-                  className={`w-full text-left p-5 rounded-2xl border transition-all duration-300 flex items-center justify-between group cursor-pointer ${
-                    isActive
-                      ? 'bg-white dark:bg-card border-brand-purple/60 shadow-lg shadow-brand-purple/10'
-                      : 'bg-white/60 dark:bg-card/40 border-slate-200 dark:border-border hover:border-slate-300 dark:hover:border-border/80'
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-                        isActive
-                          ? 'bg-brand-purple text-white shadow-md'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white'
-                      }`}
-                    >
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h4 className={`text-sm font-bold font-display ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'}`}>
-                        {ind.title}
-                      </h4>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">{ind.subtitle}</p>
-                    </div>
-                  </div>
-
-                  <ArrowRight className={`w-4 h-4 transition-transform ${isActive ? 'text-brand-purple translate-x-1' : 'text-slate-400 opacity-0 group-hover:opacity-100'}`} />
-                </button>
-              );
-            })}
+            <CinematicReveal intensity="cinematic" delay={0.2} className="pt-4 max-w-sm">
+              <img
+                src="/assets/img/illustration/11.png"
+                alt="Industries We Serve"
+                className="w-full h-auto object-contain drop-shadow-lg"
+              />
+            </CinematicReveal>
           </div>
 
-          {/* Active Industry Detail Card */}
-          <div className="lg:col-span-8">
-            <div className="bg-white dark:bg-card border border-slate-200 dark:border-border rounded-3xl p-8 sm:p-10 shadow-xl transition-all">
-              <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800 mb-6">
-                <div>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white font-display">
-                    {activeIndustry.title}
-                  </h3>
-                  <p className="text-xs sm:text-sm font-semibold text-brand-purple mt-1">
-                    {activeIndustry.subtitle}
-                  </p>
-                </div>
-                <span className="px-3.5 py-1.5 rounded-full bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan dark:text-cyan-400 text-xs font-mono font-bold">
-                  {activeIndustry.metrics}
-                </span>
-              </div>
-
-              <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-8">
-                {activeIndustry.description}
+          {/* Right Column: Numbered Industry List (Image 4 Right) */}
+          <div className="lg:col-span-7 space-y-4">
+            <CinematicReveal intensity="subtle">
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mb-4">
+                Tailored solutions for every sector.
               </p>
+            </CinematicReveal>
 
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">
-                Core Engineering Capabilities
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
-                {activeIndustry.points.map((pt, idx) => (
-                  <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 text-xs sm:text-sm text-slate-800 dark:text-slate-200">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>{pt}</span>
-                  </div>
-                ))}
-              </div>
+            <StaggerContainer className="space-y-3">
+              {industries.map((ind) => (
+                <StaggerItem key={ind.number}>
+                  <Link
+                    to={ind.href}
+                    className="group p-4 sm:p-5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-100 hover:border-slate-200 flex items-center justify-between transition-all duration-300 shadow-xs hover:shadow-md"
+                  >
+                    <div className="flex items-center gap-6">
+                      <span className="text-sm sm:text-base font-bold text-indigo-600 dark:text-cyan-400 font-mono">
+                        {ind.number}
+                      </span>
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-800 group-hover:text-[#0070ba] transition-colors font-display">
+                        {ind.title}
+                      </h3>
+                    </div>
 
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-3">
-                Applied Technology Stack
-              </h4>
-              <div className="flex flex-wrap gap-2 mb-8">
-                {activeIndustry.technologies.map((t, idx) => (
-                  <span key={idx} className="px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    {t}
-                  </span>
-                ))}
-              </div>
-
-              <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <span className="text-xs text-slate-500">Need tailored enterprise specs?</span>
-                <button
-                  onClick={onOpenBooking}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-purple to-brand-blue text-white font-bold text-xs shadow-md hover:opacity-95 transition-all"
-                >
-                  Schedule Industry Consultation
-                </button>
-              </div>
-            </div>
+                    <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-400 group-hover:bg-[#0070ba] group-hover:text-white flex items-center justify-center transition-colors">
+                      <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </div>
+                  </Link>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
           </div>
+
         </div>
       </div>
     </section>
   );
 }
+
 export default IndustriesSection;

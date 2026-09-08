@@ -1,126 +1,102 @@
 import React from 'react';
-import { SectionHeader } from '../common/SectionHeader';
-import { capabilitiesData } from '../../data/capabilitiesData';
-import { Layers, Database, TrendingUp, Bot, ArrowRight, CheckCircle2 } from 'lucide-react';
-
-const iconMap = {
-  Layers,
-  Database,
-  TrendingUp,
-  Bot
-};
-
-const domainThemes = {
-  'product-engineering': {
-    iconBg: 'bg-brand-purple/10 text-brand-purple dark:text-purple-300',
-    accentText: 'text-brand-purple dark:text-cyan-400',
-    borderHover: 'hover:border-brand-purple/50',
-    metricColor: 'text-brand-purple dark:text-cyan-400'
-  },
-  'data-engineering': {
-    iconBg: 'bg-brand-blue/10 text-brand-blue dark:text-blue-300',
-    accentText: 'text-brand-blue dark:text-blue-400',
-    borderHover: 'hover:border-brand-blue/50',
-    metricColor: 'text-brand-blue dark:text-blue-400'
-  },
-  'sales-marketing': {
-    iconBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-    accentText: 'text-amber-600 dark:text-amber-400',
-    borderHover: 'hover:border-amber-500/50',
-    metricColor: 'text-amber-600 dark:text-amber-400'
-  },
-  'ai-automation': {
-    iconBg: 'bg-brand-cyan/10 text-brand-cyan dark:text-cyan-300',
-    accentText: 'text-brand-cyan dark:text-cyan-300',
-    borderHover: 'hover:border-brand-cyan/50',
-    metricColor: 'text-brand-cyan dark:text-cyan-300'
-  }
-};
+import { Link } from 'react-router-dom';
+import { 
+  CinematicReveal, 
+  StaggerContainer, 
+  StaggerItem 
+} from '../animations';
 
 export function CapabilitiesSection({ onOpenBooking }) {
+  const capabilities = [
+    {
+      id: 'product-engineering',
+      title: 'Product Engineering – Web, Mobile & MVP',
+      desc: 'Design and build scalable web and mobile applications, from MVP to full products, delivering seamless user experiences and fast market launches',
+      illustration: '/assets/img/illustration/2.png',
+      href: '/services'
+    },
+    {
+      id: 'data-engineering',
+      title: 'Data Engineering & Analytics',
+      desc: 'Develop robust data pipelines, optimize costs, and migrate legacy systems to Snowflake. Transform raw data into actionable insights with dashboards using PowerBI',
+      illustration: '/assets/img/illustration/5.png',
+      href: '/services'
+    },
+    {
+      id: 'sales-marketing',
+      title: 'Sales and Marketing',
+      desc: 'Create sales plans, marketing strategies, SEO, content, and social media management. Drive lead generation, brand growth, and advertising campaigns across platforms',
+      illustration: '/assets/img/illustration/7.png',
+      href: '/services'
+    },
+    {
+      id: 'ai-automation',
+      title: 'AI & Automation',
+      desc: 'Implement AI agents, automate workflows, and integrate large language models to streamline operations, boost efficiency, and unlock intelligent insights.',
+      illustration: '/assets/img/illustration/12.png',
+      href: '/services'
+    }
+  ];
+
   return (
-    <section id="capabilities" className="py-24 relative bg-slate-100/60 dark:bg-dark-300/60 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <SectionHeader
-          badge="Processing & Core Capabilities"
-          badgeVariant="cyan"
-          title="Engineered for"
-          highlightText="Modern Digital Scale"
-          description="Advanced technology services built for modern digital enterprises, scaling startups, and ambitious technology leaders."
-        />
+    <section id="capabilities" className="py-16 sm:py-24 bg-white overflow-hidden border-b border-slate-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Section Header */}
+        <CinematicReveal intensity="medium" className="text-center max-w-3xl mx-auto mb-14 sm:mb-16">
+          <div className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold uppercase tracking-wider mb-3">
+            Processing
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 font-display tracking-tight">
+            Our Core Capabilities
+          </h2>
+          <p className="mt-3 text-slate-500 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto">
+            Advanced technology services built for modern digital enterprises.
+          </p>
+        </CinematicReveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          {capabilitiesData.map((cap) => {
-            const Icon = iconMap[cap.icon] || Layers;
-            const theme = domainThemes[cap.id] || domainThemes['product-engineering'];
-
-            return (
-              <div
-                key={cap.id}
-                className={`group rounded-3xl p-8 bg-white dark:bg-card border border-slate-200 dark:border-border transition-all duration-300 shadow-md hover:shadow-xl relative flex flex-col justify-between ${theme.borderHover}`}
-              >
+        {/* 4 Cards Grid - Original Size Proportions */}
+        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+          {capabilities.map((item, idx) => (
+            <StaggerItem key={item.id}>
+              <div className="group h-full flex flex-col justify-between text-left p-6 sm:p-7 rounded-2xl bg-white hover:bg-[#f8fafc] border border-slate-100 hover:border-slate-200 shadow-xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300">
                 <div>
-                  <div className="flex items-center justify-between mb-6">
-                    <div className={`w-14 h-14 rounded-2xl ${theme.iconBg} border border-slate-200 dark:border-border/60 flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                      <Icon className="w-7 h-7" />
-                    </div>
-                    <span className="text-2xl font-black font-display text-slate-400 dark:text-slate-600 group-hover:text-brand-purple transition-colors">
-                      {cap.number}
-                    </span>
+                  {/* Illustration */}
+                  <div className="h-36 sm:h-40 w-full flex items-center justify-center mb-6 overflow-hidden">
+                    <img
+                      src={item.illustration}
+                      alt={item.title}
+                      className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
 
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white font-display mb-2 group-hover:text-brand-purple transition-colors">
-                    {cap.title}
+                  {/* Title */}
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 font-display leading-snug mb-3 group-hover:text-[#0070ba] transition-colors">
+                    {item.title}
                   </h3>
-                  <div className={`text-xs font-bold uppercase tracking-wider ${theme.accentText} mb-4`}>
-                    {cap.subtitle}
-                  </div>
-                  <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6">
-                    {cap.description}
-                  </p>
 
-                  {/* Highlights */}
-                  <div className="space-y-2 mb-6">
-                    {cap.highlights.map((item, idx) => (
-                      <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-700 dark:text-slate-300">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                        <span>{item}</span>
-                      </div>
-                    ))}
-                  </div>
+                  {/* Description */}
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    {item.desc}
+                  </p>
                 </div>
 
-                <div>
-                  {/* Tech Tags */}
-                  <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100 dark:border-slate-800 mb-6">
-                    {cap.tags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className={`text-xs font-bold ${theme.metricColor}`}>
-                      {cap.metric}
-                    </span>
-                    <button
-                      onClick={onOpenBooking}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-white hover:text-brand-purple dark:hover:text-brand-cyan transition-colors cursor-pointer"
-                    >
-                      Consult Specialists <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </button>
-                  </div>
+                <div className="pt-4 mt-6 border-t border-slate-100/80">
+                  <Link
+                    to={item.href}
+                    className="text-xs font-bold text-[#0070ba] hover:underline inline-flex items-center gap-1"
+                  >
+                    Learn More →
+                  </Link>
                 </div>
               </div>
-            );
-          })}
-        </div>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+
       </div>
     </section>
   );
 }
+
 export default CapabilitiesSection;
