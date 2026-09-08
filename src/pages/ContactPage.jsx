@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Mail, Phone, Clock, Send, CheckCircle2 } from 'lucide-react';
+import { MapPin, Mail, Phone, Send, CheckCircle2 } from 'lucide-react';
 import { companyContact } from '../data/navigationData';
 
 export function ContactPage({ onShowToast, onOpenBooking }) {
@@ -45,7 +45,9 @@ export function ContactPage({ onShowToast, onOpenBooking }) {
                 <Phone className="w-7 h-7" />
               </div>
               <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Make a Call</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400">+02)-574-328-301</p>
+              <a href="tel:+917794045500" className="text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-[#0070ba] block">
+                77940 45500
+              </a>
             </div>
 
             <div className="p-8 rounded-3xl bg-slate-50 dark:bg-[#111424] border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -53,7 +55,9 @@ export function ContactPage({ onShowToast, onOpenBooking }) {
                 <Mail className="w-7 h-7" />
               </div>
               <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Send a Mail</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400">info@neuorzin.com</p>
+              <a href="mailto:info@neuorzin.com" className="text-xs text-slate-500 dark:text-slate-400 hover:text-[#0070ba] block">
+                info@neuorzin.com
+              </a>
             </div>
 
             <div className="p-8 rounded-3xl bg-slate-50 dark:bg-[#111424] border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -61,7 +65,9 @@ export function ContactPage({ onShowToast, onOpenBooking }) {
                 <MapPin className="w-7 h-7" />
               </div>
               <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Visit Office</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400">HITEC City Tech Park, Hyderabad, India</p>
+              <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Visit Office: Hyderabad, India
+              </p>
             </div>
           </div>
 

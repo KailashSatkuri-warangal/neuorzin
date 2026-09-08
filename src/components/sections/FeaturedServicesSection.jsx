@@ -1,75 +1,112 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Bot, Database, Cloud, Cpu, ArrowRight } from 'lucide-react';
+import { 
+  CinematicReveal, 
+  CinematicContainer, 
+  StaggerContainer, 
+  StaggerItem 
+} from '../animations';
 
 export function FeaturedServicesSection() {
+  const pillars = [
+    {
+      title: 'Product Intelligence',
+      desc: 'Autonomous AI decision swarms and self-healing automated QA pipelines.',
+      icon: Bot,
+      href: '/services/intelligent-autonomous-systems',
+      badge: 'Pillar 1',
+      tag: 'Autonomous AI'
+    },
+    {
+      title: 'Enterprise Data Power',
+      desc: 'Snowflake migrations, real-time data mesh & private enterprise RAG architectures.',
+      icon: Database,
+      href: '/services/enterprise-data-operations',
+      badge: 'Pillar 2',
+      tag: 'Data Mesh'
+    },
+    {
+      title: 'Cloud Scale & FinOps',
+      desc: 'High-availability multi-cloud orchestration, FinOps telemetry & zero-downtime transition.',
+      icon: Cloud,
+      href: '/services/cloud-performance-management',
+      badge: 'Pillar 3',
+      tag: 'Cloud & FinOps'
+    },
+    {
+      title: 'Deep-Tech & Quantum',
+      desc: 'Quantum-enhanced machine learning, QPU simulation & post-quantum security enclaves.',
+      icon: Cpu,
+      href: '/services/quantum-enhanced-machine-learning',
+      badge: 'Pillar 4',
+      tag: 'Quantum Innovation'
+    }
+  ];
+
   return (
-    <div className="featured-services-area pt-md-120 text-center default-padding-bottom bottom-less bg-white dark:bg-[#0b0d18] relative transition-colors">
-      <div className="fixed-shape-left-top absolute top-0 left-0 opacity-40 pointer-events-none">
-        <img src="/assets/img/shape/7.png" alt="Shape" />
+    <section className="py-16 sm:py-24 bg-white border-b border-slate-100 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Header (Scene 02 Header) */}
+        <CinematicReveal intensity="medium" className="text-center max-w-3xl mx-auto mb-14 sm:mb-16">
+          <div className="inline-block px-3 py-1 rounded-full bg-blue-50 text-[#0070ba] text-xs font-bold uppercase tracking-wider mb-3">
+            Core Engineering Pillars
+          </div>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 font-display">
+            Engineered for <strong className="text-[#0070ba]">Unrivaled Performance</strong>
+          </h2>
+          <p className="mt-3 text-slate-600 text-sm sm:text-base leading-relaxed">
+            Four specialized technical disciplines architected to elevate your enterprise software from standard code to an unstoppable competitive moat.
+          </p>
+        </CinematicReveal>
+
+        {/* 4 Cards (Scene 02 Stagger Grid with 3D Depth) */}
+        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {pillars.map((item, idx) => {
+            const IconComponent = item.icon;
+            return (
+              <StaggerItem key={idx}>
+                <div className="group h-full p-6 sm:p-7 rounded-2xl bg-[#f8fafc] border border-slate-200/80 hover:border-[#0070ba]/60 hover:bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-5">
+                      <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 text-[#0070ba] flex items-center justify-center group-hover:bg-[#0070ba] group-hover:text-white transition-all shadow-xs">
+                        <IconComponent className="w-6 h-6" />
+                      </div>
+                      <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-[#0070ba] text-[10px] font-bold uppercase tracking-wider">
+                        {item.badge}
+                      </span>
+                    </div>
+
+                    <span className="text-[11px] font-bold text-[#0070ba] uppercase tracking-wider block mb-1">
+                      {item.tag}
+                    </span>
+                    <h3 className="text-lg font-bold text-slate-900 font-display group-hover:text-[#0070ba] transition-colors mb-2">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-slate-200/60">
+                    <Link
+                      to={item.href}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0070ba] hover:text-[#005c99] transition-colors group/link"
+                    >
+                      <span>Explore Pillar</span>
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-1" />
+                    </Link>
+                  </div>
+                </div>
+              </StaggerItem>
+            );
+          })}
+        </StaggerContainer>
+
       </div>
-      <div className="container relative z-10">
-        <div className="row">
-          <div className="col-lg-8 offset-lg-2">
-            <div className="site-heading text-center mb-16">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#0070ba] dark:text-cyan-400 mb-2">
-                Featured Services
-              </h4>
-              <h2 className="title text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white font-display">
-                Engaging Creative <br /> minds via technology
-              </h2>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="container relative z-10">
-        <div className="row">
-          <div className="single-item col-lg-3 col-md-6 mb-6">
-            <div className="item p-8 rounded-3xl bg-slate-50 dark:bg-[#111424] border border-slate-200 dark:border-slate-800 text-center shadow-sm hover:shadow-xl hover:border-[#0070ba]/50 transition-all">
-              <i className="flaticon-cogwheel text-4xl text-[#0070ba] mb-4 block"></i>
-              <h5 className="font-bold text-base text-slate-900 dark:text-white mb-2">
-                <Link to="/services">IT Consultancy</Link>
-              </h5>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Astonished set expression solicitude way admiration.
-              </p>
-            </div>
-          </div>
-          <div className="single-item col-lg-3 col-md-6 mb-6">
-            <div className="item p-8 rounded-3xl bg-slate-50 dark:bg-[#111424] border border-slate-200 dark:border-slate-800 text-center shadow-sm hover:shadow-xl hover:border-[#0070ba]/50 transition-all">
-              <i className="flaticon-cloud-storage text-4xl text-[#0070ba] mb-4 block"></i>
-              <h5 className="font-bold text-base text-slate-900 dark:text-white mb-2">
-                <Link to="/services">Cloud Computing</Link>
-              </h5>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Astonished set expression solicitude way admiration.
-              </p>
-            </div>
-          </div>
-          <div className="single-item col-lg-3 col-md-6 mb-6">
-            <div className="item p-8 rounded-3xl bg-slate-50 dark:bg-[#111424] border border-slate-200 dark:border-slate-800 text-center shadow-sm hover:shadow-xl hover:border-[#0070ba]/50 transition-all">
-              <i className="flaticon-globe-grid text-4xl text-[#0070ba] mb-4 block"></i>
-              <h5 className="font-bold text-base text-slate-900 dark:text-white mb-2">
-                <Link to="/services">Cyber Security</Link>
-              </h5>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Astonished set expression solicitude way admiration.
-              </p>
-            </div>
-          </div>
-          <div className="single-item col-lg-3 col-md-6 mb-6">
-            <div className="item p-8 rounded-3xl bg-slate-50 dark:bg-[#111424] border border-slate-200 dark:border-slate-800 text-center shadow-sm hover:shadow-xl hover:border-[#0070ba]/50 transition-all">
-              <i className="flaticon-backup text-4xl text-[#0070ba] mb-4 block"></i>
-              <h5 className="font-bold text-base text-slate-900 dark:text-white mb-2">
-                <Link to="/services">Backup Recovery</Link>
-              </h5>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Astonished set expression solicitude way admiration.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </section>
   );
 }
+
 export default FeaturedServicesSection;

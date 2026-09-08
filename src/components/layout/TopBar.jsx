@@ -10,7 +10,7 @@ export function TopBar() {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
             <MapPin className="w-3.5 h-3.5 text-cyan-200" />
-            <span>HITEC City Tech Park, Phase 2, Hyderabad, India</span>
+            <span>Visit Office: Hyderabad, India</span>
           </div>
           <div className="flex items-center gap-2">
             <Mail className="w-3.5 h-3.5 text-cyan-200" />

@@ -37,7 +37,7 @@ export function Footer({ onOpenBooking, onShowToast, theme }) {
                     onChange={(e) => setEmail(e.target.value)}
                     className="form-control w-full pl-4 pr-12 py-3 rounded-full bg-white/10 border border-white/20 text-white text-xs placeholder-slate-400 focus:outline-none focus:border-[#0070ba]"
                   />
-                  <button type="submit" className="absolute right-1 top-1 bottom-1 w-9 h-9 rounded-full bg-[#0070ba] text-white flex items-center justify-center">
+                  <button type="submit" className="absolute right-1 top-1 bottom-1 w-9 h-9 rounded-full bg-[#0070ba] text-white flex items-center justify-center cursor-pointer">
                     <i className="fa fa-paper-plane text-xs"></i>
                   </button>
                 </form>
@@ -49,8 +49,9 @@ export function Footer({ onOpenBooking, onShowToast, theme }) {
                 <h4 className="widget-title text-sm font-bold uppercase tracking-wider text-white mb-4">Company</h4>
                 <ul className="space-y-2 text-xs text-slate-300">
                   <li><Link to="/about" className="hover:text-[#0070ba]">About Us</Link></li>
+                  <li><Link to="/approach" className="hover:text-[#0070ba]">Our Approach</Link></li>
                   <li><Link to="/careers" className="hover:text-[#0070ba]">Meet Our Team</Link></li>
-                  <li><Link to="/journal" className="hover:text-[#0070ba]">News & Media</Link></li>
+                  <li><Link to="/journal" className="hover:text-[#0070ba]">Insights & News</Link></li>
                   <li><Link to="/projects" className="hover:text-[#0070ba]">Case Studies</Link></li>
                   <li><Link to="/contact" className="hover:text-[#0070ba]">Contact Us</Link></li>
                   <li><Link to="/faq" className="hover:text-[#0070ba]">FAQ</Link></li>
@@ -60,14 +61,14 @@ export function Footer({ onOpenBooking, onShowToast, theme }) {
 
             <div className="col-lg-3 col-md-6 item mb-6">
               <div className="f-item link">
-                <h4 className="widget-title text-sm font-bold uppercase tracking-wider text-white mb-4">Solutions</h4>
+                <h4 className="widget-title text-sm font-bold uppercase tracking-wider text-white mb-4">Core Pillars</h4>
                 <ul className="space-y-2 text-xs text-slate-300">
-                  <li><Link to="/services" className="hover:text-[#0070ba]">IT Management</Link></li>
-                  <li><Link to="/services" className="hover:text-[#0070ba]">Cyber Security</Link></li>
-                  <li><Link to="/services" className="hover:text-[#0070ba]">Cloud Computing</Link></li>
-                  <li><Link to="/services" className="hover:text-[#0070ba]">IT Consulting</Link></li>
-                  <li><Link to="/services" className="hover:text-[#0070ba]">Software Dev</Link></li>
-                  <li><Link to="/services" className="hover:text-[#0070ba]">Backup & Recovery</Link></li>
+                  <li><Link to="/services/intelligent-autonomous-systems" className="hover:text-[#0070ba]">Product Intelligence</Link></li>
+                  <li><Link to="/services/enterprise-data-operations" className="hover:text-[#0070ba]">Data & AI</Link></li>
+                  <li><Link to="/services/cloud-performance-management" className="hover:text-[#0070ba]">Cloud Platform</Link></li>
+                  <li><Link to="/services/quantum-enhanced-machine-learning" className="hover:text-[#0070ba]">Quantum Computing</Link></li>
+                  <li><Link to="/services/cloud-cost-intelligence" className="hover:text-[#0070ba]">Cloud FinOps</Link></li>
+                  <li><Link to="/services/ai-driven-quality-automation" className="hover:text-[#0070ba]">QA Automation</Link></li>
                 </ul>
               </div>
             </div>
@@ -78,7 +79,7 @@ export function Footer({ onOpenBooking, onShowToast, theme }) {
                 <ul className="space-y-2.5 text-xs text-slate-300">
                   <li className="flex items-start gap-2">
                     <i className="fas fa-map-marker-alt text-[#0070ba] mt-0.5"></i>
-                    <span>HITEC City Tech Park, Phase 2, Hyderabad, India</span>
+                    <span>Visit Office: Hyderabad, India</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <i className="fas fa-envelope-open text-[#0070ba]"></i>
@@ -86,7 +87,7 @@ export function Footer({ onOpenBooking, onShowToast, theme }) {
                   </li>
                   <li className="flex items-center gap-2">
                     <i className="fas fa-phone text-[#0070ba]"></i>
-                    <span>+02)-574-328-301</span>
+                    <a href="tel:+917794045500" className="hover:text-[#0070ba]">77940 45500</a>
                   </li>
                 </ul>
 
