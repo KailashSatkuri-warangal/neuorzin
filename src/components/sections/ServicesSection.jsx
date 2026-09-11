@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const services = [
+  { icon: 'flaticon-target', title: 'Sales & Marketing Growth', desc: 'Performance funnels, programmatic SEO, lead generation, and CRM revenue automation.', href: '/services/sales-marketing' },
   { icon: 'flaticon-cogwheel', title: 'IT Design & Engineering', desc: 'Scalable web and mobile applications designed with modular micro-frontends.', href: '/services/product-engineering' },
   { icon: 'flaticon-analysis-1', title: 'Analytic Solutions', desc: 'Snowflake data warehousing, dbt transform models, and real-time dashboarding.', href: '/services/data-engineering' },
   { icon: 'flaticon-reduction', title: 'Cyber Security & Risk', desc: 'Comprehensive threat modeling, zero-trust enforcement, and compliance.', href: '/services/cloud-performance' },

@@ -1,45 +1,81 @@
 export const approachSteps = [
   {
     step: '01',
-    title: 'Understanding Vision & Challenges',
-    desc: 'Deep discovery workshops to analyze your technical bottlenecks, business KPIs, user journeys, and target growth trajectory.',
+    title: 'Understanding Your Vision, Challenges & Opportunities',
+    subtitle: 'Strategic Discovery & Domain Scoping',
+    desc: 'Deep discovery workshops and legacy technical audits to analyze bottlenecks, domain constraints, core business KPIs, user journeys, and target scale.',
     icon: 'Compass',
-    accent: '#745EFF'
+    accent: '#0070ba',
+    points: [
+      'Comprehensive codebase & architecture audit',
+      'Data flow modeling & cloud cost optimization plan',
+      'Requirement mapping & technical RFC documentation'
+    ]
   },
   {
     step: '02',
-    title: 'Designing Scalable Frameworks',
-    desc: 'Architecting modular microservices, clean data schemas, and high-fidelity interactive user interfaces.',
+    title: 'Designing Scalable, Intelligent Frameworks',
+    subtitle: 'Architectural Blueprint & Schema Modeling',
+    desc: 'Architecting modular microservices, clean data schemas, vector search pipelines, and high-fidelity interactive user interfaces.',
     icon: 'LayoutGrid',
-    accent: '#2B4DFF'
+    accent: '#00c6ff',
+    points: [
+      'Declarative Infrastructure as Code (IaC) specifications',
+      'Event-driven asynchronous messaging protocols',
+      'Interactive design system & high-conversion UI prototypes'
+    ]
   },
   {
     step: '03',
-    title: 'Engineering High-Performance Solutions',
-    desc: 'Writing clean, battle-tested code across web, mobile, data pipelines, and intelligent AI models.',
+    title: 'Engineering High-Performance Digital Solutions',
+    subtitle: 'High-Velocity Pod Sprints & Clean Code',
+    desc: 'Writing clean, strictly typed, battle-tested code across web, mobile, distributed data pipelines, and intelligent multi-agent AI systems.',
     icon: 'Code2',
-    accent: '#00F0FF'
+    accent: '#745EFF',
+    points: [
+      'Full-stack modern engineering (React, Node, Go, Python)',
+      'High-throughput streaming pipelines & Snowflake ETL',
+      'Continuous automated PR review & linting guardrails'
+    ]
   },
   {
     step: '04',
-    title: 'Ensuring Quality & Security',
-    desc: 'Rigorous automated testing, security vulnerability scanning, performance load tests, and compliance validation.',
+    title: 'Ensuring Quality, Security & Seamless Performance',
+    subtitle: 'Automated Verification & Resilience Testing',
+    desc: 'Rigorous automated testing, zero-trust cryptographic security checks, static/dynamic code analysis, and sub-second latency optimization.',
     icon: 'ShieldCheck',
-    accent: '#00D084'
+    accent: '#00D084',
+    points: [
+      'Automated integration, regression & chaos testing',
+      'Zero-trust SAST/DAST security compliance scans',
+      'Sub-millisecond p99 latency benchmarking'
+    ]
   },
   {
     step: '05',
-    title: 'Launching With Confidence',
-    desc: 'Zero-downtime canary deployments, telemetry setup, automated cloud scaling, and real-time error logging.',
+    title: 'Launching With Confidence — Scaling With Precision',
+    subtitle: 'Zero-Downtime Deployment & Telemetry',
+    desc: 'Zero-downtime blue/green and canary deployments, automated autoscaling, distributed logging, and real-time OpenTelemetry monitoring.',
     icon: 'Rocket',
-    accent: '#FFB800'
+    accent: '#FFB800',
+    points: [
+      'Zero-downtime production cutover orchestration',
+      'Real-time Datadog / Prometheus telemetry dashboards',
+      'Automated FinOps cloud cost governance'
+    ]
   },
   {
     step: '06',
-    title: 'Continuous Long-Term Innovation',
-    desc: 'Iterative feature enhancement, FinOps cost monitoring, algorithm fine-tuning, and ongoing technical support.',
+    title: 'Continuous Innovation for Long-Term Success',
+    subtitle: 'Iterative Evolution & AI Intelligence',
+    desc: 'Continuous feature iterations, cognitive model fine-tuning, automated performance optimizations, and 24/7 SRE engineering support.',
     icon: 'Sparkles',
-    accent: '#B537F2'
+    accent: '#FF3366',
+    points: [
+      'Closed-loop user telemetry & conversion analytics',
+      'Ongoing model retraining & guardrail upgrades',
+      'Dedicated Principal Architect roadmap advisory'
+    ]
   }
 ];
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, Search, Calendar, Menu } from 'lucide-react';
+import { ChevronDown, ChevronRight, Search, Calendar, Menu, ArrowRight, Sparkles } from 'lucide-react';
 import { navLinks } from '../../data/navigationData';
 
 export function Navbar({ onOpenBooking, onOpenSearch, onOpenOffcanvas }) {
@@ -9,7 +9,7 @@ export function Navbar({ onOpenBooking, onOpenSearch, onOpenOffcanvas }) {
   const location = useLocation();
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-slate-100 shadow-xs transition-all duration-300">
+    <header className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs transition-all duration-300">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-18 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
         
         {/* Left: Brand Logo & Mobile/Tablet Hamburger Toggle */}
@@ -71,52 +71,84 @@ export function Navbar({ onOpenBooking, onOpenSearch, onOpenOffcanvas }) {
                   <AnimatePresence>
                     {isOpen && (
                       <motion.div
-                        initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                        initial={{ opacity: 0, y: 6, scale: 0.98 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 6, scale: 0.98 }}
-                        transition={{ duration: 0.16, ease: 'easeOut' }}
-                        className={`absolute top-full bg-white border border-slate-200 shadow-2xl rounded-2xl z-50 ${
+                        exit={{ opacity: 0, y: 4, scale: 0.98 }}
+                        transition={{ duration: 0.15, ease: 'easeOut' }}
+                        className={`absolute top-full bg-white border border-slate-200/90 shadow-2xl rounded-2xl z-50 ${
                           isServices 
-                            ? 'left-1/2 -translate-x-1/2 w-[680px] xl:w-[750px] max-w-[90vw] p-4 sm:p-5 grid grid-cols-2 gap-3 sm:gap-4' 
+                            ? 'left-1/2 -translate-x-1/2 w-[860px] xl:w-[940px] max-w-[95vw] p-3.5 sm:p-4 max-h-[calc(100vh-90px)] overflow-y-auto' 
                             : 'left-0 w-64 sm:w-72 p-2.5 space-y-1'
                         }`}
                       >
                         {isServices ? (
-                          // Multi-Pillar Services Layout
-                          item.dropdownItems.map((group, gIdx) => (
-                            <div key={gIdx} className="p-3 bg-slate-50/70 rounded-xl border border-slate-100/80">
-                              <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-200/60">
-                                <span className="text-[11px] font-black uppercase tracking-wider text-[#0070ba]">
-                                  {group.category}
-                                </span>
-                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-[#0070ba]">
-                                  Pillar {gIdx + 1}
-                                </span>
-                              </div>
-                              <div className="space-y-1">
-                                {group.items.map((sub, sIdx) => (
-                                  <Link
-                                    key={sIdx}
-                                    to={sub.href}
-                                    onClick={() => setActiveDropdown(null)}
-                                    className="flex items-start justify-between p-2 rounded-lg hover:bg-white hover:shadow-xs text-slate-700 hover:text-[#0070ba] transition-all group/item"
-                                  >
-                                    <div>
-                                      <div className="text-xs font-bold text-slate-900 group-hover/item:text-[#0070ba] transition-colors leading-snug">
-                                        {sub.title}
-                                      </div>
-                                      {sub.desc && (
-                                        <div className="text-[10px] text-slate-500 font-normal line-clamp-1 mt-0.5">
-                                          {sub.desc}
+                          // Compact 3-Column Services Mega Layout
+                          <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+                            {item.dropdownItems.map((group, gIdx) => (
+                              <div 
+                                key={gIdx} 
+                                className="p-2.5 sm:p-3 bg-slate-50/80 hover:bg-slate-50 rounded-xl border border-slate-200/70 flex flex-col justify-between transition-colors"
+                              >
+                                <div>
+                                  <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-200/60">
+                                    <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#0070ba]">
+                                      {group.category}
+                                    </span>
+                                    <span className="text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-[#0070ba]">
+                                      Pillar {gIdx + 1}
+                                    </span>
+                                  </div>
+                                  <div className="space-y-0.5">
+                                    {group.items.map((sub, sIdx) => (
+                                      <Link
+                                        key={sIdx}
+                                        to={sub.href}
+                                        onClick={() => setActiveDropdown(null)}
+                                        className="flex items-start justify-between p-1.5 sm:p-2 rounded-lg hover:bg-white hover:shadow-xs text-slate-700 hover:text-[#0070ba] transition-all group/item"
+                                      >
+                                        <div>
+                                          <div className="text-[11px] sm:text-xs font-bold text-slate-900 group-hover/item:text-[#0070ba] transition-colors leading-snug">
+                                            {sub.title}
+                                          </div>
+                                          {sub.desc && (
+                                            <div className="text-[9px] sm:text-[10px] text-slate-500 font-normal line-clamp-1 mt-0.5">
+                                              {sub.desc}
+                                            </div>
+                                          )}
                                         </div>
-                                      )}
-                                    </div>
-                                    <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover/item:opacity-100 -translate-x-1 group-hover/item:translate-x-0 transition-all text-[#0070ba] shrink-0 mt-0.5" />
-                                  </Link>
-                                ))}
+                                        <ChevronRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 -translate-x-1 group-hover/item:translate-x-0 transition-all text-[#0070ba] shrink-0 mt-0.5" />
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </div>
                               </div>
+                            ))}
+
+                            {/* 6th Slot in Grid: Direct Enquiries Card */}
+                            <div className="p-3 bg-gradient-to-br from-[#0070ba] to-[#004e82] rounded-xl text-white flex flex-col justify-between shadow-xs">
+                              <div>
+                                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/20 text-white text-[9px] font-bold uppercase tracking-wider mb-2">
+                                  <Sparkles className="w-2.5 h-2.5" />
+                                  <span>Custom Architecture</span>
+                                </div>
+                                <h4 className="text-xs font-bold text-white mb-1 font-display">Need a tailored solution?</h4>
+                                <p className="text-[10px] text-blue-100 leading-relaxed">
+                                  Consult with our principal architects for end-to-end engineering blueprints.
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  setActiveDropdown(null);
+                                  if (onOpenBooking) onOpenBooking();
+                                }}
+                                className="mt-2 w-full py-1.5 px-3 rounded-lg bg-white text-[#0070ba] hover:bg-blue-50 font-bold text-[11px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                              >
+                                <span>For Enquiries</span>
+                                <ArrowRight className="w-3 h-3" />
+                              </button>
                             </div>
-                          ))
+
+                          </div>
                         ) : (
                           // Standard Dropdown Layout for Resources / Company
                           item.dropdownItems.map((group) =>
@@ -173,8 +205,8 @@ export function Navbar({ onOpenBooking, onOpenSearch, onOpenOffcanvas }) {
             className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#0070ba] to-[#00a8ff] text-white font-bold text-[11px] sm:text-xs uppercase tracking-wider shadow-md hover:shadow-lg hover:shadow-[#0070ba]/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
           >
             <Calendar className="w-3.5 h-3.5 shrink-0" />
-            <span className="hidden xs:inline sm:inline">Book Appointment</span>
-            <span className="xs:hidden sm:hidden">Book</span>
+            <span className="hidden xs:inline sm:inline">For Enquiries</span>
+            <span className="xs:hidden sm:hidden">Enquiries</span>
           </button>
 
           {/* Search Trigger */}

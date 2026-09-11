@@ -1,202 +1,112 @@
 export const blogPosts = [
-  // --- INSIGHTS ---
   {
-    id: 'build-scalable-ai-agents',
-    title: 'Architecting Autonomous AI Agents for Enterprise Workflows',
-    section: 'Insights',
-    category: 'Autonomous AI',
-    date: 'February 2026',
+    id: 'how-we-grew-organic-pipeline-in-2026-seo-playbook',
+    title: 'How We Grew Organic Pipeline in 2026: Why Traditional SEO Failed and What Actually Worked',
+    section: 'Digital Marketing',
+    category: 'Digital Marketing',
+    date: 'March 2026',
     readTime: '6 min read',
-    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
-    tags: ['Agents', 'LangChain', 'RAG', 'Python'],
-    excerpt: 'How modern businesses are deploying multi-agent systems with tool usage, memory persistence, and semantic guardrails to automate complex operations.',
-    author: 'Dr. Elena Rostova',
-    content: `
-      Autonomous AI agents represent the next evolution beyond single-prompt chatbots. By equipping LLMs with short/long-term memory, planning capabilities, and direct access to database APIs, teams can build autonomous workers capable of handling multi-step reasoning.
-      
-      Key Architectural Principles:
-      1. Deterministic State Machines combined with Probabilistic LLM decisions.
-      2. Structured output parsing with strict JSON schema validation.
-      3. Distributed asynchronous job queues for long-running reasoning loops.
-      4. Comprehensive observability with LangSmith / OpenTelemetry tracing.
-    `
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+    tags: ['Organic Growth', 'AI Search', 'Content Strategy', 'B2B Lead Gen', 'GEO'],
+    excerpt: 'If you opened your analytics over the past few months and saw search impressions rise while clicks softened, you are not imagining things. Here is how we adapted our marketing strategy to win high-intent enterprise pipeline in the new search landscape.',
+    author: 'Rajesh Varma',
+    authorRole: 'Head of Growth Marketing',
+    intro: 'If you opened your analytics dashboard over the past few months and saw search impressions rise while direct click-through rates softened, you are not imagining things. Between AI-generated overviews and direct-answer search engines, the era of capturing easy traffic with 2,000-word generic keyword articles is officially over.',
+    sections: [
+      {
+        heading: '1. The Day Our Standard Keywords Stopped Converting',
+        paragraphs: [
+          'For years, the B2B playbook was simple: find high-volume informational keywords, write comprehensive guides, build a few backlinks, and wait for the demo requests to roll in.',
+          'Early this year, we noticed a distinct shift. Our informational articles still ranked in the top 3, but the traffic was no longer clicking through. AI search summaries were answering surface-level questions directly on the results page. The casual readers got their quick answer and left, while high-intent decision-makers were looking for something much deeper.'
+        ],
+        callout: 'Traffic volume is a vanity metric; qualified pipeline velocity is what pays the bills. Winning today means being the source of truth that AI models cite when high-intent buyers ask specific questions.'
+      },
+      {
+        heading: '2. What AI Engines Actually Look For (And It Is Not Keyword Density)',
+        paragraphs: [
+          'When conversational search models synthesize an answer, they evaluate source credibility and data freshness rather than repetitive keyword density.',
+          'We completely overhauled our editorial workflow around three practical rules:'
+        ],
+        list: [
+          'Publish Original Benchmark Data: Real numbers from our client audits and engineering benchmarks get cited 4x more often than generic opinion pieces.',
+          'Direct Answer Architecture: We answer the core question clearly in the very first two sentences before expanding into architectural details.',
+          'Proprietary Frameworks: Giving unique, memorable names to our methodologies makes our concepts recognizable across the web.'
+        ]
+      },
+      {
+        heading: '3. Why Real Human Experience Beats Mass Content Every Time',
+        paragraphs: [
+          'The web is currently flooded with generic AI-written articles that all say the exact same thing in slightly different words. Decision-makers can spot automated fluff within three seconds.',
+          'What builds genuine trust—and what actually converts enterprise prospects—is unfiltered practitioner experience: sharing real mistakes, specific configuration hurdles, and the exact trade-offs made during real client implementations.'
+        ]
+      },
+      {
+        heading: '4. What You Should Change on Your Website Next Week',
+        paragraphs: [
+          'If you want to protect your inbound pipeline, start with these three high-impact adjustments:'
+        ],
+        list: [
+          'Audit your top 10 revenue pages and remove introductory fluff—get straight to the actionable insight.',
+          'Add structured comparison tables, key takeaways, and clear summary cards that search crawlers can parse instantly.',
+          'Interview your customer-facing engineers and sales reps to write about the actual edge-case problems your clients ask during sales calls.'
+        ]
+      }
+    ],
+    conclusion: 'Organic search is far from dead—it has simply grown up. The brands winning in 2026 are the ones providing genuine, authoritative human insight that both search engines and executive buyers can rely on.'
   },
   {
-    id: 'modern-data-stack-snowflake',
-    title: 'Migrating Legacy Pipelines to Snowflake & dbt at Scale',
-    section: 'Insights',
-    category: 'Data Engineering',
-    date: 'January 2026',
-    readTime: '8 min read',
-    image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
-    tags: ['Snowflake', 'dbt', 'DataMesh', 'Kafka'],
-    excerpt: 'A strategic guide to transitioning monolithic on-premise databases into a cost-efficient, real-time cloud data warehouse.',
-    author: 'Sarah Chen-Miller',
-    content: `
-      Data warehousing in 2026 demands decoupling storage from compute, automated schema migrations, and real-time transformation.
-      
-      Migration Strategy Breakdown:
-      1. Zero-downtime historical backfill using change-data-capture (CDC).
-      2. Modular dbt modeling with incremental table materializations.
-      3. Automated role-based access control (RBAC) and row-level security.
-      4. PowerBI direct-query acceleration with materialized aggregate cubes.
-    `
-  },
-  {
-    id: 'zero-downtime-cloud-migration',
-    title: 'Cloud Cost Intelligence: Cutting AWS/GCP Bills by 40% with FinOps',
-    section: 'Insights',
-    category: 'Cloud Platform',
-    date: 'January 2026',
-    readTime: '5 min read',
-    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
-    tags: ['FinOps', 'Kubernetes', 'AWS', 'Terraform'],
-    excerpt: 'Actionable FinOps practices, auto-scaling heuristics, and reserved capacity strategies to optimize your cloud engineering expenditures.',
-    author: 'Marcus Thorne',
-    content: `
-      Cloud waste is one of the fastest-growing operational drags on scaling startups. By implementing FinOps culture and automated infrastructure policies, engineering teams can slash wasted spend without degrading latency.
-      
-      Core FinOps Tactics:
-      1. Right-sizing container CPU/Memory limits based on P99 telemetry.
-      2. Spot instance orchestration for fault-tolerant background workloads.
-      3. Automated lifecycle storage tiering for cold blob data.
-    `
-  },
-  {
-    id: 'quantum-hybrid-optimization',
-    title: 'Hybrid Quantum-Classical Solvers for Enterprise Logistics',
-    section: 'Insights',
-    category: 'Quantum Computing',
-    date: 'December 2025',
+    id: 'honest-guide-to-b2b-revenue-attribution-and-capi',
+    title: 'Where Did Our Ad Budget Go? An Honest Guide to Fixing B2B Attribution',
+    section: 'Digital Marketing',
+    category: 'Digital Marketing',
+    date: 'March 2026',
     readTime: '7 min read',
-    image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=800&q=80',
-    tags: ['Quantum', 'Qiskit', 'Optimization', 'VQE'],
-    excerpt: 'Translating NP-hard supply chain routing bottlenecks into parameterized quantum circuits simulated on cloud QPUs.',
-    author: 'Dr. Elena Rostova',
-    content: `
-      Combinatorial optimization problems quickly overwhelm classical compute clusters as graph nodes scale. Hybrid quantum-classical algorithms (like QAOA and VQE) leverage quantum superposition to explore massive solution spaces in polynomial time.
-      
-      Research Takeaways:
-      1. Ising Hamiltonian problem reformulation techniques.
-      2. Error-mitigated shallow circuits suitable for noisy intermediate-scale quantum (NISQ) devices.
-      3. Microservice wrappers allowing classical enterprise ERPs to invoke quantum routines.
-    `
-  },
-  {
-    id: 'self-healing-qa-automation',
-    title: 'AI-Driven Quality Automation: Self-Healing Test Suites in CI/CD',
-    section: 'Insights',
-    category: 'Product Intelligence',
-    date: 'November 2025',
-    readTime: '5 min read',
-    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80',
-    tags: ['Playwright', 'QA Automation', 'CI/CD', 'Computer Vision'],
-    excerpt: 'Eliminating test suite flakiness and maintaining 99.4% pass rates using dynamic selector heuristics and computer vision regression validation.',
-    author: 'Vikramaditya Sharma',
-    content: `
-      Traditional UI test suites break constantly when minor DOM elements shift. By layering computer vision and semantic element scoring, test runners dynamically recover from locator changes without failing critical deployment builds.
-      
-      Key Architectural Highlights:
-      1. Dual-pass selector resolution with fuzzy semantic fallbacks.
-      2. Automated pixel-differential layout comparison with threshold gating.
-      3. Distributed parallel test runners scaling down build times from 45 min to under 4 min.
-    `
-  },
-  {
-    id: 'zero-data-leakage-enterprise-rag',
-    title: 'Zero-Data-Leakage Enterprise RAG: Sovereign Knowledge Systems',
-    section: 'Insights',
-    category: 'Autonomous AI',
-    date: 'October 2025',
-    readTime: '6 min read',
-    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
-    tags: ['RAG', 'VectorDB', 'Security', 'LLM Guardrails'],
-    excerpt: 'Designing VPC-isolated vector retrieval pipelines with strict document-level permissions and token governance.',
-    author: 'Dr. Elena Rostova',
-    content: `
-      Deploying Generative AI in banking and healthcare requires verifiable data sovereignty. Private RAG systems decouple index querying from public cloud APIs, ensuring zero intellectual property leakage.
-      
-      Security Framework:
-      1. Role-based access control (RBAC) injected at vector search query time.
-      2. Hallucination detection guardrails evaluating citation groundedness.
-      3. Self-hosted quantized embedding models running on private GPU nodes.
-    `
-  },
-
-  // --- NEWSROOM ---
-  {
-    id: 'neuorzin-expands-quantum-rd-lab',
-    title: 'NeuOrzin Launches Dedicated Quantum Computing & AI Research Pod in Hyderabad',
-    section: 'Newsroom',
-    category: 'Company News',
-    date: 'February 2026',
-    readTime: '3 min read',
-    image: 'https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=800&q=80',
-    tags: ['Hyderabad', 'R&D', 'Quantum Lab', 'Expansion'],
-    excerpt: 'NeuOrzin expands its engineering headquarters in Hyderabad, India with a specialized laboratory dedicated to quantum algorithms and multi-agent systems.',
-    author: 'NeuOrzin Press Desk',
-    content: `
-      HYDERABAD, INDIA — NeuOrzin today announced the formal inauguration of its next-generation Quantum & Autonomous AI Research Pod at its Hyderabad engineering campus.
-      
-      The newly expanded laboratory will focus on developing enterprise-grade hybrid quantum-classical optimization solvers and open-weight LLM fine-tuning pipelines.
-      
-      "Hyderabad has cemented its reputation as a global powerhouse for advanced engineering talent. This facility expands our capacity to deliver deep-tech transformations for startups worldwide," said NeuOrzin leadership.
-    `
-  },
-  {
-    id: 'neuorzin-finops-partner-recognition',
-    title: 'NeuOrzin Recognized for Cloud FinOps Excellence Delivering $3.2M in Client Cost Reductions',
-    section: 'Newsroom',
-    category: 'Press Release',
-    date: 'January 2026',
-    readTime: '4 min read',
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
-    tags: ['FinOps', 'Award', 'Cloud Scale', 'Case Study'],
-    excerpt: 'Annual review highlights how NeuOrzin automated cloud cost intelligence frameworks saved enterprise clients over 42% on AWS and GCP expenditures.',
-    author: 'NeuOrzin Media Team',
-    content: `
-      NeuOrzin has released its Annual Cloud Infrastructure Impact Report, documenting over $3.2 million in aggregate annual cloud spend reductions achieved across 28 client deployments in 2025.
-      
-      By deploying automated Kubernetes right-sizing with Karpenter, pruning orphan storage volumes, and implementing FinOps tagging policies, NeuOrzin clients achieved high availability at a fraction of legacy cloud costs.
-    `
-  },
-  {
-    id: 'neuorzin-autonomous-swarms-v2',
-    title: 'NeuOrzin Unveils Enterprise Multi-Agent Cognitive Framework v2.0',
-    section: 'Newsroom',
-    category: 'Product Release',
-    date: 'December 2025',
-    readTime: '4 min read',
-    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
-    tags: ['Agent Swarms', 'Framework v2', 'Open Source', 'FastAPI'],
-    excerpt: 'The upgraded v2.0 cognitive engine introduces self-correcting consensus loops and sub-50ms tool resolution for high-concurrency workflows.',
-    author: 'NeuOrzin Engineering',
-    content: `
-      NeuOrzin has officially released version 2.0 of its proprietary Multi-Agent Autonomous Framework.
-      
-      Key Enhancements in v2.0:
-      - Multi-agent asynchronous consensus protocol with fallback routing.
-      - Integrated LangSmith and Datadog telemetry hooks for live decision tree inspection.
-      - 3.8x faster vector retrieval with hybrid keyword + dense embedding indexes.
-    `
-  },
-  {
-    id: 'neuorzin-global-startup-initiative',
-    title: 'NeuOrzin Announces "Idea to MVP in 8 Weeks" Startup Acceleration Pod',
-    section: 'Newsroom',
-    category: 'Initiatives',
-    date: 'November 2025',
-    readTime: '3 min read',
-    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
-    tags: ['Startups', 'MVP', 'Acceleration', 'Scale'],
-    excerpt: 'Dedicated engineering pods pairing startup founders with Principal Architects to ship production-ready, scalable applications with zero technical debt.',
-    author: 'NeuOrzin Press Desk',
-    content: `
-      Designed specifically for fast-growing startups and seed-stage founders, the new NeuOrzin MVP Pod guarantees a complete, production-grade web or mobile system deployed in 8 weeks.
-      
-      Founders receive full source code ownership, automated CI/CD pipelines, modular database architecture, and a 30-day post-launch warranty.
-    `
+    image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80',
+    tags: ['RevOps', 'Server-Side Tracking', 'Meta / Google CAPI', 'Attribution', 'CAC Optimization'],
+    excerpt: 'Every marketing leader knows the pain of seeing ad dashboards report 50 conversions while the sales team insists they only met 3 qualified prospects. Here is the exact server-side tracking setup that fixed our funnel.',
+    author: 'Aparna Sundaram',
+    authorRole: 'Principal Revenue Operations Lead',
+    intro: 'Every marketing director knows the sinking feeling of looking at an ad manager dashboard showing 50 reported conversions, only to have the VP of Sales walk in and ask why the team only received 3 qualified enterprise leads that week.',
+    sections: [
+      {
+        heading: '1. The 40% Telemetry Blind Spot We Did Not Know We Had',
+        paragraphs: [
+          'For a long time, marketing teams relied on browser-side JavaScript pixels to measure ad effectiveness. But with modern browser tracking restrictions, mobile privacy updates, and ad-blockers, client-side tracking now misses between 30% and 45% of real conversion signals.',
+          'When your ad platforms are operating with half the data, their automated bidding algorithms end up optimizing for low-quality form-fills and spam bots instead of real enterprise buyers.'
+        ],
+        callout: 'If your ad platform only optimizes for form submissions instead of qualified sales opportunities, you are essentially training your budget to find tire-kickers.'
+      },
+      {
+        heading: '2. Moving to Server-Side Tracking Without the Headache',
+        paragraphs: [
+          'The fix is moving from client-side browser tags to server-side event tracking (Conversions API / CAPI).',
+          'Instead of hoping the user browser sends the conversion event back to Meta or Google, our server captures the action directly and passes verified identifiers (hashed email, timestamp, transaction ID) over a secure API connection.'
+        ],
+        list: [
+          'Direct Server-to-Server Connection: Zero interference from ad-blockers or browser cookie clearing.',
+          'Higher Signal Quality: Event match quality scores jump from 4.5/10 to over 8.8/10, giving ad bidding algorithms the clarity they need.',
+          'Full Privacy Compliance: We control exactly what data is sanitized and sent, ensuring complete GDPR and CCPA adherence.'
+        ]
+      },
+      {
+        heading: '3. The Magic of Feeding CRM Deal Stages Back to Ad Engines',
+        paragraphs: [
+          'The biggest breakthrough happened when we connected our CRM (HubSpot / Salesforce) directly back to Google Ads and LinkedIn Campaign Manager.',
+          'Instead of telling Google "someone filled a form," we trigger an offline conversion event only when an opportunity reaches "Demo Completed & Qualified" in the CRM. The ad algorithms immediately shifted spend toward companies matching our exact ideal customer profile.'
+        ]
+      },
+      {
+        heading: '4. The Results After 90 Days',
+        paragraphs: [
+          'Once the closed-loop tracking was live for a quarter, the results spoke for themselves:'
+        ],
+        list: [
+          'Our Customer Acquisition Cost (CAC) dropped by 34% because we stopped wasting budget on unengaged audiences.',
+          'Sales qualification rates on inbound demo requests jumped from 22% to over 54%.',
+          'Marketing and sales finally look at the exact same pipeline numbers during weekly executive reviews.'
+        ]
+      }
+    ],
+    conclusion: 'Fixing attribution is not about chasing vanity metrics—it is about giving your growth budget the intelligence it needs to invest in channels that produce real enterprise revenue.'
   }
 ];
-
-export const blogArticles = blogPosts;

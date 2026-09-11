@@ -1,3 +1,4 @@
+import { EMAIL_CONFIG } from '../../data/emailConfig';
 import React from 'react';
 import { MapPin, Mail, Clock, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
 import { companyContact } from '../../data/navigationData';
@@ -14,7 +15,7 @@ export function TopBar() {
           </div>
           <div className="flex items-center gap-2">
             <Mail className="w-3.5 h-3.5 text-cyan-200" />
-            <a href="mailto:info@neuorzin.com" className="hover:underline">info@neuorzin.com</a>
+            <a href={`mailto:${EMAIL_CONFIG.general}`} className="hover:underline">{EMAIL_CONFIG.general}</a>
           </div>
         </div>
 

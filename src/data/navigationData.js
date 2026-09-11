@@ -1,3 +1,4 @@
+import { EMAIL_CONFIG } from './emailConfig';
 export const navLinks = [
   { name: 'Home', href: '/' },
   {
@@ -5,6 +6,23 @@ export const navLinks = [
     href: '/services',
     hasDropdown: true,
     dropdownItems: [
+      {
+        category: 'Growth & Marketing',
+        items: [
+          {
+            title: 'Sales & Marketing Growth Engines',
+            desc: 'Multi-channel acquisition, programmatic SEO, inbound pipelines & CRO',
+            href: '/services/sales-marketing',
+            badge: 'Growth'
+          },
+          {
+            title: 'CRM & Revenue Operations',
+            desc: 'HubSpot & Salesforce automation, lead enrichment & pipeline telemetry',
+            href: '/services/crm-revenue-operations',
+            badge: 'RevOps'
+          }
+        ]
+      },
       {
         category: 'Product Intelligence',
         items: [
@@ -83,7 +101,7 @@ export const navLinks = [
   },
   {
     name: 'Resources',
-    href: '/journal',
+    href: '/insights',
     hasDropdown: true,
     dropdownItems: [
       {
@@ -107,7 +125,7 @@ export const navLinks = [
           { title: 'About Us', desc: 'Our mission, engineering culture & leadership team', href: '/about' },
           { title: 'Our Approach', desc: 'A strategic, engineering-driven 6-step methodology', href: '/approach' },
           { title: 'Meet Our Team', desc: 'World-class architects, researchers & engineers', href: '/careers', badge: 'Hiring' },
-          { title: 'Industry Verticals', desc: 'Fintech, Healthcare, Manufacturing & Education', href: '/industries' },
+          { title: 'Industry Verticals', desc: 'Retail, Manufacturing, Real Estate, EduTech & CPG', href: '/industries' },
           { title: 'FAQ', desc: 'Engagement models, delivery timelines & IP security', href: '/faq' },
         ]
       }
@@ -121,7 +139,7 @@ export const companyContact = {
   phone: "77940 45500",
   rawPhone: "+917794045500",
   formattedPhone: "+91 77940 45500",
-  email: "info@neuorzin.com",
+  email: EMAIL_CONFIG.general,
   address: "Visit Office: Hyderabad, India",
   city: "Hyderabad, India",
   officeHours: "Mon – Fri: 9:00 AM – 7:00 PM IST",

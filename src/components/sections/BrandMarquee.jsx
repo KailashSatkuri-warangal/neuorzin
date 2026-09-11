@@ -13,7 +13,7 @@ const brands = [
 
 export function BrandMarquee() {
   return (
-    <section className="py-16 bg-surface/30 border-y border-white/5 overflow-hidden">
+    <section className="py-8 sm:py-10 bg-slate-50 border-y border-white/5 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 text-center mb-8">
         <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">
           We worked with global largest brands & scaling startups

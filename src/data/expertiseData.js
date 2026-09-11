@@ -1,5 +1,19 @@
 export const expertiseData = [
   {
+    id: 'sales-marketing-growth',
+    title: 'Sales & Marketing Growth Intelligence',
+    category: 'Revenue Operations',
+    summary: 'We build high-converting growth funnels, programmatic SEO infrastructure, AI lead generation engines, and revenue attribution analytics.',
+    details: [
+      'Multi-channel programmatic SEO architectures generating compounding organic inbound acquisition.',
+      'AI-powered lead enrichment, predictive scoring models, and automated personalized outreach.',
+      'HubSpot, Salesforce, and Marketo full-lifecycle CRM pipeline synchronization.',
+      'Real-time multi-touch revenue attribution modeling and conversion rate optimization (CRO).'
+    ],
+    techStack: ['HubSpot Enterprise', 'Salesforce CRM', 'Google Analytics 4', 'Segment CDP', 'Semrush / Ahrefs', 'Zapier / Make'],
+    metrics: '+240% Pipeline Velocity'
+  },
+  {
     id: 'ai-automation-engineering',
     title: 'AI & Automation Engineering',
     category: 'Cognitive Computing',

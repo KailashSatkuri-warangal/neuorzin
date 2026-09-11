@@ -1,3 +1,4 @@
+import { EMAIL_CONFIG } from './emailConfig';
 export const newsroomData = [
   {
     id: 'news-1',

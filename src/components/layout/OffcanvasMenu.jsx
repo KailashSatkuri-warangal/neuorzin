@@ -141,7 +141,7 @@ export function OffcanvasMenu({ isOpen, onClose, onOpenBooking }) {
             }}
             className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#0070ba] to-[#00a8ff] text-white font-bold text-sm shadow-lg hover:shadow-[#0070ba]/25 hover:opacity-95 transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider"
           >
-            <Calendar className="w-4 h-4" /> Book Appointment
+            <Calendar className="w-4 h-4" /> For Enquiries
           </button>
 
           <div className="flex items-center justify-center gap-4 pt-1">

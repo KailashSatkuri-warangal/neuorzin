@@ -88,7 +88,7 @@ export function TestimonialsSection() {
   const progressPercentage = ((currentIndex + 1) / totalSlides) * 100;
 
   return (
-    <section id="testimonials" className="py-20 sm:py-28 bg-white overflow-hidden border-b border-slate-100 select-none">
+    <section id="testimonials" className="py-20 sm:py-16 lg:py-20 bg-white overflow-hidden border-b border-slate-100 select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         
         {/* Section Header */}

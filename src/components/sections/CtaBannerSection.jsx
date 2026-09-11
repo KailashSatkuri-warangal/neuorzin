@@ -30,7 +30,7 @@ export function CtaBannerSection({ onOpenBooking }) {
               onClick={onOpenBooking}
               className="w-full sm:w-auto shadow-xl"
             >
-              Book Appointment
+              For Enquiries
             </Button>
             <Button
               variant="secondary"

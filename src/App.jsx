@@ -1,3 +1,4 @@
+import { AdminPage } from './pages/AdminPage';
 import React, { useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -154,6 +155,7 @@ export function App() {
               <Route path="/terms" element={<PageWrapper><TermsPage /></PageWrapper>} />
               
               {/* Fallback & Demos */}
+              <Route path="/admin" element={<PageWrapper><AdminPage onShowToast={showToast} /></PageWrapper>} />
               <Route path="/loading-demo" element={<PageWrapper><LoadingDemoPage /></PageWrapper>} />
               <Route path="*" element={<PageWrapper><NotFoundPage /></PageWrapper>} />
             </Routes>

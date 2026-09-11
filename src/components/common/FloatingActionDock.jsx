@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUp, Calendar, Search } from 'lucide-react';
+import { ArrowUp, Search } from 'lucide-react';
 
 export function FloatingActionDock({ onOpenBooking, onOpenSearch }) {
   const { pathname, hash } = useLocation();
@@ -49,26 +49,12 @@ export function FloatingActionDock({ onOpenBooking, onOpenSearch }) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 30, scale: 0.9 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="fixed bottom-6 right-6 z-40 flex items-center gap-2 p-1.5 rounded-full bg-white/95 backdrop-blur-xl border border-slate-200 shadow-2xl shadow-black/10"
+          className="fixed bottom-6 right-6 z-40 flex items-center gap-1.5 p-1.5 rounded-full bg-white/95 backdrop-blur-xl border border-slate-200 shadow-2xl shadow-black/10"
         >
-          {/* Quick Book Call Button */}
-          <button
-            onClick={onOpenBooking}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-gradient-to-r from-[#0070ba] to-[#00c6ff] text-white text-xs font-semibold shadow-md hover:shadow-[#0070ba]/30 transition-all cursor-pointer group"
-            title="Book Free Consultation"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
-            </span>
-            <Calendar className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Book Studio</span>
-          </button>
-
           {/* Quick Search */}
           <button
             onClick={onOpenSearch}
-            className="p-2 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-2.5 rounded-full text-slate-600 hover:text-[#0070ba] hover:bg-slate-100 transition-colors cursor-pointer"
             title="Quick Search (Ctrl+K)"
             aria-label="Search"
           >
@@ -78,7 +64,7 @@ export function FloatingActionDock({ onOpenBooking, onOpenSearch }) {
           {/* Circular Scroll To Top Indicator */}
           <button
             onClick={scrollToTop}
-            className="relative p-2 rounded-full text-slate-700 hover:bg-slate-100 transition-colors flex items-center justify-center cursor-pointer group"
+            className="relative p-2.5 rounded-full text-slate-700 hover:text-[#0070ba] hover:bg-slate-100 transition-colors flex items-center justify-center cursor-pointer group"
             title={`Scroll to top (${scrollPercentage}%)`}
             aria-label="Scroll to top"
           >
@@ -111,4 +97,5 @@ export function FloatingActionDock({ onOpenBooking, onOpenSearch }) {
     </AnimatePresence>
   );
 }
+
 export default FloatingActionDock;

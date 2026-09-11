@@ -1,3 +1,4 @@
+import { EMAIL_CONFIG } from '../../data/emailConfig';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, UploadCloud, CheckCircle2, Briefcase } from 'lucide-react';

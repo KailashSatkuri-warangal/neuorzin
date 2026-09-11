@@ -39,30 +39,30 @@ export function CapabilitiesSection({ onOpenBooking }) {
   ];
 
   return (
-    <section id="capabilities" className="py-16 sm:py-24 bg-white overflow-hidden border-b border-slate-100">
+    <section id="capabilities" className="py-12 sm:py-20 bg-white overflow-hidden border-b border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <CinematicReveal intensity="medium" className="text-center max-w-3xl mx-auto mb-14 sm:mb-16">
-          <div className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold uppercase tracking-wider mb-3">
+        <CinematicReveal intensity="medium" className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2 sm:mb-3">
             Processing
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 font-display tracking-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 font-display tracking-tight">
             Our Core Capabilities
           </h2>
-          <p className="mt-3 text-slate-500 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto">
+          <p className="mt-2 sm:mt-3 text-slate-500 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto">
             Advanced technology services built for modern digital enterprises.
           </p>
         </CinematicReveal>
 
-        {/* 4 Cards Grid - Original Size Proportions */}
-        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        {/* 4 Cards Grid */}
+        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {capabilities.map((item, idx) => (
             <StaggerItem key={item.id}>
-              <div className="group h-full flex flex-col justify-between text-left p-6 sm:p-7 rounded-2xl bg-white hover:bg-[#f8fafc] border border-slate-100 hover:border-slate-200 shadow-xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300">
+              <div className="group h-full flex flex-col justify-between text-left p-5 sm:p-7 rounded-2xl bg-[#fafcff] sm:bg-white hover:bg-[#f8fafc] border border-slate-200/80 sm:border-slate-100 hover:border-slate-300 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div>
-                  {/* Illustration */}
-                  <div className="h-36 sm:h-40 w-full flex items-center justify-center mb-6 overflow-hidden">
+                  {/* Compact Illustration on Mobile */}
+                  <div className="h-28 sm:h-36 w-full flex items-center justify-center mb-4 sm:mb-6 overflow-hidden">
                     <img
                       src={item.illustration}
                       alt={item.title}
@@ -71,7 +71,7 @@ export function CapabilitiesSection({ onOpenBooking }) {
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-base sm:text-lg font-bold text-slate-900 font-display leading-snug mb-3 group-hover:text-[#0070ba] transition-colors">
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 font-display leading-snug mb-2 sm:mb-3 group-hover:text-[#0070ba] transition-colors">
                     {item.title}
                   </h3>
 
@@ -81,7 +81,7 @@ export function CapabilitiesSection({ onOpenBooking }) {
                   </p>
                 </div>
 
-                <div className="pt-4 mt-6 border-t border-slate-100/80">
+                <div className="pt-3 sm:pt-4 mt-4 sm:mt-6 border-t border-slate-100">
                   <Link
                     to={item.href}
                     className="text-xs font-bold text-[#0070ba] hover:underline inline-flex items-center gap-1"

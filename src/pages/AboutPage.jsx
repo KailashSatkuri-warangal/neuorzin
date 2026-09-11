@@ -28,7 +28,6 @@ export function AboutPage({ onOpenBooking }) {
       <FeaturesSection onOpenBooking={onOpenBooking} />
       <WorkProcessSection />
       <FunFactorSection />
-      <TeamSection />
       <QuickContactBanner onOpenBooking={onOpenBooking} />
     </div>
   );

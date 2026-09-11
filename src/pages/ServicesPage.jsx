@@ -6,7 +6,7 @@ import { QuickContactBanner } from '../components/sections/QuickContactBanner';
 
 export function ServicesPage({ onOpenBooking }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const categories = ['All', 'Core Engineering', 'Data & Cloud', 'AI & Automation', 'Cloud & Infrastructure', 'Next-Gen Research'];
+  const categories = ['All', 'Growth & Marketing', 'Core Engineering', 'Data & Cloud', 'AI & Automation', 'Cloud & Infrastructure', 'Next-Gen Research'];
 
   const filteredServices = selectedCategory === 'All'
     ? detailedServices

@@ -1,5 +1,132 @@
 export const detailedServices = [
   {
+    id: 'sales-marketing',
+    slug: 'sales-marketing',
+    title: 'Sales & Marketing Growth Engines',
+    subtitle: 'Multi-Channel Acquisition & Inbound Funnels',
+    tagline: 'Programmatic SEO, Demand Generation & High-Yield Performance Campaigns',
+    description: 'NeuOrzin engineers scalable inbound customer acquisition engines, programmatic SEO infrastructures, and multi-channel performance marketing funnels. We turn organic and paid traffic into high-converting enterprise pipeline with continuous CAC/LTV optimization.',
+    heroMetric: '+310% Inbound Lead Velocity',
+    accentColor: '#0070ba',
+    icon: 'TrendingUp',
+    category: 'Growth & Marketing',
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+    features: [
+      {
+        title: 'Programmatic SEO & Content Mesh',
+        desc: 'High-authority topic cluster architecture, dynamic landing pages, and technical SEO that compounds organic inbound pipeline.'
+      },
+      {
+        title: 'High-Conversion Outbound & Funnel Engineering',
+        desc: 'Omnichannel lead nurturing workflows, automated sequencing, trigger-based intent tracking, and personalized landing page funnels.'
+      },
+      {
+        title: 'Multi-Channel Performance Campaigns',
+        desc: 'Precision target marketing across Google Search, Meta Ads, and LinkedIn Campaign Manager optimized for lowest CAC.'
+      },
+      {
+        title: 'Conversion Rate Optimization (CRO) & A/B Testing',
+        desc: 'Data-driven UI/UX experiments, checkout and form friction reduction, and heatmapping to maximize conversion yields.'
+      },
+      {
+        title: 'Real-Time Multi-Touch Revenue Attribution',
+        desc: 'Closed-loop conversion telemetry connecting ad spend, organic touchpoints, and CRM deal velocity into unified executive dashboards.'
+      },
+      {
+        title: 'Social Media & Brand Authority Campaigns',
+        desc: 'Multi-platform brand campaigns across LinkedIn, Twitter/X, and industry media to establish thought leadership and high-intent inbound demand.'
+      }
+    ],
+    phases: [
+      { step: '01', name: 'Growth Audit & Audience Segmentation', duration: 'Week 1', desc: 'Full-funnel analytics teardown, ICP definition, CAC/LTV benchmark modeling, and keyword opportunity mapping.' },
+      { step: '02', name: 'Funnel Architecture & SEO Mesh', duration: 'Week 2–3', desc: 'Building landing page funnels, programmatic SEO infrastructure, lead capture mechanisms, and attribution pixels.' },
+      { step: '03', name: 'Acquisition Launch & Paid Orchestration', duration: 'Week 4–6', desc: 'Deploying multi-channel campaigns, automated nurture sequences, paid acquisition funnels, and conversion tests.' },
+      { step: '04', name: 'Compounding Organic Scale & Attribution', duration: 'Week 7+', desc: 'Continuous multi-touch attribution telemetry, CAC optimization, weekly A/B testing, and compounding lead acceleration.' }
+    ],
+    techStack: [
+      'Google Analytics 4',
+      'Semrush / Ahrefs',
+      'Meta & LinkedIn Ads',
+      'Segment CDP',
+      'Unbounce / Webflow',
+      'Clearbit / Apollo',
+      'Looker Studio',
+      'Zapier / Make'
+    ],
+    deliverables: [
+      'Comprehensive digital inbound marketing strategy and ICP positioning blueprint.',
+      'Scalable programmatic SEO architecture targeting high-intent commercial keywords.',
+      'High-converting interactive landing page design and continuous A/B test iterations.',
+      'Automated multi-channel outbound lead enrichment and nurturing sequences.',
+      'Real-time multi-touch attribution executive dashboard with ROI and CAC/LTV tracking.'
+    ],
+    impact: 'Average +310% inbound lead velocity and 3.5x boost in organic inbound conversions.'
+  },
+  {
+    id: 'crm-revenue-operations',
+    slug: 'crm-revenue-operations',
+    title: 'CRM & Revenue Operations',
+    subtitle: 'HubSpot & Salesforce RevOps Telemetry',
+    tagline: 'Full-Lifecycle CRM Automation, Lead Enrichment & Closed-Loop Attribution',
+    description: 'We design unified Revenue Operations architectures that bridge Marketing, Sales, and Customer Success. From automated lead routing and scoring to bidirectional ERP/CRM synchronization, we eliminate funnel leakage and maximize sales rep productivity.',
+    heroMetric: '68% Reduction in Sales Cycle Time',
+    accentColor: '#0070ba',
+    icon: 'TrendingUp',
+    category: 'Growth & Marketing',
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80',
+    features: [
+      {
+        title: 'Enterprise HubSpot & Salesforce Architecture',
+        desc: 'Custom lifecycle stage schemas, validation rules, deal stages, and custom object modeling tailored for complex sales cycles.'
+      },
+      {
+        title: 'Automated Lead Scoring & Predictive Routing',
+        desc: 'Algorithmic lead prioritization based on firmographic fit, behavioral signals, and intent data with instant rep assignment.'
+      },
+      {
+        title: 'Bidirectional ERP & Billing Synchronization',
+        desc: 'Seamless data integration between CRM, Stripe, QuickBooks, and SAP for automated invoice generation and subscription tracking.'
+      },
+      {
+        title: 'Pipeline Velocity & Deal Telemetry',
+        desc: 'Real-time telemetry dashboards tracking stage-by-stage conversion velocity, win rates, and rep performance KPIs.'
+      },
+      {
+        title: 'Omnichannel Sales Enablement Sequences',
+        desc: 'Automated multi-touch outreach sequences with dynamic personalization tokens, meeting booking integrations, and CRM logging.'
+      },
+      {
+        title: 'Data Hygiene & Reverse ETL Pipelines',
+        desc: 'Automated deduplication, data enrichment with Clearbit/Apollo, and Reverse ETL syncing Snowflake data directly into CRM fields.'
+      }
+    ],
+    phases: [
+      { step: '01', name: 'RevOps Diagnostic & Data Schema Design', duration: 'Week 1', desc: 'Audit of current CRM pipeline bottlenecks, duplicate records, routing inefficiencies, and lifecycle stage definitions.' },
+      { step: '02', name: 'CRM Architecture & Field Mapping', duration: 'Week 2–3', desc: 'Configuring custom properties, lead scoring algorithms, routing rules, and permission sets in HubSpot or Salesforce.' },
+      { step: '03', name: 'Pipeline Automation & Integration Hooks', duration: 'Week 4–6', desc: 'Deploying bidirectional sync with billing/ERP, automated sales sequences, Slack notification hooks, and enrichment pipelines.' },
+      { step: '04', name: 'Executive Telemetry & Global Rollout', duration: 'Week 7+', desc: 'Building executive KPI dashboards, team training, SLA monitoring, and ongoing pipeline optimization.' }
+    ],
+    techStack: [
+      'Salesforce Enterprise',
+      'HubSpot RevOps',
+      'Segment CDP',
+      'Clearbit / Apollo',
+      'Stripe Billing',
+      'Census / Hightouch',
+      'PowerBI RevOps',
+      'Zapier / Make'
+    ],
+    deliverables: [
+      'Cleaned, deduplicated, and fully structured enterprise CRM schema (HubSpot or Salesforce).',
+      'Automated lead scoring, qualification rules, and round-robin routing workflows.',
+      'Bidirectional data integration with billing platforms and data warehouses.',
+      'Real-time executive pipeline health and sales velocity dashboards.',
+      'Sales enablement playbook and standard operating procedures for sales reps.'
+    ],
+    impact: 'Average 68% reduction in sales cycle time and 45% increase in pipeline conversion efficiency.'
+  },
+  
+  {
     id: 'intelligent-autonomous-systems',
     slug: 'intelligent-autonomous-systems',
     title: 'Intelligent Autonomous Systems',

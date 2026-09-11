@@ -1,5 +1,4 @@
 import React from 'react';
-import { CountUp } from '../common/CountUp';
 import { SlideRight, SlideLeft, FadeIn } from '../animations';
 
 export function AboutSection({ onOpenBooking }) {
@@ -8,19 +7,11 @@ export function AboutSection({ onOpenBooking }) {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          {/* Left Visual Column */}
+          {/* Left Visual Column - Clean image without the 20+ overlay */}
           <div className="lg:col-span-6">
             <SlideRight distance={30} className="thumb relative max-w-lg mx-auto lg:max-w-none">
               <img src="/assets/img/about/1.jpg" alt="About NeuOrzin" className="rounded-3xl shadow-xl w-full object-cover" />
               <img src="/assets/img/about/2.jpg" alt="Team Work" className="rounded-2xl shadow-2xl absolute -bottom-8 -right-4 sm:-bottom-10 sm:-right-8 w-1/2 border-4 border-white hidden sm:block object-cover" />
-              <div className="absolute top-6 left-6 bg-[#0070ba] text-white p-4 sm:p-6 rounded-2xl shadow-xl">
-                <h4 className="text-xl sm:text-2xl font-black font-display leading-tight m-0 text-white">
-                  <strong className="text-3xl sm:text-4xl block">
-                    <CountUp end={20} suffix="+" duration={2} />
-                  </strong> 
-                  Years of Experience
-                </h4>
-              </div>
             </SlideRight>
           </div>
 
