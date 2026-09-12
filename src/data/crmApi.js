@@ -4,7 +4,7 @@
  * Supports JWT auth, live data streaming, PDF downloads, and graceful fallback.
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 function getAuthToken() {
   return localStorage.getItem('neuorzin_jwt_token') || '';
