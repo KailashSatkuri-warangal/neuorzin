@@ -3,7 +3,7 @@ import db from '../db/database.js';
 import { onNewLeadCreated } from '../services/automationService.js';
 import { logAudit } from '../services/auditService.js';
 
-export const getLeads = (req, res) => {
+export const getLeads = async (req, res) => {
   try {
     const { status, source, assigned_to, search } = req.query;
     let query = `
@@ -33,31 +33,31 @@ export const getLeads = (req, res) => {
     }
 
     query += ' ORDER BY l.created_at DESC';
-    const leads = db.prepare(query).all(...params);
+    const leads = await db.all(query, params);
     res.json(leads);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-export const getLeadById = (req, res) => {
+export const getLeadById = async (req, res) => {
   try {
-    const lead = db.prepare(`
+    const lead = await db.get(`
       SELECT l.*, u.name as assigned_to_name, u.email as assigned_to_email
       FROM leads l
       LEFT JOIN users u ON l.assigned_to = u.id
       WHERE l.id = ?
-    `).get(req.params.id);
+    `, [req.params.id]);
 
     if (!lead) return res.status(404).json({ error: 'Lead not found' });
 
-    const activities = db.prepare(`
+    const activities = await db.all(`
       SELECT a.*, u.name as user_name
       FROM activities a
       LEFT JOIN users u ON a.user_id = u.id
       WHERE a.lead_id = ?
       ORDER BY a.created_at DESC
-    `).all(req.params.id);
+    `, [req.params.id]);
 
     res.json({ lead, activities });
   } catch (err) {
@@ -65,194 +65,114 @@ export const getLeadById = (req, res) => {
   }
 };
 
-export const createLead = (req, res) => {
+export const createLead = async (req, res) => {
   try {
     const {
-      name, email, phone, whatsapp, company, location, service,
-      requirement_need, budget, timeline, source, utm_source,
-      utm_medium, utm_campaign, priority, assigned_to, score
+      name, email, phone, company, whatsapp, location, service,
+      requirement_need, budget, timeline, source, utm_source, utm_medium, utm_campaign
     } = req.body;
 
     if (!name || !email) {
-      return res.status(400).json({ error: 'Name and email are required' });
+      return res.status(400).json({ error: 'Name and email are required fields' });
     }
 
     const leadId = `LEAD-${uuidv4().substring(0, 8)}`;
+    const score = budget && budget.includes('10L') ? 85 : 60;
 
-    let leadScore = score || 40;
-    if (phone || whatsapp) leadScore += 20;
-    if (company) leadScore += 15;
-    if (budget) leadScore += 15;
-    if (requirement_need && requirement_need.length > 20) leadScore += 10;
-
-    const stmt = db.prepare(`
+    await db.run(`
       INSERT INTO leads (
         id, source, name, company, phone, whatsapp, email, location,
-        service, requirement_need, budget, timeline, assigned_to,
-        priority, score, status, utm_source, utm_medium, utm_campaign
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'New', ?, ?, ?)
-    `);
-
-    stmt.run(
+        service, requirement_need, budget, timeline, priority, score, status,
+        utm_source, utm_medium, utm_campaign
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Medium', ?, 'New', ?, ?, ?)
+    `, [
       leadId,
-      source || 'Website Enquiries',
+      source || 'Website',
       name,
-      company || null,
+      company || 'Direct Client',
       phone || null,
       whatsapp || phone || null,
       email,
-      location || 'Hyderabad, India',
-      service || 'Enterprise Solutions',
+      location || 'India',
+      service || 'General Technology Consultation',
       requirement_need || null,
       budget || null,
       timeline || null,
-      assigned_to || null,
-      priority || 'Medium',
-      leadScore,
-      utm_source || 'direct',
-      utm_medium || 'organic',
-      utm_campaign || 'inbound'
-    );
+      score,
+      utm_source || null,
+      utm_medium || null,
+      utm_campaign || null
+    ]);
 
-    const lead = db.prepare('SELECT * FROM leads WHERE id = ?').get(leadId);
+    const created = await db.get('SELECT * FROM leads WHERE id = ?', [leadId]);
 
-    onNewLeadCreated(lead);
-
-    if (req.user) {
-      logAudit({
-        userId: req.user.id,
-        userName: req.user.name,
-        action: 'LEAD_CREATED',
-        entityType: 'Lead',
-        entityId: leadId,
-        changes: { name, email, company, service }
-      });
-    }
+    // Non-blocking automation triggers
+    try { onNewLeadCreated(created); } catch {}
 
     res.status(201).json({
-      message: 'Lead created successfully',
-      leadId,
-      lead
+      message: 'Inbound lead captured and routed successfully',
+      lead: created
     });
   } catch (err) {
-    console.error('Error creating lead:', err);
     res.status(500).json({ error: err.message });
   }
 };
 
-export const updateLead = (req, res) => {
+export const updateLead = async (req, res) => {
   try {
-    const {
-      name, email, phone, whatsapp, company, location, service,
-      requirement_need, budget, timeline, priority, score, status, assigned_to, notes
-    } = req.body;
+    const { id } = req.params;
+    const { status, assigned_to, score, priority, notes } = req.body;
 
-    const leadId = req.params.id;
-    const existing = db.prepare('SELECT * FROM leads WHERE id = ?').get(leadId);
-    if (!existing) return res.status(404).json({ error: 'Lead not found' });
-
-    db.prepare(`
+    await db.run(`
       UPDATE leads
-      SET name = COALESCE(?, name),
-          email = COALESCE(?, email),
-          phone = COALESCE(?, phone),
-          whatsapp = COALESCE(?, whatsapp),
-          company = COALESCE(?, company),
-          location = COALESCE(?, location),
-          service = COALESCE(?, service),
-          requirement_need = COALESCE(?, requirement_need),
-          budget = COALESCE(?, budget),
-          timeline = COALESCE(?, timeline),
-          priority = COALESCE(?, priority),
-          score = COALESCE(?, score),
-          status = COALESCE(?, status),
+      SET status = COALESCE(?, status),
           assigned_to = COALESCE(?, assigned_to),
-          notes = COALESCE(?, notes),
+          score = COALESCE(?, score),
+          priority = COALESCE(?, priority),
+          requirement_need = COALESCE(?, requirement_need),
           updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
-    `).run(
-      name, email, phone, whatsapp, company, location, service,
-      requirement_need, budget, timeline, priority, score, status, assigned_to, notes, leadId
-    );
+    `, [status, assigned_to, score, priority, notes, id]);
 
-    if (req.user) {
-      logAudit({
-        userId: req.user.id,
-        userName: req.user.name,
-        action: 'LEAD_UPDATED',
-        entityType: 'Lead',
-        entityId: leadId,
-        changes: req.body
-      });
-    }
-
-    const updatedLead = db.prepare('SELECT * FROM leads WHERE id = ?').get(leadId);
-    res.json({ message: 'Lead updated', lead: updatedLead });
+    const updated = await db.get('SELECT * FROM leads WHERE id = ?', [id]);
+    res.json({ message: 'Lead updated successfully', lead: updated });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-export const convertLead = (req, res) => {
+export const convertLead = async (req, res) => {
   try {
-    const leadId = req.params.id;
-    const lead = db.prepare('SELECT * FROM leads WHERE id = ?').get(leadId);
+    const { id } = req.params;
+    const { deal_amount } = req.body;
+
+    const lead = await db.get('SELECT * FROM leads WHERE id = ?', [id]);
     if (!lead) return res.status(404).json({ error: 'Lead not found' });
 
-    let customer = db.prepare('SELECT * FROM customers WHERE email = ?').get(lead.email);
-    let customerId;
-    if (customer) {
-      customerId = customer.id;
-    } else {
-      customerId = `CUST-${uuidv4().substring(0, 8)}`;
-      db.prepare(`
-        INSERT INTO customers (id, lead_id, name, company, email, phone, whatsapp, location, billing_address)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(
-        customerId,
-        lead.id,
-        lead.name,
-        lead.company || lead.name,
-        lead.email,
-        lead.phone || null,
-        lead.whatsapp || lead.phone || null,
-        lead.location || 'Hyderabad, India',
-        lead.location || 'Hyderabad, India'
-      );
-    }
+    // Create Customer
+    const custId = `CUST-${uuidv4().substring(0, 8)}`;
+    await db.run(`
+      INSERT INTO customers (id, lead_id, name, company, email, phone)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `, [custId, lead.id, lead.name, lead.company || 'Direct Client', lead.email, lead.phone]);
 
+    // Create Deal
     const dealId = `DEAL-${uuidv4().substring(0, 8)}`;
-    const dealTitle = `${lead.company || lead.name} - ${lead.service || 'Enterprise Solution'}`;
-
-    db.prepare(`
+    await db.run(`
       INSERT INTO deals (
-        id, pipeline_id, title, lead_id, customer_id, assigned_to,
-        stage, value, currency, probability, expected_close_date, status
-      ) VALUES (?, 'PIPE-SW', ?, ?, ?, ?, 'Lead Qualified', ?, 'INR', 20, DATE('now', '+30 days'), 'Open')
-    `).run(
-      dealId,
-      dealTitle,
-      lead.id,
-      customerId,
-      lead.assigned_to || (req.user ? req.user.id : 'USR-001'),
-      req.body.deal_amount || 350000.00
-    );
+        id, pipeline_id, title, lead_id, customer_id, stage, value, status
+      ) VALUES (?, 'PIPE-SW', ?, ?, ?, 'Negotiation', ?, 'Open')
+    `, [dealId, `${lead.name} - ${lead.service}`, lead.id, custId, parseFloat(deal_amount) || 150000]);
 
-    db.prepare("UPDATE leads SET status = 'Qualified', updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(leadId);
-
-    const actId = `ACT-${uuidv4().substring(0, 8)}`;
-    db.prepare(`
-      INSERT INTO activities (id, lead_id, user_id, type, subject, notes, status)
-      VALUES (?, ?, ?, 'Note', 'Lead Converted', 'Converted lead into Customer and created Deal: ' || ?, 'Completed')
-    `).run(actId, leadId, req.user ? req.user.id : 'USR-001', dealTitle);
+    // Mark Lead as Won
+    await db.run("UPDATE leads SET status = 'Won', updated_at = CURRENT_TIMESTAMP WHERE id = ?", [id]);
 
     res.json({
-      message: 'Lead converted successfully',
-      customerId,
+      message: 'Lead converted successfully into Customer and Deal',
+      customerId: custId,
       dealId
     });
   } catch (err) {
-    console.error('Error converting lead:', err);
     res.status(500).json({ error: err.message });
   }
 };

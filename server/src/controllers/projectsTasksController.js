@@ -1,11 +1,44 @@
 import { v4 as uuidv4 } from 'uuid';
 import db from '../db/database.js';
-import { logAudit } from '../services/auditService.js';
 
-// ---- PROJECTS ----
-export const getProjects = (req, res) => {
+async function ensureCustomer(customerId, defaultName = 'Enterprise Client') {
+  if (!customerId) customerId = 'CUST-001';
+  let cust = await db.get('SELECT id FROM customers WHERE id = ?', [customerId]);
+  if (!cust) {
+    let lead = await db.get('SELECT * FROM leads WHERE id = ?', [customerId]);
+    if (lead) {
+      await db.run(`
+        INSERT INTO customers (id, lead_id, name, company, email, phone)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `, [customerId, lead.id, lead.name, lead.company || 'Enterprise Client', lead.email, lead.phone]);
+    } else {
+      let firstCust = await db.get('SELECT id FROM customers LIMIT 1');
+      if (firstCust) return firstCust.id;
+      await db.run(`
+        INSERT INTO customers (id, name, company, email)
+        VALUES (?, ?, ?, ?)
+      `, ['CUST-001', defaultName, defaultName, 'client@neuorzin.com']);
+      return 'CUST-001';
+    }
+  }
+  return customerId;
+}
+
+async function resolveUserId(userId) {
+  if (!userId) return 'USR-001';
+  const u = await db.get('SELECT id FROM users WHERE id = ? OR name LIKE ?', [userId, `%${userId}%`]);
+  return u ? u.id : 'USR-001';
+}
+
+async function resolveProjectId(projId) {
+  if (!projId) return null;
+  const p = await db.get('SELECT id FROM projects WHERE id = ?', [projId]);
+  return p ? p.id : null;
+}
+
+export const getProjects = async (req, res) => {
   try {
-    const projects = db.prepare(`
+    const projects = await db.all(`
       SELECT p.*, c.name as customer_name, c.company as customer_company,
              c.email as customer_email, c.phone as customer_phone,
              d.title as deal_title, u.name as project_manager_name
@@ -14,102 +47,62 @@ export const getProjects = (req, res) => {
       LEFT JOIN deals d ON p.deal_id = d.id
       LEFT JOIN users u ON p.project_manager_id = u.id
       ORDER BY p.created_at DESC
-    `).all();
-
+    `);
     res.json(projects);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-export const getProjectById = (req, res) => {
+export const getProjectById = async (req, res) => {
   try {
     const { id } = req.params;
-    const project = db.prepare(`
+    const project = await db.get(`
       SELECT p.*, c.name as customer_name, c.company as customer_company,
              u.name as project_manager_name
       FROM projects p
       LEFT JOIN customers c ON p.customer_id = c.id
       LEFT JOIN users u ON p.project_manager_id = u.id
       WHERE p.id = ?
-    `).get(id);
+    `, [id]);
 
     if (!project) return res.status(404).json({ error: 'Project not found' });
 
-    const milestones = db.prepare('SELECT * FROM project_milestones WHERE project_id = ? ORDER BY due_date ASC').all(id);
-    const tasks = db.prepare(`
+    const tasks = await db.all(`
       SELECT t.*, u.name as assigned_to_name
       FROM tasks t
       LEFT JOIN users u ON t.assigned_to = u.id
       WHERE t.project_id = ?
       ORDER BY t.created_at DESC
-    `).all(id);
+    `, [id]);
 
-    res.json({
-      project,
-      milestones,
-      tasks
-    });
+    res.json({ project, tasks });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-function ensureCustomer(customerId, defaultName = 'Enterprise Client') {
-  if (!customerId) customerId = 'CUST-001';
-  let cust = db.prepare('SELECT id FROM customers WHERE id = ?').get(customerId);
-  if (!cust) {
-    let lead = db.prepare('SELECT * FROM leads WHERE id = ?').get(customerId);
-    if (lead) {
-      db.prepare(`
-        INSERT OR IGNORE INTO customers (id, lead_id, name, company, email, phone)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `).run(customerId, lead.id, lead.name, lead.company || 'Enterprise Client', lead.email, lead.phone);
-    } else {
-      let firstCust = db.prepare('SELECT id FROM customers LIMIT 1').get();
-      if (firstCust) return firstCust.id;
-      db.prepare(`
-        INSERT OR IGNORE INTO customers (id, name, company, email)
-        VALUES (?, ?, ?, ?)
-      `).run('CUST-001', defaultName, defaultName, 'client@neuorzin.com');
-      return 'CUST-001';
-    }
-  }
-  return customerId;
-}
-
-function resolveUserId(userId) {
-  if (!userId) return 'USR-001';
-  const u = db.prepare('SELECT id FROM users WHERE id = ? OR name LIKE ?').get(userId, `%${userId}%`);
-  return u ? u.id : 'USR-001';
-}
-
-function resolveProjectId(projId) {
-  if (!projId) return null;
-  const p = db.prepare('SELECT id FROM projects WHERE id = ?').get(projId);
-  return p ? p.id : null;
-}
-
-export const createProject = (req, res) => {
+export const createProject = async (req, res) => {
   try {
     let { name, deal_id, customer_id, project_manager_id, department, start_date, deadline, budget, description, priority } = req.body;
     if (!name) {
       return res.status(400).json({ error: 'Project name is required' });
     }
 
-    customer_id = ensureCustomer(customer_id, name);
-    const pmId = resolveUserId(project_manager_id || 'USR-004');
+    customer_id = await ensureCustomer(customer_id, name);
+    const pmId = await resolveUserId(project_manager_id || 'USR-004');
 
     const projectId = `PRJ-${uuidv4().substring(0, 8)}`;
-    const projCount = db.prepare('SELECT COUNT(*) as count FROM projects').get().count;
+    const countRow = await db.get('SELECT COUNT(*) as count FROM projects');
+    const projCount = Number(countRow?.count || 0);
     const projectCode = `PRJ-2026-${String(projCount + 1).padStart(4, '0')}`;
 
-    db.prepare(`
+    await db.run(`
       INSERT INTO projects (
         id, project_code, name, customer_id, deal_id, project_manager_id,
         department, start_date, deadline, budget, priority, status, health, description
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Kickoff', 'Good', ?)
-    `).run(
+    `, [
       projectId,
       projectCode,
       name,
@@ -122,7 +115,7 @@ export const createProject = (req, res) => {
       parseFloat(budget) || 0,
       priority || 'High',
       description || null
-    );
+    ]);
 
     res.status(201).json({ id: projectId, project_code: projectCode, message: 'Project created successfully' });
   } catch (err) {
@@ -130,12 +123,12 @@ export const createProject = (req, res) => {
   }
 };
 
-export const updateProject = (req, res) => {
+export const updateProject = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, status, health, deadline, budget, priority, description } = req.body;
 
-    db.prepare(`
+    await db.run(`
       UPDATE projects
       SET name = COALESCE(?, name),
           status = COALESCE(?, status),
@@ -146,7 +139,7 @@ export const updateProject = (req, res) => {
           description = COALESCE(?, description),
           updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
-    `).run(name, status, health, deadline, budget, priority, description, id);
+    `, [name, status, health, deadline, budget, priority, description, id]);
 
     res.json({ message: 'Project updated successfully' });
   } catch (err) {
@@ -154,8 +147,7 @@ export const updateProject = (req, res) => {
   }
 };
 
-// ---- TASKS & TIMESHEETS ----
-export const getTasks = (req, res) => {
+export const getTasks = async (req, res) => {
   try {
     const { project_id, assigned_to, status, priority, department } = req.query;
     let query = `
@@ -189,34 +181,35 @@ export const getTasks = (req, res) => {
     }
 
     query += ' ORDER BY t.due_date ASC';
-    const tasks = db.prepare(query).all(...params);
+    const tasks = await db.all(query, params);
     res.json(tasks);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-export const createTask = (req, res) => {
+export const createTask = async (req, res) => {
   try {
     const { project_id, title, description, department, assigned_to, priority, estimated_hours, due_date } = req.body;
     if (!title) {
       return res.status(400).json({ error: 'Task title is required' });
     }
 
-    const assignedUserId = resolveUserId(assigned_to || (req.user ? req.user.id : 'USR-005'));
-    const resolvedProjId = resolveProjectId(project_id);
+    const assignedUserId = await resolveUserId(assigned_to || (req.user ? req.user.id : 'USR-005'));
+    const resolvedProjId = await resolveProjectId(project_id);
 
     const taskId = `TSK-${uuidv4().substring(0, 8)}`;
-    const count = db.prepare('SELECT COUNT(*) as count FROM tasks').get().count;
+    const countRow = await db.get('SELECT COUNT(*) as count FROM tasks');
+    const count = Number(countRow?.count || 0);
     const taskCode = `TSK-${String(count + 1).padStart(4, '0')}`;
 
-    db.prepare(`
+    await db.run(`
       INSERT INTO tasks (
         id, task_code, project_id, title, description, department,
         assigned_to, priority, status, estimated_hours, logged_hours,
         due_date, created_by
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Todo', ?, 0, ?, ?)
-    `).run(
+    `, [
       taskId,
       taskCode,
       resolvedProjId,
@@ -228,7 +221,7 @@ export const createTask = (req, res) => {
       parseFloat(estimated_hours) || 0,
       due_date || null,
       req.user ? req.user.id : 'USR-001'
-    );
+    ]);
 
     res.status(201).json({ id: taskId, task_code: taskCode, message: 'Task created successfully' });
   } catch (err) {
@@ -236,14 +229,13 @@ export const createTask = (req, res) => {
   }
 };
 
-export const updateTask = (req, res) => {
+export const updateTask = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, assigned_to, priority, status, estimated_hours, logged_hours, due_date } = req.body;
+    const assignedUserId = assigned_to ? await resolveUserId(assigned_to) : null;
 
-    const assignedUserId = assigned_to ? resolveUserId(assigned_to) : null;
-
-    db.prepare(`
+    await db.run(`
       UPDATE tasks
       SET title = COALESCE(?, title),
           description = COALESCE(?, description),
@@ -255,7 +247,7 @@ export const updateTask = (req, res) => {
           due_date = COALESCE(?, due_date),
           updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
-    `).run(title, description, assignedUserId, priority, status, estimated_hours, logged_hours, due_date, id);
+    `, [title, description, assignedUserId, priority, status, estimated_hours, logged_hours, due_date, id]);
 
     res.json({ message: 'Task updated successfully' });
   } catch (err) {
@@ -263,35 +255,27 @@ export const updateTask = (req, res) => {
   }
 };
 
-export const logTimesheet = (req, res) => {
+export const logTimesheet = async (req, res) => {
   try {
     const { task_id, hours, notes, date } = req.body;
     if (!task_id || !hours) {
       return res.status(400).json({ error: 'Task ID and hours are required' });
     }
 
-    // Ensure task exists
-    let task = db.prepare('SELECT id FROM tasks WHERE id = ?').get(task_id);
+    let task = await db.get('SELECT id FROM tasks WHERE id = ?', [task_id]);
     if (!task) {
-      task = db.prepare('SELECT id FROM tasks LIMIT 1').get();
+      task = await db.get('SELECT id FROM tasks LIMIT 1');
     }
     const finalTaskId = task ? task.id : task_id;
     const userId = req.user ? req.user.id : 'USR-005';
 
     const timesheetId = `TM-${uuidv4().substring(0, 8)}`;
-    db.prepare(`
+    await db.run(`
       INSERT INTO timesheets (id, task_id, user_id, date, hours, notes)
       VALUES (?, ?, ?, ?, ?, ?)
-    `).run(
-      timesheetId,
-      finalTaskId,
-      userId,
-      date || new Date().toISOString().split('T')[0],
-      parseFloat(hours) || 0,
-      notes || null
-    );
+    `, [timesheetId, finalTaskId, userId, date || new Date().toISOString().split('T')[0], parseFloat(hours) || 0, notes || null]);
 
-    db.prepare('UPDATE tasks SET logged_hours = logged_hours + ? WHERE id = ?').run(parseFloat(hours) || 0, finalTaskId);
+    await db.run('UPDATE tasks SET logged_hours = logged_hours + ? WHERE id = ?', [parseFloat(hours) || 0, finalTaskId]);
 
     res.status(201).json({ message: 'Timesheet logged successfully', timesheetId });
   } catch (err) {
