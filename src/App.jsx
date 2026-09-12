@@ -75,31 +75,37 @@ export function App() {
     setTimeout(() => setToastMessage(''), 4000);
   };
 
+  const isAdmin = location.pathname.startsWith('/admin');
+
   return (
     <>
-      {isLoading && (
+      {isLoading && !isAdmin && (
         <Preloader onComplete={() => setIsLoading(false)} />
       )}
 
-      <ScrollProgress />
+      {!isAdmin && <ScrollProgress />}
 
-      <div className="min-h-screen bg-white text-slate-900 flex flex-col font-sans selection:bg-[#0070ba] selection:text-white transition-colors duration-200 overflow-x-hidden">
-        {/* Navigation */}
-        <Navbar
-          onOpenBooking={() => setIsBookingOpen(true)}
-          onOpenSearch={() => setIsSearchOpen(true)}
-          onOpenOffcanvas={() => setIsOffcanvasOpen(true)}
-        />
+      <div className={`min-h-screen ${isAdmin ? 'bg-[#f8fafc]' : 'bg-white'} text-slate-900 flex flex-col font-sans selection:bg-[#0070ba] selection:text-white transition-colors duration-200 overflow-x-hidden`}>
+        {/* Navigation - Hidden for Admin Portal */}
+        {!isAdmin && (
+          <>
+            <Navbar
+              onOpenBooking={() => setIsBookingOpen(true)}
+              onOpenSearch={() => setIsSearchOpen(true)}
+              onOpenOffcanvas={() => setIsOffcanvasOpen(true)}
+            />
 
-        {/* Offcanvas Drawer */}
-        <OffcanvasMenu
-          isOpen={isOffcanvasOpen}
-          onClose={() => setIsOffcanvasOpen(false)}
-          onOpenBooking={() => setIsBookingOpen(true)}
-        />
+            {/* Offcanvas Drawer */}
+            <OffcanvasMenu
+              isOpen={isOffcanvasOpen}
+              onClose={() => setIsOffcanvasOpen(false)}
+              onOpenBooking={() => setIsBookingOpen(true)}
+            />
+          </>
+        )}
 
         {/* Routes */}
-        <main className="flex-grow w-full overflow-x-hidden">
+        <main className={`flex-grow w-full overflow-x-hidden ${isAdmin ? 'p-0 m-0' : ''}`}>
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
               {/* Home */}
@@ -155,7 +161,8 @@ export function App() {
               <Route path="/terms" element={<PageWrapper><TermsPage /></PageWrapper>} />
               
               {/* Fallback & Demos */}
-              <Route path="/admin" element={<PageWrapper><AdminPage onShowToast={showToast} /></PageWrapper>} />
+              <Route path="/admin" element={<AdminPage onShowToast={showToast} />} />
+              <Route path="/admin/*" element={<AdminPage onShowToast={showToast} />} />
               <Route path="/loading-demo" element={<PageWrapper><LoadingDemoPage /></PageWrapper>} />
               <Route path="*" element={<PageWrapper><NotFoundPage /></PageWrapper>} />
             </Routes>
@@ -163,17 +170,21 @@ export function App() {
         </main>
 
         {/* Footer */}
-        <Footer
-          onOpenBooking={() => setIsBookingOpen(true)}
-          onShowToast={showToast}
-        />
+        {!isAdmin && (
+          <Footer
+            onOpenBooking={() => setIsBookingOpen(true)}
+            onShowToast={showToast}
+          />
+        )}
 
         {/* Modals & Docks */}
-        <RouteProgressBar />
-        <FloatingActionDock
-          onOpenBooking={() => setIsBookingOpen(true)}
-          onOpenSearch={() => setIsSearchOpen(true)}
-        />
+        {!isAdmin && <RouteProgressBar />}
+        {!isAdmin && (
+          <FloatingActionDock
+            onOpenBooking={() => setIsBookingOpen(true)}
+            onOpenSearch={() => setIsSearchOpen(true)}
+          />
+        )}
         <BookingModal
           isOpen={isBookingOpen}
           onClose={() => setIsBookingOpen(false)}

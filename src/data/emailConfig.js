@@ -51,7 +51,7 @@ export async function sendEmailEnquiry(data = {}) {
     targetEmail = EMAIL_CONFIG.enquiries
   } = data;
 
-  // Auto-record lead into local Admin transactions DB in real time
+  // Auto-record lead into real-time SQLite Backend DB and Local transactions DB
   try {
     recordNewLead({
       name,
@@ -63,6 +63,21 @@ export async function sendEmailEnquiry(data = {}) {
       formType,
       targetEmail
     });
+
+    // POST directly to Express CRM Backend
+    fetch('http://localhost:5000/api/leads/inbound', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        email,
+        phone,
+        company,
+        service: service || 'Enterprise Solutions',
+        requirement_need: message,
+        source: formType || 'Website Inbound'
+      })
+    }).catch(e => console.warn('Inbound CRM sync notice:', e.message));
   } catch (storeErr) {
     console.warn('Lead store sync note:', storeErr);
   }
