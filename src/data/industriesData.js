@@ -1,21 +1,21 @@
 export const industriesData = [
   {
-    id: 'retail',
+    id: 'financial-services',
     number: '01',
-    title: 'Retail & Omnichannel Commerce',
-    subtitle: 'High-Throughput Storefronts, Dynamic Pricing & Inventory Mesh',
-    description: 'We build headless commerce engines, sub-second checkout funnels, AI-driven personalized recommendation swarms, and unified omnichannel inventory synchronizers.',
-    metrics: '0.3s Load Speed | 3.5x Conversion Growth',
+    title: 'Financial Services & FinTech',
+    subtitle: 'Ultra-Low Latency Core Banking, Algorithmic Risk & Fraud Defenses',
+    description: 'We architect resilient core banking backbones, high-frequency transaction clearing meshes, real-time algorithmic fraud prevention systems, and automated KYC/AML regulatory reporting pipelines.',
+    metrics: '< 15ms Latency | 99.999% Availability',
     points: [
-      'Headless commerce architecture with Edge SSR / SSG micro-frontends',
-      'Vector-based real-time personalized product recommendation swarms',
-      'Omnichannel inventory synchronization with millisecond lock consistency',
-      'Unified multi-currency checkout funnels with automated fraud filtering'
+      'Microsecond-clearing transaction ledgers with distributed ACID consensus',
+      'Machine-learning fraud anomaly detection on live payment & transaction streams',
+      'Automated regulatory compliance pipelines (RBI, SEC, FINRA & PCI-DSS Level 1)',
+      'High-throughput algorithmic credit scoring & automated underwriting engines'
     ],
-    technologies: ['React 18', 'Next.js', 'Node.js', 'Redis Enterprise', 'Tailwind CSS', 'GraphQL', 'Stripe'],
-    tags: ['Headless Retail', 'Recommendation AI', 'Omnichannel Sync', 'High Concurrency'],
-    stats: { primary: '0.3s', label: 'Edge Load Speed' },
-    icon: 'ShoppingBag'
+    technologies: ['Go / Rust', 'Java Spring Boot', 'Apache Kafka', 'PostgreSQL', 'Redis Cluster', 'HashiCorp Vault', 'AWS'],
+    tags: ['FinTech', 'Core Banking', 'Algorithmic Fraud', 'PCI-DSS Level 1'],
+    stats: { primary: '< 15ms', label: 'Transaction Latency' },
+    icon: 'ShieldCheck'
   },
   {
     id: 'manufacturing',
@@ -72,22 +72,22 @@ export const industriesData = [
     icon: 'GraduationCap'
   },
   {
-    id: 'cpg',
+    id: 'retail-cpg',
     number: '05',
-    title: 'CPG (Consumer Packaged Goods)',
-    subtitle: 'Demand Forecasting, D2C Distribution & Supply Telemetry',
-    description: 'We build predictive demand forecasting pipelines, Direct-to-Consumer (D2C) brand engines, distributor order management portals, and SKU-level inventory visibility hubs.',
-    metrics: '99.4% Forecast Accuracy | 2.8x D2C Velocity',
+    title: 'Retail and CPG (Consumer Packaged Goods)',
+    subtitle: 'Headless Storefronts, D2C Distribution & Supply Telemetry',
+    description: 'We build headless omnichannel commerce engines, sub-second checkout funnels, predictive demand forecasting pipelines, D2C brand engines, and SKU-level inventory visibility hubs.',
+    metrics: '0.3s Edge Speed | 99.4% Forecast Accuracy',
     points: [
+      'Headless omnichannel commerce architecture with Edge SSR / SSG micro-frontends',
+      'Vector-based real-time personalized product recommendation swarms',
       'Machine learning demand forecasting based on market trends and seasonality',
-      'D2C brand storefronts with high-conversion recurring subscription billing',
-      'B2B distributor ordering portals with automated credit limits & dynamic discounting',
-      'End-to-end batch traceability & real-time SKU distribution telemetry'
+      'D2C brand storefronts with high-conversion recurring subscription billing'
     ],
-    technologies: ['Python', 'Snowflake', 'Apache Flink', 'React', 'Next.js', 'GraphQL', 'AWS'],
-    tags: ['CPG Solutions', 'Demand Forecasting', 'D2C Commerce', 'SKU Telemetry'],
-    stats: { primary: '99.4%', label: 'Forecast Accuracy' },
-    icon: 'Package'
+    technologies: ['React 18', 'Next.js', 'Node.js', 'Snowflake', 'Redis Enterprise', 'GraphQL', 'Stripe'],
+    tags: ['Retail Commerce', 'CPG Solutions', 'Demand Forecasting', 'D2C Distribution'],
+    stats: { primary: '0.3s', label: 'Edge Load Speed' },
+    icon: 'ShoppingBag'
   }
 ];
 

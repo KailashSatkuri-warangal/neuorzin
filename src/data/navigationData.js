@@ -125,7 +125,7 @@ export const navLinks = [
           { title: 'About Us', desc: 'Our mission, engineering culture & leadership team', href: '/about' },
           { title: 'Our Approach', desc: 'A strategic, engineering-driven 6-step methodology', href: '/approach' },
           { title: 'Meet Our Team', desc: 'World-class architects, researchers & engineers', href: '/careers', badge: 'Hiring' },
-          { title: 'Industry Verticals', desc: 'Retail, Manufacturing, Real Estate, EduTech & CPG', href: '/industries' },
+          { title: 'Industry Verticals', desc: 'Financial Services, Manufacturing, Real Estate, EduTech, Retail & CPG', href: '/industries' },
           { title: 'FAQ', desc: 'Engagement models, delivery timelines & IP security', href: '/faq' },
         ]
       }

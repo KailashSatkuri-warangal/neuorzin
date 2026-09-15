@@ -9,11 +9,11 @@ import { ArrowUpRight } from 'lucide-react';
 
 export function IndustriesSection({ onOpenBooking }) {
   const industries = [
-    { number: '01', title: 'Retail', href: '/industries' },
+    { number: '01', title: 'Financial Services', href: '/industries' },
     { number: '02', title: 'Manufacturing', href: '/industries' },
     { number: '03', title: 'Real Estate', href: '/industries' },
     { number: '04', title: 'EduTech', href: '/industries' },
-    { number: '05', title: 'CPG', href: '/industries' },
+    { number: '05', title: 'Retail & CPG', href: '/industries' },
   ];
 
   return (
