@@ -72,7 +72,9 @@ import {
   Sliders,
   Database,
   ArrowUpDown,
-  Laptop
+  Laptop,
+  Pencil,
+  Edit
 } from 'lucide-react';
 import { getStoredLeads, saveLeads, recordNewLead } from '../data/leadsStore';
 import { getCachedCrmData, saveCachedCrmData } from '../data/initialCrmStore';
@@ -223,6 +225,14 @@ export function AdminPage({ onShowToast }) {
   const [showAddCampaignModal, setShowAddCampaignModal] = useState(false);
   const [showNotificationsDrawer, setShowNotificationsDrawer] = useState(false);
   const [notifFilter, setNotifFilter] = useState('all');
+
+  // Edit Modal States
+  const [editingQuotation, setEditingQuotation] = useState(null);
+  const [editingInvoice, setEditingInvoice] = useState(null);
+  const [editingProject, setEditingProject] = useState(null);
+  const [editingTask, setEditingTask] = useState(null);
+  const [editingCampaign, setEditingCampaign] = useState(null);
+  const [editingLead, setEditingLead] = useState(null);
 
   // Modal Form States
   const [leadForm, setLeadForm] = useState({
@@ -1033,6 +1043,208 @@ export function AdminPage({ onShowToast }) {
         });
       }
       if (onShowToast) onShowToast('Marketing Campaign created with UTM attribution!', 'success');
+      fetchLiveDatabase();
+    } catch (err) {
+      if (onShowToast) onShowToast(err.message, 'error');
+    }
+  };
+
+  // 16. Delete Lead
+  const handleDeleteLead = async (id, e) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this lead?')) return;
+    setLeads(prev => prev.filter(l => l.id !== id));
+    try {
+      if (isBackendOnline) {
+        await crmApi.deleteLead(id);
+      }
+      if (onShowToast) onShowToast('Lead deleted successfully', 'info');
+      fetchLiveDatabase();
+    } catch (err) {
+      if (onShowToast) onShowToast(err.message, 'error');
+    }
+  };
+
+  // 17. Delete Deal
+  const handleDeleteDeal = async (id, e) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this deal?')) return;
+    setDeals(prev => prev.filter(d => d.id !== id));
+    try {
+      if (isBackendOnline) {
+        await crmApi.deleteDeal(id);
+      }
+      if (onShowToast) onShowToast('Deal deleted successfully', 'info');
+      fetchLiveDatabase();
+    } catch (err) {
+      if (onShowToast) onShowToast(err.message, 'error');
+    }
+  };
+
+  // 18. Update Quotation
+  const handleUpdateQuotation = async (id, updates) => {
+    setQuotations(prev => prev.map(q => q.id === id ? { ...q, ...updates } : q));
+    setEditingQuotation(null);
+    try {
+      if (isBackendOnline) {
+        await crmApi.updateQuotation(id, updates);
+      }
+      if (onShowToast) onShowToast('Quotation updated successfully', 'success');
+      fetchLiveDatabase();
+    } catch (err) {
+      if (onShowToast) onShowToast(err.message, 'error');
+    }
+  };
+
+  // 19. Delete Quotation
+  const handleDeleteQuotation = async (id, e) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this quotation?')) return;
+    setQuotations(prev => prev.filter(q => q.id !== id));
+    try {
+      if (isBackendOnline) {
+        await crmApi.deleteQuotation(id);
+      }
+      if (onShowToast) onShowToast('Quotation deleted successfully', 'info');
+      fetchLiveDatabase();
+    } catch (err) {
+      if (onShowToast) onShowToast(err.message, 'error');
+    }
+  };
+
+  // 20. Update Invoice
+  const handleUpdateInvoice = async (id, updates) => {
+    setInvoices(prev => prev.map(i => i.id === id ? { ...i, ...updates } : i));
+    setEditingInvoice(null);
+    try {
+      if (isBackendOnline) {
+        await crmApi.updateInvoice(id, updates);
+      }
+      if (onShowToast) onShowToast('Invoice updated successfully', 'success');
+      fetchLiveDatabase();
+    } catch (err) {
+      if (onShowToast) onShowToast(err.message, 'error');
+    }
+  };
+
+  // 21. Delete Invoice
+  const handleDeleteInvoice = async (id, e) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this tax invoice?')) return;
+    setInvoices(prev => prev.filter(i => i.id !== id));
+    try {
+      if (isBackendOnline) {
+        await crmApi.deleteInvoice(id);
+      }
+      if (onShowToast) onShowToast('Invoice deleted successfully', 'info');
+      fetchLiveDatabase();
+    } catch (err) {
+      if (onShowToast) onShowToast(err.message, 'error');
+    }
+  };
+
+  // 22. Update Project
+  const handleUpdateProject = async (id, updates) => {
+    setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+    setEditingProject(null);
+    try {
+      if (isBackendOnline) {
+        await crmApi.updateProject(id, updates);
+      }
+      if (onShowToast) onShowToast('Project updated successfully', 'success');
+      fetchLiveDatabase();
+    } catch (err) {
+      if (onShowToast) onShowToast(err.message, 'error');
+    }
+  };
+
+  // 23. Delete Project
+  const handleDeleteProject = async (id, e) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this project and its tasks?')) return;
+    setProjects(prev => prev.filter(p => p.id !== id));
+    try {
+      if (isBackendOnline) {
+        await crmApi.deleteProject(id);
+      }
+      if (onShowToast) onShowToast('Project deleted successfully', 'info');
+      fetchLiveDatabase();
+    } catch (err) {
+      if (onShowToast) onShowToast(err.message, 'error');
+    }
+  };
+
+  // 24. Update Task
+  const handleUpdateTask = async (id, updates) => {
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
+    setEditingTask(null);
+    try {
+      if (isBackendOnline) {
+        await crmApi.updateTask(id, updates);
+      }
+      if (onShowToast) onShowToast('Task updated successfully', 'success');
+      fetchLiveDatabase();
+    } catch (err) {
+      if (onShowToast) onShowToast(err.message, 'error');
+    }
+  };
+
+  // 25. Delete Task
+  const handleDeleteTask = async (id, e) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this task?')) return;
+    setTasks(prev => prev.filter(t => t.id !== id));
+    try {
+      if (isBackendOnline) {
+        await crmApi.deleteTask(id);
+      }
+      if (onShowToast) onShowToast('Task deleted successfully', 'info');
+      fetchLiveDatabase();
+    } catch (err) {
+      if (onShowToast) onShowToast(err.message, 'error');
+    }
+  };
+
+  // 26. Delete WhatsApp Message
+  const handleDeleteWhatsAppMessage = async (id, e) => {
+    if (e) e.stopPropagation();
+    setWhatsappMessages(prev => prev.filter(m => m.id !== id));
+    try {
+      if (isBackendOnline) {
+        await crmApi.deleteWhatsAppMessage(id);
+      }
+      if (onShowToast) onShowToast('Message deleted', 'info');
+      fetchLiveDatabase();
+    } catch (err) {
+      if (onShowToast) onShowToast(err.message, 'error');
+    }
+  };
+
+  // 27. Update Campaign
+  const handleUpdateCampaign = async (id, updates) => {
+    setCampaigns(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
+    setEditingCampaign(null);
+    try {
+      if (isBackendOnline) {
+        await crmApi.updateCampaign(id, updates);
+      }
+      if (onShowToast) onShowToast('Campaign updated successfully', 'success');
+      fetchLiveDatabase();
+    } catch (err) {
+      if (onShowToast) onShowToast(err.message, 'error');
+    }
+  };
+
+  // 28. Delete Campaign
+  const handleDeleteCampaign = async (id, e) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this marketing campaign?')) return;
+    setCampaigns(prev => prev.filter(c => c.id !== id));
+    try {
+      if (isBackendOnline) {
+        await crmApi.deleteCampaign(id);
+      }
+      if (onShowToast) onShowToast('Campaign deleted successfully', 'info');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -1968,19 +2180,27 @@ export function AdminPage({ onShowToast }) {
                               {lead.created_at || 'Today'}
                             </td>
                             <td className="py-3.5 px-4 text-right">
-                              <div className="flex items-center justify-end gap-2">
+                              <div className="flex items-center justify-end gap-1.5">
                                 <button
                                   onClick={() => handleConvertLeadToDeal(lead)}
                                   title="Convert to Deal"
-                                  className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] border border-emerald-200 transition-colors"
+                                  className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] border border-emerald-200 transition-colors cursor-pointer"
                                 >
                                   Convert to Deal
                                 </button>
                                 <button
                                   onClick={() => setSelectedLead(lead)}
-                                  className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600"
+                                  title="View Details"
+                                  className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 cursor-pointer"
                                 >
                                   <Eye className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={(e) => handleDeleteLead(lead.id, e)}
+                                  title="Delete Lead"
+                                  className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 cursor-pointer transition-colors"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
                             </td>
@@ -2177,7 +2397,16 @@ export function AdminPage({ onShowToast }) {
                         ) : (
                           stageDeals.map(d => (
                             <div key={d.id} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-[#0070ba] hover:bg-white transition-all shadow-xs space-y-2">
-                              <div className="font-bold text-xs text-slate-900">{d.title}</div>
+                              <div className="flex justify-between items-start gap-2">
+                                <div className="font-bold text-xs text-slate-900">{d.title}</div>
+                                <button
+                                  onClick={(e) => handleDeleteDeal(d.id, e)}
+                                  className="text-slate-400 hover:text-rose-600 p-0.5 rounded cursor-pointer transition-colors shrink-0"
+                                  title="Delete Deal"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                               <div className="flex justify-between items-center text-xs">
                                 <span className="text-[10px] text-slate-500">{d.customer_name || 'Enterprise'}</span>
                                 <span className="font-mono font-bold text-emerald-600">₹{Number(d.value || 0).toLocaleString('en-IN')}</span>
@@ -2281,7 +2510,7 @@ export function AdminPage({ onShowToast }) {
                               </span>
                             </td>
                             <td className="py-3.5 px-4 text-right">
-                              <div className="flex items-center justify-end gap-2">
+                              <div className="flex items-center justify-end gap-1.5">
                                 {q.status !== 'Accepted' && (
                                   <button
                                     onClick={async () => {
@@ -2298,9 +2527,16 @@ export function AdminPage({ onShowToast }) {
                                     }}
                                     className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] border border-emerald-200 cursor-pointer"
                                   >
-                                    Accept Quote
+                                    Accept
                                   </button>
                                 )}
+                                <button
+                                  onClick={() => setEditingQuotation(q)}
+                                  className="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#0070ba] cursor-pointer transition-colors"
+                                  title="Edit Quotation"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                </button>
                                 <button
                                   onClick={async () => {
                                     try {
@@ -2310,10 +2546,18 @@ export function AdminPage({ onShowToast }) {
                                       if (onShowToast) onShowToast(err.message, 'error');
                                     }
                                   }}
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold cursor-pointer"
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold cursor-pointer"
+                                  title="Download PDF"
                                 >
                                   <Download className="w-3.5 h-3.5 text-slate-600" />
                                   <span>PDF</span>
+                                </button>
+                                <button
+                                  onClick={(e) => handleDeleteQuotation(q.id, e)}
+                                  className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 cursor-pointer transition-colors"
+                                  title="Delete Quotation"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
                             </td>
@@ -2408,7 +2652,22 @@ export function AdminPage({ onShowToast }) {
                                 </span>
                               </td>
                               <td className="py-3.5 px-4 text-right">
-                                <div className="flex items-center justify-end gap-2">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  {balance > 0 && (
+                                    <button
+                                      onClick={() => { setShowRecordPaymentModal(inv); setPaymentForm({ ...paymentForm, amount: String(balance) }); }}
+                                      className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] border border-emerald-200 cursor-pointer"
+                                    >
+                                      Payment
+                                    </button>
+                                  )}
+                                  <button
+                                    onClick={() => setEditingInvoice(inv)}
+                                    className="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#0070ba] cursor-pointer transition-colors"
+                                    title="Edit Invoice"
+                                  >
+                                    <Pencil className="w-3.5 h-3.5" />
+                                  </button>
                                   <button
                                     onClick={async () => {
                                       try {
@@ -2423,14 +2682,13 @@ export function AdminPage({ onShowToast }) {
                                   >
                                     <Download className="w-3.5 h-3.5" />
                                   </button>
-                                  {balance > 0 && (
-                                    <button
-                                      onClick={() => { setShowRecordPaymentModal(inv); setPaymentForm({ ...paymentForm, amount: String(balance) }); }}
-                                      className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] border border-emerald-200 cursor-pointer"
-                                    >
-                                      Record Payment
-                                    </button>
-                                  )}
+                                  <button
+                                    onClick={(e) => handleDeleteInvoice(inv.id, e)}
+                                    className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 cursor-pointer transition-colors"
+                                    title="Delete Invoice"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
                                 </div>
                               </td>
                             </tr>
@@ -2494,16 +2752,32 @@ export function AdminPage({ onShowToast }) {
                 ) : (
                   projects.map(p => (
                     <div key={p.id} className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start gap-2">
                         <div>
                           <span className="text-[10px] font-mono font-bold text-[#0070ba]">{p.project_code || `PRJ-${p.id}`}</span>
                           <h4 className="text-base font-black text-slate-900 mt-0.5">{p.name}</h4>
                         </div>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          p.health === 'Good' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
-                        }`}>
-                          ● {p.health || 'Good'}
-                        </span>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            p.health === 'Good' ? 'bg-emerald-50 text-emerald-700' : p.health === 'Delayed' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'
+                          }`}>
+                            ● {p.health || 'Good'}
+                          </span>
+                          <button
+                            onClick={() => setEditingProject(p)}
+                            className="p-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-[#0070ba] text-slate-600 cursor-pointer transition-colors"
+                            title="Edit Project"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={(e) => handleDeleteProject(p.id, e)}
+                            className="p-1 rounded-lg bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 cursor-pointer transition-colors"
+                            title="Delete Project"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
 
                       <p className="text-xs text-slate-500 line-clamp-2">{p.description || 'Sprint architecture and deliverables.'}</p>
@@ -2612,12 +2886,29 @@ export function AdminPage({ onShowToast }) {
                               <strong>{t.logged_hours || 0}h</strong> / {t.estimated_hours || 0}h
                             </td>
                             <td className="py-3.5 px-4 text-right">
-                              <button
-                                onClick={() => setShowLogTimeModal(t)}
-                                className="px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-[11px] border border-purple-200 cursor-pointer"
-                              >
-                                Log Hours
-                              </button>
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => setShowLogTimeModal(t)}
+                                  className="px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-[11px] border border-purple-200 cursor-pointer"
+                                  title="Log Timesheet"
+                                >
+                                  Log Hours
+                                </button>
+                                <button
+                                  onClick={() => setEditingTask(t)}
+                                  className="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#0070ba] cursor-pointer transition-colors"
+                                  title="Edit Task"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={(e) => handleDeleteTask(t.id, e)}
+                                  className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 cursor-pointer transition-colors"
+                                  title="Delete Task"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))
@@ -2663,12 +2954,21 @@ export function AdminPage({ onShowToast }) {
                     </div>
                   ) : (
                     whatsappMessages.map(m => (
-                      <div key={m.id} className={`p-4 rounded-2xl max-w-xl text-xs space-y-1 ${
-                        m.direction === 'Outbound' ? 'ml-auto bg-blue-50/80 border border-blue-100' : 'mr-auto bg-slate-50 border border-slate-100'
+                      <div key={m.id} className={`group relative p-4 rounded-2xl max-w-xl text-xs space-y-1 ${
+                        m.direction === 'Outbound' || m.sender_type === 'Agent' ? 'ml-auto bg-blue-50/80 border border-blue-100' : 'mr-auto bg-slate-50 border border-slate-100'
                       }`}>
-                        <div className="flex justify-between items-center text-[10px] text-slate-500">
-                          <span className="font-bold">{m.from_phone} → {m.to_phone}</span>
-                          <span>{m.timestamp || 'Today'}</span>
+                        <div className="flex justify-between items-center text-[10px] text-slate-500 gap-4">
+                          <span className="font-bold">{m.from_phone || m.phone || 'Client'} → {m.to_phone || m.customer_name || 'NeuOrzin'}</span>
+                          <div className="flex items-center gap-2">
+                            <span>{m.timestamp || 'Today'}</span>
+                            <button
+                              onClick={(e) => handleDeleteWhatsAppMessage(m.id, e)}
+                              className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-600 transition-opacity p-0.5 rounded cursor-pointer"
+                              title="Delete Message"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
                         </div>
                         <p className="text-slate-800 text-xs leading-relaxed">{m.message}</p>
                       </div>
@@ -2715,12 +3015,13 @@ export function AdminPage({ onShowToast }) {
                         <th className="py-3.5 px-4">Spend</th>
                         <th className="py-3.5 px-4">Leads Generated</th>
                         <th className="py-3.5 px-4">Status</th>
+                        <th className="py-3.5 px-4 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {campaigns.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="py-12 text-center text-slate-400">
+                          <td colSpan={7} className="py-12 text-center text-slate-400">
                             <BarChart3 className="w-8 h-8 mx-auto mb-2 text-slate-300" />
                             <div>No marketing campaigns created.</div>
                           </td>
@@ -2737,6 +3038,24 @@ export function AdminPage({ onShowToast }) {
                               <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px]">
                                 {c.status || 'Active'}
                               </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => setEditingCampaign(c)}
+                                  className="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#0070ba] cursor-pointer transition-colors"
+                                  title="Edit Campaign"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={(e) => handleDeleteCampaign(c.id, e)}
+                                  className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 cursor-pointer transition-colors"
+                                  title="Delete Campaign"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))
@@ -3865,6 +4184,624 @@ export function AdminPage({ onShowToast }) {
                 Convert to Active Deal
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 13. EDIT QUOTATION MODAL */}
+      {editingQuotation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="w-full max-w-lg bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-[10px] font-bold text-[#0070ba] uppercase tracking-wider">Edit Quotation</span>
+                <h3 className="text-base font-black text-slate-900">{editingQuotation.quote_number || editingQuotation.id}</h3>
+              </div>
+              <button onClick={() => setEditingQuotation(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const sub = parseFloat(editingQuotation.subtotal || 0);
+                const gst = sub * 0.18;
+                const tot = sub + gst;
+                handleUpdateQuotation(editingQuotation.id, {
+                  customer_name: editingQuotation.customer_name,
+                  service_title: editingQuotation.service_title,
+                  subtotal: sub,
+                  gst_amount: gst,
+                  total_amount: tot,
+                  status: editingQuotation.status,
+                  valid_until: editingQuotation.valid_until
+                });
+              }}
+              className="space-y-3"
+            >
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">Customer / Client Name</label>
+                <input
+                  type="text"
+                  required
+                  value={editingQuotation.customer_name || ''}
+                  onChange={(e) => setEditingQuotation({ ...editingQuotation, customer_name: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">Service Title / Scope</label>
+                <input
+                  type="text"
+                  required
+                  value={editingQuotation.service_title || ''}
+                  onChange={(e) => setEditingQuotation({ ...editingQuotation, service_title: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Subtotal (INR)</label>
+                  <input
+                    type="number"
+                    required
+                    value={editingQuotation.subtotal || ''}
+                    onChange={(e) => setEditingQuotation({ ...editingQuotation, subtotal: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Status</label>
+                  <select
+                    value={editingQuotation.status || 'Draft'}
+                    onChange={(e) => setEditingQuotation({ ...editingQuotation, status: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  >
+                    <option value="Draft">Draft</option>
+                    <option value="Sent">Sent</option>
+                    <option value="Accepted">Accepted</option>
+                    <option value="Rejected">Rejected</option>
+                    <option value="Expired">Expired</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">Valid Until</label>
+                <input
+                  type="date"
+                  value={editingQuotation.valid_until ? editingQuotation.valid_until.split('T')[0] : ''}
+                  onChange={(e) => setEditingQuotation({ ...editingQuotation, valid_until: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingQuotation(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#0070ba] hover:bg-[#005a96] text-white text-xs font-bold shadow-md shadow-blue-500/20 cursor-pointer"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 14. EDIT INVOICE MODAL */}
+      {editingInvoice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="w-full max-w-lg bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-[10px] font-bold text-[#0070ba] uppercase tracking-wider">Edit Tax Invoice</span>
+                <h3 className="text-base font-black text-slate-900">{editingInvoice.invoice_number || editingInvoice.id}</h3>
+              </div>
+              <button onClick={() => setEditingInvoice(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const tot = parseFloat(editingInvoice.total_amount || 0);
+                const paid = parseFloat(editingInvoice.paid_amount || 0);
+                const st = paid >= tot && tot > 0 ? 'Paid' : paid > 0 ? 'Partially Paid' : (editingInvoice.status || 'Pending');
+                handleUpdateInvoice(editingInvoice.id, {
+                  customer_name: editingInvoice.customer_name,
+                  total_amount: tot,
+                  paid_amount: paid,
+                  status: st,
+                  due_date: editingInvoice.due_date,
+                  notes: editingInvoice.notes
+                });
+              }}
+              className="space-y-3"
+            >
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">Customer / Client Name</label>
+                <input
+                  type="text"
+                  required
+                  value={editingInvoice.customer_name || ''}
+                  onChange={(e) => setEditingInvoice({ ...editingInvoice, customer_name: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Total Amount (INR)</label>
+                  <input
+                    type="number"
+                    required
+                    value={editingInvoice.total_amount || ''}
+                    onChange={(e) => setEditingInvoice({ ...editingInvoice, total_amount: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Paid Amount (INR)</label>
+                  <input
+                    type="number"
+                    value={editingInvoice.paid_amount || ''}
+                    onChange={(e) => setEditingInvoice({ ...editingInvoice, paid_amount: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Status</label>
+                  <select
+                    value={editingInvoice.status || 'Pending'}
+                    onChange={(e) => setEditingInvoice({ ...editingInvoice, status: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Partially Paid">Partially Paid</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Overdue">Overdue</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Due Date</label>
+                  <input
+                    type="date"
+                    value={editingInvoice.due_date ? editingInvoice.due_date.split('T')[0] : ''}
+                    onChange={(e) => setEditingInvoice({ ...editingInvoice, due_date: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">Notes / Terms</label>
+                <textarea
+                  rows="2"
+                  value={editingInvoice.notes || ''}
+                  onChange={(e) => setEditingInvoice({ ...editingInvoice, notes: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingInvoice(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#0070ba] hover:bg-[#005a96] text-white text-xs font-bold shadow-md shadow-blue-500/20 cursor-pointer"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 15. EDIT PROJECT MODAL */}
+      {editingProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="w-full max-w-lg bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-[10px] font-bold text-[#0070ba] uppercase tracking-wider">Edit Project</span>
+                <h3 className="text-base font-black text-slate-900">{editingProject.name}</h3>
+              </div>
+              <button onClick={() => setEditingProject(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleUpdateProject(editingProject.id, {
+                  name: editingProject.name,
+                  budget: parseFloat(editingProject.budget || 0),
+                  department: editingProject.department,
+                  deadline: editingProject.deadline,
+                  health: editingProject.health,
+                  status: editingProject.status,
+                  description: editingProject.description
+                });
+              }}
+              className="space-y-3"
+            >
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">Project Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={editingProject.name || ''}
+                  onChange={(e) => setEditingProject({ ...editingProject, name: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Department</label>
+                  <select
+                    value={editingProject.department || 'Development'}
+                    onChange={(e) => setEditingProject({ ...editingProject, department: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  >
+                    <option value="Development">Development</option>
+                    <option value="AI & ML">AI & ML</option>
+                    <option value="Cloud Infrastructure">Cloud Infrastructure</option>
+                    <option value="UI/UX Design">UI/UX Design</option>
+                    <option value="QA & Security">QA & Security</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Budget (INR)</label>
+                  <input
+                    type="number"
+                    value={editingProject.budget || ''}
+                    onChange={(e) => setEditingProject({ ...editingProject, budget: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Health</label>
+                  <select
+                    value={editingProject.health || 'Good'}
+                    onChange={(e) => setEditingProject({ ...editingProject, health: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  >
+                    <option value="Good">Good</option>
+                    <option value="At Risk">At Risk</option>
+                    <option value="Delayed">Delayed</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Status</label>
+                  <select
+                    value={editingProject.status || 'Kickoff'}
+                    onChange={(e) => setEditingProject({ ...editingProject, status: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  >
+                    <option value="Kickoff">Kickoff</option>
+                    <option value="Active">Active</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="In Review">In Review</option>
+                    <option value="Completed">Completed</option>
+                    <option value="On Hold">On Hold</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Deadline</label>
+                  <input
+                    type="date"
+                    value={editingProject.deadline ? editingProject.deadline.split('T')[0] : ''}
+                    onChange={(e) => setEditingProject({ ...editingProject, deadline: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">Description</label>
+                <textarea
+                  rows="2"
+                  value={editingProject.description || ''}
+                  onChange={(e) => setEditingProject({ ...editingProject, description: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingProject(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#0070ba] hover:bg-[#005a96] text-white text-xs font-bold shadow-md shadow-blue-500/20 cursor-pointer"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 16. EDIT TASK MODAL */}
+      {editingTask && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="w-full max-w-lg bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-[10px] font-bold text-[#0070ba] uppercase tracking-wider">Edit Task</span>
+                <h3 className="text-base font-black text-slate-900">{editingTask.title}</h3>
+              </div>
+              <button onClick={() => setEditingTask(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleUpdateTask(editingTask.id, {
+                  title: editingTask.title,
+                  department: editingTask.department,
+                  priority: editingTask.priority,
+                  status: editingTask.status,
+                  estimated_hours: parseFloat(editingTask.estimated_hours || 0),
+                  logged_hours: parseFloat(editingTask.logged_hours || 0),
+                  due_date: editingTask.due_date
+                });
+              }}
+              className="space-y-3"
+            >
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">Task Title *</label>
+                <input
+                  type="text"
+                  required
+                  value={editingTask.title || ''}
+                  onChange={(e) => setEditingTask({ ...editingTask, title: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Department</label>
+                  <select
+                    value={editingTask.department || 'Engineering'}
+                    onChange={(e) => setEditingTask({ ...editingTask, department: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  >
+                    <option value="Engineering">Engineering</option>
+                    <option value="Development">Development</option>
+                    <option value="AI & ML">AI & ML</option>
+                    <option value="QA">QA</option>
+                    <option value="Design">Design</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Priority</label>
+                  <select
+                    value={editingTask.priority || 'High'}
+                    onChange={(e) => setEditingTask({ ...editingTask, priority: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Status</label>
+                  <select
+                    value={editingTask.status || 'Todo'}
+                    onChange={(e) => setEditingTask({ ...editingTask, status: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  >
+                    <option value="Todo">Todo</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="In Review">In Review</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Est. Hours</label>
+                  <input
+                    type="number"
+                    value={editingTask.estimated_hours || ''}
+                    onChange={(e) => setEditingTask({ ...editingTask, estimated_hours: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Logged Hours</label>
+                  <input
+                    type="number"
+                    value={editingTask.logged_hours || ''}
+                    onChange={(e) => setEditingTask({ ...editingTask, logged_hours: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Due Date</label>
+                  <input
+                    type="date"
+                    value={editingTask.due_date ? editingTask.due_date.split('T')[0] : ''}
+                    onChange={(e) => setEditingTask({ ...editingTask, due_date: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingTask(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#0070ba] hover:bg-[#005a96] text-white text-xs font-bold shadow-md shadow-blue-500/20 cursor-pointer"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 17. EDIT CAMPAIGN MODAL */}
+      {editingCampaign && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="w-full max-w-lg bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-[10px] font-bold text-[#0070ba] uppercase tracking-wider">Edit Campaign</span>
+                <h3 className="text-base font-black text-slate-900">{editingCampaign.name}</h3>
+              </div>
+              <button onClick={() => setEditingCampaign(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleUpdateCampaign(editingCampaign.id, {
+                  name: editingCampaign.name,
+                  channel: editingCampaign.channel || editingCampaign.platform,
+                  utm_source: editingCampaign.utm_source,
+                  budget: parseFloat(editingCampaign.budget || 0),
+                  spend: parseFloat(editingCampaign.spend || 0),
+                  leads_generated: parseInt(editingCampaign.leads_generated || 0, 10),
+                  status: editingCampaign.status
+                });
+              }}
+              className="space-y-3"
+            >
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">Campaign Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={editingCampaign.name || ''}
+                  onChange={(e) => setEditingCampaign({ ...editingCampaign, name: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Platform</label>
+                  <select
+                    value={editingCampaign.channel || editingCampaign.platform || 'Google Ads'}
+                    onChange={(e) => setEditingCampaign({ ...editingCampaign, channel: e.target.value, platform: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  >
+                    <option value="Google Ads">Google Ads</option>
+                    <option value="LinkedIn">LinkedIn Ads</option>
+                    <option value="Meta Ads">Meta Ads</option>
+                    <option value="Organic SEO">Organic SEO</option>
+                    <option value="Twitter/X">Twitter/X</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">UTM Source</label>
+                  <input
+                    type="text"
+                    value={editingCampaign.utm_source || ''}
+                    onChange={(e) => setEditingCampaign({ ...editingCampaign, utm_source: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Budget (INR)</label>
+                  <input
+                    type="number"
+                    value={editingCampaign.budget || ''}
+                    onChange={(e) => setEditingCampaign({ ...editingCampaign, budget: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Spend (INR)</label>
+                  <input
+                    type="number"
+                    value={editingCampaign.spend || ''}
+                    onChange={(e) => setEditingCampaign({ ...editingCampaign, spend: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Status</label>
+                  <select
+                    value={editingCampaign.status || 'Active'}
+                    onChange={(e) => setEditingCampaign({ ...editingCampaign, status: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-[#0070ba] focus:outline-none"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Paused">Paused</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingCampaign(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#0070ba] hover:bg-[#005a96] text-white text-xs font-bold shadow-md shadow-blue-500/20 cursor-pointer"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

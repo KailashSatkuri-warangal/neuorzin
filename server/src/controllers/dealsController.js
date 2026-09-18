@@ -128,3 +128,13 @@ export const updateDeal = async (req, res) => {
   }
 };
 
+export const deleteDeal = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.run('DELETE FROM deals WHERE id = ?', [id]);
+    res.json({ message: 'Deal deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+

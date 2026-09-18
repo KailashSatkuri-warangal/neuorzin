@@ -330,3 +330,96 @@ export const recordPayment = async (req, res) => {
   }
 };
 
+export const updateQuotation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { service_title, scope_of_work, items, subtotal, discount, gst_rate, gst_amount, total_amount, status, valid_until } = req.body;
+    await db.run(`
+      UPDATE quotations
+      SET service_title = COALESCE(?, service_title),
+          scope_of_work = COALESCE(?, scope_of_work),
+          items = COALESCE(?, items),
+          subtotal = COALESCE(?, subtotal),
+          discount = COALESCE(?, discount),
+          gst_rate = COALESCE(?, gst_rate),
+          gst_amount = COALESCE(?, gst_amount),
+          total_amount = COALESCE(?, total_amount),
+          status = COALESCE(?, status),
+          valid_until = COALESCE(?, valid_until),
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `, [
+      service_title || null,
+      scope_of_work || null,
+      items ? (typeof items === 'string' ? items : JSON.stringify(items)) : null,
+      subtotal ? parseFloat(subtotal) : null,
+      discount ? parseFloat(discount) : null,
+      gst_rate ? parseFloat(gst_rate) : null,
+      gst_amount ? parseFloat(gst_amount) : null,
+      total_amount ? parseFloat(total_amount) : null,
+      status || null,
+      valid_until || null,
+      id
+    ]);
+    res.json({ message: 'Quotation updated successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const deleteQuotation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.run('DELETE FROM quotations WHERE id = ?', [id]);
+    res.json({ message: 'Quotation deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const updateInvoice = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { items, subtotal, discount, gst_amount, total_amount, issue_date, due_date, status, notes } = req.body;
+    await db.run(`
+      UPDATE invoices
+      SET items = COALESCE(?, items),
+          subtotal = COALESCE(?, subtotal),
+          discount = COALESCE(?, discount),
+          gst_amount = COALESCE(?, gst_amount),
+          total_amount = COALESCE(?, total_amount),
+          issue_date = COALESCE(?, issue_date),
+          due_date = COALESCE(?, due_date),
+          status = COALESCE(?, status),
+          notes = COALESCE(?, notes),
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `, [
+      items ? (typeof items === 'string' ? items : JSON.stringify(items)) : null,
+      subtotal ? parseFloat(subtotal) : null,
+      discount ? parseFloat(discount) : null,
+      gst_amount ? parseFloat(gst_amount) : null,
+      total_amount ? parseFloat(total_amount) : null,
+      issue_date || null,
+      due_date || null,
+      status || null,
+      notes || null,
+      id
+    ]);
+    res.json({ message: 'Invoice updated successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const deleteInvoice = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.run('DELETE FROM payments WHERE invoice_id = ?', [id]);
+    await db.run('DELETE FROM invoices WHERE id = ?', [id]);
+    res.json({ message: 'Invoice deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+

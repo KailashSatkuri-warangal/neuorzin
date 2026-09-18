@@ -204,3 +204,14 @@ export const convertLead = async (req, res) => {
   }
 };
 
+export const deleteLead = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.run('DELETE FROM activities WHERE lead_id = ?', [id]);
+    await db.run('DELETE FROM leads WHERE id = ?', [id]);
+    res.json({ message: 'Lead deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+

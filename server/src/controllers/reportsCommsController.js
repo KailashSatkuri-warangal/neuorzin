@@ -217,3 +217,54 @@ export const sendWhatsAppMessage = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const updateCampaign = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, platform, budget, spent, status, utm_source, utm_campaign } = req.body;
+    await db.run(`
+      UPDATE marketing_campaigns
+      SET name = COALESCE(?, name),
+          platform = COALESCE(?, platform),
+          budget = COALESCE(?, budget),
+          spent = COALESCE(?, spent),
+          status = COALESCE(?, status),
+          utm_source = COALESCE(?, utm_source),
+          utm_campaign = COALESCE(?, utm_campaign),
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `, [
+      name || null,
+      platform || null,
+      budget ? parseFloat(budget) : null,
+      spent ? parseFloat(spent) : null,
+      status || null,
+      utm_source || null,
+      utm_campaign || null,
+      id
+    ]);
+    res.json({ message: 'Campaign updated successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const deleteCampaign = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.run('DELETE FROM marketing_campaigns WHERE id = ?', [id]);
+    res.json({ message: 'Campaign deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const deleteWhatsAppMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.run('DELETE FROM whatsapp_messages WHERE id = ?', [id]);
+    res.json({ message: 'WhatsApp message deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

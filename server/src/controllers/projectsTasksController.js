@@ -282,3 +282,27 @@ export const logTimesheet = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const deleteProject = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.run('DELETE FROM timesheets WHERE task_id IN (SELECT id FROM tasks WHERE project_id = ?)', [id]);
+    await db.run('DELETE FROM tasks WHERE project_id = ?', [id]);
+    await db.run('DELETE FROM project_milestones WHERE project_id = ?', [id]);
+    await db.run('DELETE FROM projects WHERE id = ?', [id]);
+    res.json({ message: 'Project and associated tasks deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const deleteTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.run('DELETE FROM timesheets WHERE task_id = ?', [id]);
+    await db.run('DELETE FROM tasks WHERE id = ?', [id]);
+    res.json({ message: 'Task deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

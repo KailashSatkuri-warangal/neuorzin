@@ -62,6 +62,7 @@ router.post('/users', authorizeRoles('Super Admin', 'Admin'), authController.cre
 router.get('/leads', leadsController.getLeads);
 router.get('/leads/:id', leadsController.getLeadById);
 router.put('/leads/:id', leadsController.updateLead);
+router.delete('/leads/:id', leadsController.deleteLead);
 router.post('/leads/:id/convert', leadsController.convertLead);
 
 // Follow-ups
@@ -74,15 +75,20 @@ router.get('/pipelines', dealsController.getPipelines);
 router.get('/deals', dealsController.getDeals);
 router.post('/deals', dealsController.createDeal);
 router.put('/deals/:id', dealsController.updateDeal);
+router.delete('/deals/:id', dealsController.deleteDeal);
 
 // Finance: Quotations, Invoices & Payments
 router.get('/quotations', financeController.getQuotations);
 router.post('/quotations', financeController.createQuotation);
+router.put('/quotations/:id', financeController.updateQuotation);
 router.put('/quotations/:id/status', financeController.updateQuotationStatus);
+router.delete('/quotations/:id', financeController.deleteQuotation);
 router.get('/quotations/:id/pdf', financeController.downloadQuotationPdf);
 
 router.get('/invoices', financeController.getInvoices);
 router.post('/invoices', financeController.createInvoice);
+router.put('/invoices/:id', financeController.updateInvoice);
+router.delete('/invoices/:id', financeController.deleteInvoice);
 router.get('/invoices/:id/pdf', financeController.downloadInvoicePdf);
 router.post('/invoices/payments', financeController.recordPayment);
 
@@ -91,10 +97,12 @@ router.get('/projects', projectsTasksController.getProjects);
 router.get('/projects/:id', projectsTasksController.getProjectById);
 router.post('/projects', projectsTasksController.createProject);
 router.put('/projects/:id', projectsTasksController.updateProject);
+router.delete('/projects/:id', projectsTasksController.deleteProject);
 
 router.get('/tasks', projectsTasksController.getTasks);
 router.post('/tasks', projectsTasksController.createTask);
 router.put('/tasks/:id', projectsTasksController.updateTask);
+router.delete('/tasks/:id', projectsTasksController.deleteTask);
 router.post('/tasks/timesheets', projectsTasksController.logTimesheet);
 
 // Reports & Global Search
@@ -106,13 +114,15 @@ router.put('/notifications/read-all', reportsCommsController.markAllNotification
 router.put('/notifications/:id/read', reportsCommsController.markNotificationRead);
 router.delete('/notifications/:id', reportsCommsController.deleteNotification);
 
-
 // Marketing Campaigns
 router.get('/marketing/campaigns', reportsCommsController.getCampaigns);
 router.post('/marketing/campaigns', reportsCommsController.createCampaign);
+router.put('/marketing/campaigns/:id', reportsCommsController.updateCampaign);
+router.delete('/marketing/campaigns/:id', reportsCommsController.deleteCampaign);
 
 // WhatsApp Communications
 router.get('/whatsapp/messages', reportsCommsController.getWhatsAppMessages);
 router.post('/whatsapp/send', reportsCommsController.sendWhatsAppMessage);
+router.delete('/whatsapp/messages/:id', reportsCommsController.deleteWhatsAppMessage);
 
 export default router;

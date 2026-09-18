@@ -70,6 +70,7 @@ export const crmApi = {
   getLeadById: (id) => request(`/leads/${id}`),
   createLead: (leadData) => request('/leads', { method: 'POST', body: JSON.stringify(leadData) }),
   updateLead: (id, updates) => request(`/leads/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
+  deleteLead: (id) => request(`/leads/${id}`, { method: 'DELETE' }),
   convertLead: (id, dealAmount) => request(`/leads/${id}/convert`, { method: 'POST', body: JSON.stringify({ deal_amount: dealAmount }) }),
 
   // Follow-ups & Activities
@@ -88,11 +89,14 @@ export const crmApi = {
   },
   createDeal: (dealData) => request('/deals', { method: 'POST', body: JSON.stringify(dealData) }),
   updateDeal: (id, updates) => request(`/deals/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
+  deleteDeal: (id) => request(`/deals/${id}`, { method: 'DELETE' }),
 
   // Finance: Quotations, Invoices & Payments
   getQuotations: () => request('/quotations'),
   createQuotation: (qtnData) => request('/quotations', { method: 'POST', body: JSON.stringify(qtnData) }),
+  updateQuotation: (id, updates) => request(`/quotations/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
   updateQuotationStatus: (id, status) => request(`/quotations/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  deleteQuotation: (id) => request(`/quotations/${id}`, { method: 'DELETE' }),
   getQuotationPdfUrl: (id) => `${API_BASE_URL}/quotations/${id}/pdf`,
   downloadQuotationPdf: async (id, quoteNumber = 'Quotation') => {
     const token = getAuthToken();
@@ -113,6 +117,8 @@ export const crmApi = {
 
   getInvoices: () => request('/invoices'),
   createInvoice: (invData) => request('/invoices', { method: 'POST', body: JSON.stringify(invData) }),
+  updateInvoice: (id, updates) => request(`/invoices/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
+  deleteInvoice: (id) => request(`/invoices/${id}`, { method: 'DELETE' }),
   getInvoicePdfUrl: (id) => `${API_BASE_URL}/invoices/${id}/pdf`,
   downloadInvoicePdf: async (id, invoiceNumber = 'Invoice') => {
     const token = getAuthToken();
@@ -138,6 +144,7 @@ export const crmApi = {
   getProjectById: (id) => request(`/projects/${id}`),
   createProject: (projData) => request('/projects', { method: 'POST', body: JSON.stringify(projData) }),
   updateProject: (id, updates) => request(`/projects/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
+  deleteProject: (id) => request(`/projects/${id}`, { method: 'DELETE' }),
 
   getTasks: (params = {}) => {
     const query = new URLSearchParams(params).toString();
@@ -145,6 +152,7 @@ export const crmApi = {
   },
   createTask: (taskData) => request('/tasks', { method: 'POST', body: JSON.stringify(taskData) }),
   updateTask: (id, updates) => request(`/tasks/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
+  deleteTask: (id) => request(`/tasks/${id}`, { method: 'DELETE' }),
   logTimesheet: (timesheetData) => request('/tasks/timesheets', { method: 'POST', body: JSON.stringify(timesheetData) }),
 
   // Communications & Marketing
@@ -153,8 +161,11 @@ export const crmApi = {
     return request(`/whatsapp/messages${query ? `?${query}` : ''}`);
   },
   sendWhatsAppMessage: (msgData) => request('/whatsapp/send', { method: 'POST', body: JSON.stringify(msgData) }),
+  deleteWhatsAppMessage: (id) => request(`/whatsapp/messages/${id}`, { method: 'DELETE' }),
   getCampaigns: () => request('/marketing/campaigns'),
   createCampaign: (campData) => request('/marketing/campaigns', { method: 'POST', body: JSON.stringify(campData) }),
+  updateCampaign: (id, updates) => request(`/marketing/campaigns/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
+  deleteCampaign: (id) => request(`/marketing/campaigns/${id}`, { method: 'DELETE' }),
 
   // Reports & Search
   getDashboardMetrics: () => request('/reports/dashboard'),
