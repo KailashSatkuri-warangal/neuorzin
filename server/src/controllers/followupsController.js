@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import db from '../db/database.js';
+import { onFollowUpCompleted } from '../services/automationService.js';
+import { logAudit } from '../services/auditService.js';
 
 export const getFollowUps = async (req, res) => {
   try {
@@ -55,6 +57,15 @@ export const createFollowUp = async (req, res) => {
       next_action || null
     ]);
 
+    await logAudit({
+      userId: req.user?.id || 'USR-001',
+      userName: req.user?.name || 'Super Admin',
+      action: 'ACTIVITY_CREATED',
+      entityType: 'Activity',
+      entityId: activityId,
+      changes: { type, subject, scheduled_at }
+    });
+
     res.status(201).json({ id: activityId, message: 'Follow-up activity scheduled' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -74,8 +85,23 @@ export const updateFollowUp = async (req, res) => {
       WHERE id = ?
     `, [status, outcome, status, id]);
 
-    res.json({ message: 'Activity updated successfully' });
+    const updated = await db.get('SELECT * FROM activities WHERE id = ?', [id]);
+    if (updated && status === 'Completed') {
+      await onFollowUpCompleted(updated);
+    }
+
+    await logAudit({
+      userId: req.user?.id || 'USR-001',
+      userName: req.user?.name || 'Super Admin',
+      action: 'ACTIVITY_UPDATED',
+      entityType: 'Activity',
+      entityId: id,
+      changes: { status, outcome }
+    });
+
+    res.json({ message: 'Activity updated successfully', activity: updated });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+

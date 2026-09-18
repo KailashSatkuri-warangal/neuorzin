@@ -8,25 +8,21 @@ export const authenticateToken = async (req, res, next) => {
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    const admin = await db.get("SELECT id, name, email, role, department, status, avatar FROM users WHERE role = 'Super Admin' LIMIT 1");
-    req.user = admin || { id: 'USR-001', name: 'Kailash S (Super Admin)', email: 'admin@neuorzin.com', role: 'Super Admin', department: 'Executive', status: 'Active' };
-    return next();
+    return res.status(401).json({ error: 'Access denied. No authentication token provided.' });
   }
 
   try {
     const decodedUser = jwt.verify(token, JWT_SECRET);
     const user = await db.get('SELECT id, name, email, role, department, status, avatar FROM users WHERE id = ?', [decodedUser.id]);
+    
     if (!user || user.status !== 'Active') {
-      const admin = await db.get("SELECT id, name, email, role, department, status, avatar FROM users WHERE role = 'Super Admin' LIMIT 1");
-      req.user = admin || { id: 'USR-001', name: 'Kailash S (Super Admin)', email: 'admin@neuorzin.com', role: 'Super Admin', department: 'Executive', status: 'Active' };
-      return next();
+      return res.status(401).json({ error: 'User account not found or inactive.' });
     }
+    
     req.user = user;
     next();
   } catch (err) {
-    const admin = await db.get("SELECT id, name, email, role, department, status, avatar FROM users WHERE role = 'Super Admin' LIMIT 1");
-    req.user = admin || { id: 'USR-001', name: 'Kailash S (Super Admin)', email: 'admin@neuorzin.com', role: 'Super Admin', department: 'Executive', status: 'Active' };
-    return next();
+    return res.status(401).json({ error: 'Invalid or expired authentication token.' });
   }
 };
 
@@ -40,3 +36,4 @@ export const authorizeRoles = (...allowedRoles) => {
     next();
   };
 };
+

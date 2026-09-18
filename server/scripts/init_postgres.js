@@ -237,6 +237,8 @@ async function initPostgres() {
       CREATE TABLE IF NOT EXISTS payments (
         id VARCHAR(64) PRIMARY KEY,
         invoice_id VARCHAR(64) NOT NULL,
+        customer_id VARCHAR(64),
+        receipt_number VARCHAR(100),
         amount NUMERIC NOT NULL,
         payment_date DATE NOT NULL,
         payment_method VARCHAR(50) NOT NULL,
@@ -247,6 +249,7 @@ async function initPostgres() {
         FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE,
         FOREIGN KEY (recorded_by) REFERENCES users(id) ON DELETE CASCADE
       );
+
 
       -- 9. PROJECTS & TASKS
       CREATE TABLE IF NOT EXISTS projects (
@@ -271,6 +274,20 @@ async function initPostgres() {
         FOREIGN KEY (project_manager_id) REFERENCES users(id) ON DELETE CASCADE
       );
 
+      CREATE TABLE IF NOT EXISTS project_milestones (
+        id VARCHAR(64) PRIMARY KEY,
+        project_id VARCHAR(64) NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        due_date DATE,
+        billing_amount NUMERIC DEFAULT 0,
+        linked_invoice_id VARCHAR(64),
+        status VARCHAR(50) DEFAULT 'Pending',
+        client_approved BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+      );
+
       CREATE TABLE IF NOT EXISTS tasks (
         id VARCHAR(64) PRIMARY KEY,
         task_code VARCHAR(50) UNIQUE NOT NULL,
@@ -283,6 +300,7 @@ async function initPostgres() {
         status VARCHAR(50) DEFAULT 'Todo',
         estimated_hours NUMERIC DEFAULT 0,
         logged_hours NUMERIC DEFAULT 0,
+
         due_date DATE,
         created_by VARCHAR(64) NOT NULL,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

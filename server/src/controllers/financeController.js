@@ -1,5 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import db from '../db/database.js';
+import { generateQuotationPDF, generateInvoicePDF } from '../services/pdfService.js';
+import { onQuotationAccepted, onPaymentReceived } from '../services/automationService.js';
+import { logAudit } from '../services/auditService.js';
 
 async function ensureCustomer(customerId, defaultName = 'Enterprise Client') {
   if (!customerId) customerId = 'CUST-001';
@@ -99,6 +102,15 @@ export const createQuotation = async (req, res) => {
       terms_conditions || '1. 40% Advance on project kickoff.\n2. 40% on milestone beta release.\n3. 20% on final deployment.'
     ]);
 
+    await logAudit({
+      userId: req.user?.id || 'USR-001',
+      userName: req.user?.name || 'Super Admin',
+      action: 'QUOTATION_CREATED',
+      entityType: 'Quotation',
+      entityId: qtnId,
+      changes: { quote_number: quoteNumber, total_amount }
+    });
+
     res.status(201).json({ id: qtnId, quote_number: quoteNumber, message: 'Quotation created successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -110,7 +122,22 @@ export const updateQuotationStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     await db.run('UPDATE quotations SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [status, id]);
-    res.json({ message: 'Quotation status updated' });
+
+    const quotation = await db.get('SELECT * FROM quotations WHERE id = ?', [id]);
+    if (quotation && status === 'Accepted') {
+      await onQuotationAccepted(quotation);
+    }
+
+    await logAudit({
+      userId: req.user?.id || 'USR-001',
+      userName: req.user?.name || 'Super Admin',
+      action: 'QUOTATION_STATUS_CHANGE',
+      entityType: 'Quotation',
+      entityId: id,
+      changes: { new_status: status }
+    });
+
+    res.json({ message: 'Quotation status updated successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -118,7 +145,18 @@ export const updateQuotationStatus = async (req, res) => {
 
 export const downloadQuotationPdf = async (req, res) => {
   try {
-    res.json({ message: 'PDF generated successfully' });
+    const { id } = req.params;
+    const quotation = await db.get('SELECT * FROM quotations WHERE id = ? OR quote_number = ?', [id, id]);
+    if (!quotation) {
+      return res.status(404).json({ error: 'Quotation not found' });
+    }
+
+    const customer = await db.get('SELECT * FROM customers WHERE id = ?', [quotation.customer_id]);
+    const filePath = await generateQuotationPDF(quotation, customer);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="Quotation_${quotation.quote_number}.pdf"`);
+    res.sendFile(filePath);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -205,6 +243,18 @@ export const createInvoice = async (req, res) => {
       notes || 'Payment due within 15 days via NEFT/RTGS/IMPS or UPI.'
     ]);
 
+    // Update Customer Outstanding Balance in ledger
+    await db.run('UPDATE customers SET balance_amount = COALESCE(balance_amount, 0) + ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [total_amount, customer_id]);
+
+    await logAudit({
+      userId: req.user?.id || 'USR-001',
+      userName: req.user?.name || 'Super Admin',
+      action: 'INVOICE_ISSUED',
+      entityType: 'Invoice',
+      entityId: invId,
+      changes: { invoice_number: invoiceNumber, total_amount }
+    });
+
     res.status(201).json({ id: invId, invoice_number: invoiceNumber, message: 'Invoice created successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -213,7 +263,18 @@ export const createInvoice = async (req, res) => {
 
 export const downloadInvoicePdf = async (req, res) => {
   try {
-    res.json({ message: 'PDF generated successfully' });
+    const { id } = req.params;
+    const invoice = await db.get('SELECT * FROM invoices WHERE id = ? OR invoice_number = ?', [id, id]);
+    if (!invoice) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+
+    const customer = await db.get('SELECT * FROM customers WHERE id = ?', [invoice.customer_id]);
+    const filePath = await generateInvoicePDF(invoice, customer);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="Invoice_${invoice.invoice_number}.pdf"`);
+    res.sendFile(filePath);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -226,14 +287,25 @@ export const recordPayment = async (req, res) => {
       return res.status(400).json({ error: 'Invoice ID and amount are required' });
     }
 
+    const invoice = await db.get('SELECT * FROM invoices WHERE id = ?', [invoice_id]);
+    if (!invoice) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+
     const paymentId = `PAY-${uuidv4().substring(0, 8)}`;
+    const countRow = await db.get('SELECT COUNT(*) as count FROM payments');
+    const recCount = Number(countRow?.count || 0);
+    const receiptNumber = `REC-2026-${String(recCount + 1).padStart(4, '0')}`;
+
     await db.run(`
       INSERT INTO payments (
-        id, invoice_id, amount, payment_date, payment_method, transaction_ref, notes, recorded_by
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        id, invoice_id, customer_id, receipt_number, amount, payment_date, payment_method, transaction_ref, notes, recorded_by
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       paymentId,
       invoice_id,
+      invoice.customer_id,
+      receiptNumber,
       parseFloat(amount),
       payment_date || new Date().toISOString().split('T')[0],
       payment_method || 'Bank Transfer',
@@ -242,17 +314,19 @@ export const recordPayment = async (req, res) => {
       req.user ? req.user.id : 'USR-001'
     ]);
 
-    await db.run('UPDATE invoices SET paid_amount = paid_amount + ? WHERE id = ?', [parseFloat(amount), invoice_id]);
+    // Trigger payment automation & ledger reconciliation
+    await onPaymentReceived({
+      id: paymentId,
+      invoice_id,
+      amount: parseFloat(amount),
+      payment_method,
+      transaction_ref,
+      recorded_by: req.user?.id || 'USR-001'
+    });
 
-    const invoice = await db.get('SELECT total_amount, paid_amount FROM invoices WHERE id = ?', [invoice_id]);
-    if (invoice && invoice.paid_amount >= invoice.total_amount) {
-      await db.run("UPDATE invoices SET status = 'Paid' WHERE id = ?", [invoice_id]);
-    } else if (invoice && invoice.paid_amount > 0) {
-      await db.run("UPDATE invoices SET status = 'Partial' WHERE id = ?", [invoice_id]);
-    }
-
-    res.status(201).json({ message: 'Payment recorded successfully', paymentId });
+    res.status(201).json({ message: 'Payment recorded and reconciled in ledger', paymentId, receiptNumber });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+

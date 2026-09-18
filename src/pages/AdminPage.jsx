@@ -365,33 +365,39 @@ export function AdminPage({ onShowToast }) {
   }, [searchQuery, isBackendOnline]);
 
   // Handle Login
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError('');
     setIsLoggingIn(true);
 
-    setTimeout(() => {
+    try {
       const email = emailInput.trim().toLowerCase();
       const pwd = passwordInput.trim();
 
-      if ((email === VALID_EMAIL || email === VALID_EMAIL_ALT) && pwd === DEFAULT_PASSWORD) {
+      const data = await crmApi.login(email, pwd);
+      if (data && data.token) {
         setIsAuthenticated(true);
         localStorage.setItem('neuorzin_admin_auth', 'true');
-        if (onShowToast) onShowToast('Welcome back, Super Admin! Operations Portal Live.', 'success');
+        if (onShowToast) onShowToast(`Welcome back, ${data.user?.name || 'Super Admin'}! Portal Live.`, 'success');
         fetchLiveDatabase();
       } else {
-        setLoginError('Invalid credentials. Use admin@neuorzin.com / demo0722');
+        throw new Error('No authentication token received');
       }
+    } catch (err) {
+      setLoginError(err.message || 'Invalid credentials. Use admin@neuorzin.com / demo0722');
+    } finally {
       setIsLoggingIn(false);
-    }, 300);
+    }
   };
 
   // Handle Logout
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('neuorzin_admin_auth');
+    localStorage.removeItem('neuorzin_jwt_token');
     if (onShowToast) onShowToast('Signed out of Admin Portal.', 'info');
   };
+
 
   // 1. Dynamic Quick Update Lead Status
   const handleUpdateLeadStatus = async (leadId, newStatus) => {
@@ -1797,15 +1803,38 @@ export function AdminPage({ onShowToast }) {
                               </span>
                             </td>
                             <td className="py-3.5 px-4 text-right">
-                              <a
-                                href={crmApi.getQuotationPdfUrl(q.id)}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold cursor-pointer"
-                              >
-                                <Download className="w-3.5 h-3.5 text-slate-600" />
-                                <span>Download PDF</span>
-                              </a>
+                              <div className="flex items-center justify-end gap-2">
+                                {q.status !== 'Accepted' && (
+                                  <button
+                                    onClick={async () => {
+                                      try {
+                                        await crmApi.updateQuotationStatus(q.id, 'Accepted');
+                                        if (onShowToast) onShowToast(`Quotation ${q.quote_number} accepted! Auto-created Won Deal, Project & Advance Invoice.`, 'success');
+                                        fetchLiveDatabase();
+                                      } catch (err) {
+                                        if (onShowToast) onShowToast(err.message, 'error');
+                                      }
+                                    }}
+                                    className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] border border-emerald-200 cursor-pointer"
+                                  >
+                                    Accept Quote
+                                  </button>
+                                )}
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      await crmApi.downloadQuotationPdf(q.id, q.quote_number);
+                                      if (onShowToast) onShowToast(`Downloaded Quotation ${q.quote_number} PDF!`, 'success');
+                                    } catch (err) {
+                                      if (onShowToast) onShowToast(err.message, 'error');
+                                    }
+                                  }}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold cursor-pointer"
+                                >
+                                  <Download className="w-3.5 h-3.5 text-slate-600" />
+                                  <span>PDF</span>
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))
@@ -1899,15 +1928,20 @@ export function AdminPage({ onShowToast }) {
                               </td>
                               <td className="py-3.5 px-4 text-right">
                                 <div className="flex items-center justify-end gap-2">
-                                  <a
-                                    href={crmApi.getInvoicePdfUrl(inv.id)}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600"
+                                  <button
+                                    onClick={async () => {
+                                      try {
+                                        await crmApi.downloadInvoicePdf(inv.id, inv.invoice_number);
+                                        if (onShowToast) onShowToast(`Downloaded Invoice ${inv.invoice_number} PDF!`, 'success');
+                                      } catch (err) {
+                                        if (onShowToast) onShowToast(err.message, 'error');
+                                      }
+                                    }}
+                                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 cursor-pointer"
                                     title="Download PDF"
                                   >
                                     <Download className="w-3.5 h-3.5" />
-                                  </a>
+                                  </button>
                                   {balance > 0 && (
                                     <button
                                       onClick={() => { setShowRecordPaymentModal(inv); setPaymentForm({ ...paymentForm, amount: String(balance) }); }}
@@ -1928,6 +1962,7 @@ export function AdminPage({ onShowToast }) {
               </div>
             </div>
           )}
+
 
           {/* -------------------------------------------------------------
               PAGE 7: AGILE PROJECTS & DELIVERY

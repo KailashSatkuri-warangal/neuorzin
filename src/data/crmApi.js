@@ -94,11 +94,44 @@ export const crmApi = {
   createQuotation: (qtnData) => request('/quotations', { method: 'POST', body: JSON.stringify(qtnData) }),
   updateQuotationStatus: (id, status) => request(`/quotations/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
   getQuotationPdfUrl: (id) => `${API_BASE_URL}/quotations/${id}/pdf`,
+  downloadQuotationPdf: async (id, quoteNumber = 'Quotation') => {
+    const token = getAuthToken();
+    const res = await fetch(`${API_BASE_URL}/quotations/${id}/pdf`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
+    if (!res.ok) throw new Error(`Failed to download PDF: ${res.statusText}`);
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Quotation_${quoteNumber}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  },
 
   getInvoices: () => request('/invoices'),
   createInvoice: (invData) => request('/invoices', { method: 'POST', body: JSON.stringify(invData) }),
   getInvoicePdfUrl: (id) => `${API_BASE_URL}/invoices/${id}/pdf`,
+  downloadInvoicePdf: async (id, invoiceNumber = 'Invoice') => {
+    const token = getAuthToken();
+    const res = await fetch(`${API_BASE_URL}/invoices/${id}/pdf`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
+    if (!res.ok) throw new Error(`Failed to download PDF: ${res.statusText}`);
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Invoice_${invoiceNumber}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  },
   recordPayment: (paymentData) => request('/invoices/payments', { method: 'POST', body: JSON.stringify(paymentData) }),
+
 
   // Projects & Tasks
   getProjects: () => request('/projects'),

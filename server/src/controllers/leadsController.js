@@ -76,8 +76,10 @@ export const createLead = async (req, res) => {
       return res.status(400).json({ error: 'Name and email are required fields' });
     }
 
+    // Check duplicate lead
+    const duplicate = await db.get('SELECT id, name, status FROM leads WHERE email = ?', [email]);
     const leadId = `LEAD-${uuidv4().substring(0, 8)}`;
-    const score = budget && budget.includes('10L') ? 85 : 60;
+    const score = budget && (budget.includes('10L') || budget.includes('15,00,000') || budget.includes('500000')) ? 85 : 65;
 
     await db.run(`
       INSERT INTO leads (
@@ -106,12 +108,17 @@ export const createLead = async (req, res) => {
 
     const created = await db.get('SELECT * FROM leads WHERE id = ?', [leadId]);
 
-    // Non-blocking automation triggers
-    try { onNewLeadCreated(created); } catch {}
+    // Execute automation
+    try {
+      await onNewLeadCreated(created);
+    } catch (err) {
+      console.warn('Lead automation notice:', err.message);
+    }
 
     res.status(201).json({
       message: 'Inbound lead captured and routed successfully',
-      lead: created
+      lead: created,
+      isDuplicate: Boolean(duplicate)
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -135,6 +142,16 @@ export const updateLead = async (req, res) => {
     `, [status, assigned_to, score, priority, notes, id]);
 
     const updated = await db.get('SELECT * FROM leads WHERE id = ?', [id]);
+
+    await logAudit({
+      userId: req.user?.id || 'USR-001',
+      userName: req.user?.name || 'Super Admin',
+      action: 'LEAD_UPDATED',
+      entityType: 'Lead',
+      entityId: id,
+      changes: { status, assigned_to, score, priority }
+    });
+
     res.json({ message: 'Lead updated successfully', lead: updated });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -152,20 +169,30 @@ export const convertLead = async (req, res) => {
     // Create Customer
     const custId = `CUST-${uuidv4().substring(0, 8)}`;
     await db.run(`
-      INSERT INTO customers (id, lead_id, name, company, email, phone)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `, [custId, lead.id, lead.name, lead.company || 'Direct Client', lead.email, lead.phone]);
+      INSERT INTO customers (id, lead_id, name, company, email, phone, whatsapp, location)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [custId, lead.id, lead.name, lead.company || 'Direct Client', lead.email, lead.phone, lead.whatsapp, lead.location || 'India']);
 
     // Create Deal
     const dealId = `DEAL-${uuidv4().substring(0, 8)}`;
+    const parsedDealAmount = parseFloat(deal_amount) || 150000;
     await db.run(`
       INSERT INTO deals (
-        id, pipeline_id, title, lead_id, customer_id, stage, value, status
-      ) VALUES (?, 'PIPE-SW', ?, ?, ?, 'Negotiation', ?, 'Open')
-    `, [dealId, `${lead.name} - ${lead.service}`, lead.id, custId, parseFloat(deal_amount) || 150000]);
+        id, pipeline_id, title, lead_id, customer_id, assigned_to, stage, value, status
+      ) VALUES (?, 'PIPE-SW', ?, ?, ?, ?, 'Negotiation', ?, 'Open')
+    `, [dealId, `${lead.name} - ${lead.service}`, lead.id, custId, lead.assigned_to || (req.user ? req.user.id : 'USR-001'), parsedDealAmount]);
 
     // Mark Lead as Won
     await db.run("UPDATE leads SET status = 'Won', updated_at = CURRENT_TIMESTAMP WHERE id = ?", [id]);
+
+    await logAudit({
+      userId: req.user?.id || 'USR-001',
+      userName: req.user?.name || 'Super Admin',
+      action: 'LEAD_CONVERTED_TO_DEAL',
+      entityType: 'Lead',
+      entityId: id,
+      changes: { customer_id: custId, deal_id: dealId, amount: parsedDealAmount }
+    });
 
     res.json({
       message: 'Lead converted successfully into Customer and Deal',
@@ -176,3 +203,4 @@ export const convertLead = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+

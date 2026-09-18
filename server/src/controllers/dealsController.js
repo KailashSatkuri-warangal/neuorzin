@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import db from '../db/database.js';
+import { onDealWon } from '../services/automationService.js';
+import { logAudit } from '../services/auditService.js';
 
 export const getPipelines = async (req, res) => {
   try {
@@ -75,6 +77,15 @@ export const createDeal = async (req, res) => {
       expected_close_date || null
     ]);
 
+    await logAudit({
+      userId: req.user?.id || 'USR-001',
+      userName: req.user?.name || 'Super Admin',
+      action: 'DEAL_CREATED',
+      entityType: 'Deal',
+      entityId: dealId,
+      changes: { title, value, stage }
+    });
+
     res.status(201).json({ id: dealId, message: 'Deal created in pipeline' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -97,8 +108,23 @@ export const updateDeal = async (req, res) => {
       WHERE id = ?
     `, [stage, value, probability, status, expected_close_date, id]);
 
-    res.json({ message: 'Deal updated successfully' });
+    const updated = await db.get('SELECT * FROM deals WHERE id = ?', [id]);
+    if (updated && (updated.status === 'Won' || updated.stage === 'Won' || updated.stage === 'Won / Signed')) {
+      await onDealWon(updated);
+    }
+
+    await logAudit({
+      userId: req.user?.id || 'USR-001',
+      userName: req.user?.name || 'Super Admin',
+      action: 'DEAL_UPDATED',
+      entityType: 'Deal',
+      entityId: id,
+      changes: { stage, status, value }
+    });
+
+    res.json({ message: 'Deal updated successfully', deal: updated });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
