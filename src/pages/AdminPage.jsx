@@ -80,6 +80,25 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { getStoredLeads, saveLeads, recordNewLead } from '../data/leadsStore';
+
+// Mobile-First Advanced UI/UX Components
+import MobileHeader from '../components/admin/mobile/MobileHeader';
+import MobileBottomNav from '../components/admin/mobile/MobileBottomNav';
+import MobileMoreDrawer from '../components/admin/mobile/MobileMoreDrawer';
+import MobileGlobalSearch from '../components/admin/mobile/MobileGlobalSearch';
+import MobileDashboard from '../components/admin/mobile/MobileDashboard';
+import MobileLeadList from '../components/admin/mobile/MobileLeadList';
+import MobileLeadDetailsSheet from '../components/admin/mobile/MobileLeadDetailsSheet';
+import MobileDealsView from '../components/admin/mobile/MobileDealsView';
+import MobileFinanceView from '../components/admin/mobile/MobileFinanceView';
+import MobileProjectsView from '../components/admin/mobile/MobileProjectsView';
+import MobileTasksView from '../components/admin/mobile/MobileTasksView';
+import MobileCustomersView from '../components/admin/mobile/MobileCustomersView';
+import MobileFollowUpsView from '../components/admin/mobile/MobileFollowUpsView';
+import MobileTeamsView from '../components/admin/mobile/MobileTeamsView';
+import MobileMarketingView from '../components/admin/mobile/MobileMarketingView';
+import MobileReportsView from '../components/admin/mobile/MobileReportsView';
+import MobileSettingsView from '../components/admin/mobile/MobileSettingsView';
 import { getCachedCrmData, saveCachedCrmData } from '../data/initialCrmStore';
 import { EMAIL_CONFIG, createMailtoLink } from '../data/emailConfig';
 import { crmApi } from '../data/crmApi';
@@ -236,6 +255,10 @@ export function AdminPage({ onShowToast }) {
   const [editingTask, setEditingTask] = useState(null);
   const [activeTimerTask, setActiveTimerTask] = useState(null);
   const [dailyTodoInput, setDailyTodoInput] = useState('');
+  const [showMobileMoreDrawer, setShowMobileMoreDrawer] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [mobileLeadDetail, setMobileLeadDetail] = useState(null);
+  const [mobileFinanceSubTab, setMobileFinanceSubTab] = useState('quotations');
   const [editingCampaign, setEditingCampaign] = useState(null);
   const [editingLead, setEditingLead] = useState(null);
 
@@ -1541,8 +1564,20 @@ export function AdminPage({ onShowToast }) {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans">
       
-      {/* TOP COMMAND NAVBAR */}
-      <header className="h-16 border-b border-slate-200 bg-white/95 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+      {/* 1. MOBILE TOP COMMAND NAVBAR */}
+      <MobileHeader
+        activeTab={activeTab}
+        onOpenMenu={() => setShowMobileMoreDrawer(true)}
+        onOpenSearch={() => setShowMobileSearch(true)}
+        onOpenNotifications={() => setShowNotificationsDrawer(true)}
+        unreadCount={unreadNotifsCount}
+        isBackendOnline={isBackendOnline}
+        isRefreshing={isRefreshing}
+        onRefresh={fetchLiveDatabase}
+      />
+
+      {/* 2. DESKTOP TOP COMMAND NAVBAR */}
+      <header className="hidden md:flex h-16 border-b border-slate-200 bg-white/95 backdrop-blur-md px-4 sm:px-8 items-center justify-between sticky top-0 z-30 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0070ba] to-cyan-500 flex items-center justify-center text-white font-black text-xs shadow-md shadow-blue-500/25">
             NO
@@ -2072,6 +2107,172 @@ export function AdminPage({ onShowToast }) {
 
         {/* MAIN CANVAS */}
         <main className="flex-1 min-w-0 space-y-6">
+
+          {/* =========================================================
+              MOBILE-FIRST DEDICATED VIEWS (MD:HIDDEN)
+             ========================================================= */}
+          <div className="block md:hidden">
+            {activeTab === 'dashboard' && (
+              <MobileDashboard
+                leads={leads}
+                deals={deals}
+                quotations={quotations}
+                invoices={invoices}
+                projects={projects}
+                tasks={tasks}
+                activities={activities}
+                auditLogs={auditLogs}
+                onNavigate={(tab) => handleTabChange(tab)}
+                onQuickAction={(action) => {
+                  if (action === 'addLead') setShowAddLeadModal(true);
+                  if (action === 'addDeal') setShowAddDealModal(true);
+                  if (action === 'addQuote') setShowAddQuoteModal(true);
+                  if (action === 'addInvoice') setShowAddInvoiceModal(true);
+                }}
+              />
+            )}
+
+            {activeTab === 'leads' && (
+              <MobileLeadList
+                leads={leads}
+                onSelectLead={(l) => setMobileLeadDetail(l)}
+                onAddNewLead={() => setShowAddLeadModal(true)}
+                onEditLead={(l) => setEditingLead(l)}
+                onDeleteLead={(id) => handleDeleteLead(id)}
+                onConvertToDeal={(l) => handleConvertLead(l.id)}
+                onStatusChange={(id, status) => handleUpdateLeadStatus(id, status)}
+              />
+            )}
+
+            {activeTab === 'deals' && (
+              <MobileDealsView
+                deals={deals}
+                onAddNewDeal={() => setShowAddDealModal(true)}
+                onEditDeal={(d) => setEditingDeal(d)}
+                onDeleteDeal={(id) => handleDeleteDeal(id)}
+                onStageChange={(id, stage) => handleUpdateDealStage(id, stage)}
+              />
+            )}
+
+            {(activeTab === 'quotations' || activeTab === 'invoices' || activeTab === 'payments') && (
+              <MobileFinanceView
+                subTab={activeTab === 'invoices' ? 'invoices' : activeTab === 'payments' ? 'payments' : mobileFinanceSubTab}
+                onSubTabChange={(st) => {
+                  setMobileFinanceSubTab(st);
+                  handleTabChange(st);
+                }}
+                quotations={quotations}
+                invoices={invoices}
+                payments={[]}
+                onAddNewQuote={() => setShowAddQuoteModal(true)}
+                onAddNewInvoice={() => setShowAddInvoiceModal(true)}
+                onRecordPayment={() => setShowRecordPaymentModal(true)}
+                onDownloadQuotePdf={async (q) => {
+                  try {
+                    await crmApi.downloadQuotationPdf(q.id, q.quote_number, q);
+                    if (onShowToast) onShowToast(`Downloaded Quotation ${q.quote_number} PDF!`, 'success');
+                  } catch (err) {
+                    if (onShowToast) onShowToast(err.message, 'error');
+                  }
+                }}
+                onDownloadInvoicePdf={async (inv) => {
+                  try {
+                    await crmApi.downloadInvoicePdf(inv.id, inv.invoice_number, inv);
+                    if (onShowToast) onShowToast(`Downloaded Invoice ${inv.invoice_number} PDF!`, 'success');
+                  } catch (err) {
+                    if (onShowToast) onShowToast(err.message, 'error');
+                  }
+                }}
+                onEditQuote={(q) => setEditingQuotation(q)}
+                onEditInvoice={(inv) => setEditingInvoice(inv)}
+                onDeleteQuote={(id) => handleDeleteQuotation(id)}
+                onDeleteInvoice={(id) => handleDeleteInvoice(id)}
+              />
+            )}
+
+            {activeTab === 'projects' && (
+              <MobileProjectsView
+                projects={projects}
+                onAddNewProject={() => setShowAddProjectModal(true)}
+                onEditProject={(p) => setEditingProject(p)}
+                onDeleteProject={(id) => handleDeleteProject(id)}
+                getTimelineMetrics={getTimelineMetrics}
+              />
+            )}
+
+            {activeTab === 'tasks' && (
+              <MobileTasksView
+                tasks={tasks}
+                activeTimerTask={activeTimerTask}
+                formatSeconds={formatSeconds}
+                onStartTimer={handleStartTimer}
+                onPauseResumeTimer={() => setActiveTimerTask(prev => prev ? ({ ...prev, isRunning: !prev.isRunning }) : null)}
+                onStopTimerAndLog={handleStopTimerAndLog}
+                onResetTimer={() => setActiveTimerTask(null)}
+                onQuickAddTodo={async (title) => {
+                  setDailyTodoInput(title);
+                  await handleQuickAddDailyTodo();
+                }}
+                onAddNewTask={() => setShowAddTaskModal(true)}
+                onEditTask={(t) => setEditingTask(t)}
+                onDeleteTask={(id) => handleDeleteTask(id)}
+                onStatusChange={(id, status) => handleUpdateTaskStatus(id, status)}
+                getTimelineMetrics={getTimelineMetrics}
+              />
+            )}
+
+            {activeTab === 'customers' && (
+              <MobileCustomersView
+                customers={[]}
+                leads={leads}
+                onSelectCustomer={(c) => {
+                  setSelectedLead(c);
+                  setMobileLeadDetail(c);
+                }}
+                onAddNewCustomer={() => setShowAddLeadModal(true)}
+              />
+            )}
+
+            {activeTab === 'followups' && (
+              <MobileFollowUpsView
+                activities={activities}
+                onCompleteActivity={handleCompleteActivity}
+                onAddNewActivity={() => setShowAddLeadModal(true)}
+              />
+            )}
+
+            {(activeTab === 'teams' || activeTab === 'employees') && (
+              <MobileTeamsView />
+            )}
+
+            {activeTab === 'marketing' && (
+              <MobileMarketingView
+                campaigns={campaigns}
+                onAddNewCampaign={() => setShowAddCampaignModal(true)}
+              />
+            )}
+
+            {activeTab === 'reports' && (
+              <MobileReportsView
+                downloadCsv={downloadCsv}
+                leads={leads}
+                deals={deals}
+                invoices={invoices}
+              />
+            )}
+
+            {activeTab === 'settings' && (
+              <MobileSettingsView
+                systemSettings={systemSettings}
+                isBackendOnline={isBackendOnline}
+              />
+            )}
+          </div>
+
+          {/* =========================================================
+              DESKTOP CRM VIEWS (HIDDEN MD:BLOCK)
+             ========================================================= */}
+          <div className="hidden md:block space-y-6">
 
           {/* -------------------------------------------------------------
               PAGE 1: EXECUTIVE DASHBOARD (WHITE & BLUE)
@@ -3530,6 +3731,7 @@ export function AdminPage({ onShowToast }) {
             </div>
           )}
 
+          </div>
         </main>
       </div>
 
@@ -5110,6 +5312,75 @@ export function AdminPage({ onShowToast }) {
           </div>
         </div>
       )}
+
+      {/* =============================================================
+          3. MOBILE BOTTOM NAVIGATION & DRAWERS (MD:HIDDEN)
+         ============================================================= */}
+      <MobileBottomNav
+        activeTab={activeTab}
+        onTabChange={(tab) => handleTabChange(tab)}
+        onOpenMore={() => setShowMobileMoreDrawer(true)}
+        leadsCount={leads.length}
+        dealsCount={deals.length}
+        tasksCount={tasks.length}
+        hasAlerts={unreadNotifsCount > 0}
+      />
+
+      <MobileMoreDrawer
+        isOpen={showMobileMoreDrawer}
+        onClose={() => setShowMobileMoreDrawer(false)}
+        activeTab={activeTab}
+        onSelectTab={(tab) => handleTabChange(tab)}
+        counts={{
+          customers: leads.filter(l => l.status === 'Won').length,
+          activities: activities.length,
+          emails: inboundEmails.length,
+          whatsapp: whatsappMessages.length,
+          quotations: quotations.length,
+          invoices: invoices.length,
+          payments: 1,
+          projects: projects.length,
+          teams: 3,
+          employees: 4,
+          campaigns: campaigns.length,
+          notifications: notifications.length
+        }}
+        onLogout={handleLogout}
+      />
+
+      <MobileGlobalSearch
+        isOpen={showMobileSearch}
+        onClose={() => setShowMobileSearch(false)}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchResults={searchResults}
+        onNavigate={(tab, item) => {
+          handleTabChange(tab);
+          if (tab === 'leads') {
+            setSelectedLead(item);
+            setMobileLeadDetail(item);
+          }
+        }}
+      />
+
+      <MobileLeadDetailsSheet
+        lead={mobileLeadDetail}
+        isOpen={!!mobileLeadDetail}
+        onClose={() => setMobileLeadDetail(null)}
+        onEdit={(l) => {
+          setEditingLead(l);
+          setMobileLeadDetail(null);
+        }}
+        onDelete={(id) => {
+          handleDeleteLead(id);
+          setMobileLeadDetail(null);
+        }}
+        onConvertToDeal={(l) => {
+          handleConvertLead(l.id);
+          setMobileLeadDetail(null);
+        }}
+        onStatusChange={(id, st) => handleUpdateLeadStatus(id, st)}
+      />
 
     </div>
   );
