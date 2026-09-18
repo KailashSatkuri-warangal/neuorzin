@@ -160,8 +160,14 @@ export const crmApi = {
   getDashboardMetrics: () => request('/reports/dashboard'),
   globalSearch: (q) => request(`/search?q=${encodeURIComponent(q)}`),
   getAuditLogs: () => request('/audit-logs'),
-  getNotifications: () => request('/notifications'),
-  markNotificationRead: (id) => request(`/notifications/${id}/read`, { method: 'PUT' })
+  getNotifications: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/notifications${query ? `?${query}` : ''}`);
+  },
+  markNotificationRead: (id) => request(`/notifications/${id}/read`, { method: 'PUT' }),
+  markAllNotificationsRead: () => request('/notifications/read-all', { method: 'PUT' }),
+  deleteNotification: (id) => request(`/notifications/${id}`, { method: 'DELETE' })
 };
 
 export default crmApi;
+

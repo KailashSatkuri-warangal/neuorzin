@@ -102,7 +102,10 @@ router.get('/reports/dashboard', reportsCommsController.getDashboardMetrics);
 router.get('/search', reportsCommsController.globalSearch);
 router.get('/audit-logs', reportsCommsController.getAuditLogs);
 router.get('/notifications', reportsCommsController.getNotifications);
+router.put('/notifications/read-all', reportsCommsController.markAllNotificationsRead);
 router.put('/notifications/:id/read', reportsCommsController.markNotificationRead);
+router.delete('/notifications/:id', reportsCommsController.deleteNotification);
+
 
 // Marketing Campaigns
 router.get('/marketing/campaigns', reportsCommsController.getCampaigns);

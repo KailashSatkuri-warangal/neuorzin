@@ -91,8 +91,24 @@ export const getAuditLogs = async (req, res) => {
 
 export const getNotifications = async (req, res) => {
   try {
-    const notes = await db.all('SELECT * FROM notifications ORDER BY created_at DESC LIMIT 20');
-    res.json(notes);
+    const { unread_only } = req.query;
+    let query = 'SELECT * FROM notifications';
+    const params = [];
+    if (unread_only === 'true') {
+      query += ' WHERE is_read = FALSE OR is_read = 0';
+    }
+    query += ' ORDER BY created_at DESC LIMIT 50';
+
+    const notes = await db.all(query, params);
+    const unreadRow = await db.get('SELECT COUNT(*) as count FROM notifications WHERE is_read = FALSE OR is_read = 0');
+    const unreadCount = Number(unreadRow?.count || 0);
+
+    const formatted = (notes || []).map(n => ({
+      ...n,
+      is_read: Boolean(n.is_read === true || n.is_read === 1 || n.is_read === 't')
+    }));
+
+    res.json({ notifications: formatted, unreadCount });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -100,12 +116,33 @@ export const getNotifications = async (req, res) => {
 
 export const markNotificationRead = async (req, res) => {
   try {
-    await db.run('UPDATE notifications SET is_read = TRUE WHERE id = ?', [req.params.id]);
+    const isPg = db.isPostgres;
+    await db.run(`UPDATE notifications SET is_read = ${isPg ? 'TRUE' : '1'} WHERE id = ?`, [req.params.id]);
     res.json({ message: 'Notification marked as read' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const markAllNotificationsRead = async (req, res) => {
+  try {
+    const isPg = db.isPostgres;
+    await db.run(`UPDATE notifications SET is_read = ${isPg ? 'TRUE' : '1'}`);
+    res.json({ message: 'All notifications marked as read' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const deleteNotification = async (req, res) => {
+  try {
+    await db.run('DELETE FROM notifications WHERE id = ?', [req.params.id]);
+    res.json({ message: 'Notification deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 
 export const getCampaigns = async (req, res) => {
   try {

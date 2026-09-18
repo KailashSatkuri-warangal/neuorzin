@@ -220,6 +220,7 @@ export function AdminPage({ onShowToast }) {
   const [showDispatchWhatsAppModal, setShowDispatchWhatsAppModal] = useState(false);
   const [showAddCampaignModal, setShowAddCampaignModal] = useState(false);
   const [showNotificationsDrawer, setShowNotificationsDrawer] = useState(false);
+  const [notifFilter, setNotifFilter] = useState('all');
 
   // Modal Form States
   const [leadForm, setLeadForm] = useState({
@@ -396,6 +397,86 @@ export function AdminPage({ onShowToast }) {
     localStorage.removeItem('neuorzin_admin_auth');
     localStorage.removeItem('neuorzin_jwt_token');
     if (onShowToast) onShowToast('Signed out of Admin Portal.', 'info');
+  };
+
+  // Notification Counts & Filtering
+  const isNotificationRead = (n) => n.is_read === true || n.is_read === 1 || n.is_read === 't';
+
+  const unreadNotifsCount = useMemo(() => {
+    return notifications.filter(n => !isNotificationRead(n)).length;
+  }, [notifications]);
+
+  const escalationsNotifsCount = useMemo(() => {
+    return notifications.filter(n => n.priority === 'urgent' || n.priority === 'high' || n.type?.includes('sla') || n.title?.toLowerCase().includes('sla')).length;
+  }, [notifications]);
+
+  const filteredNotifications = useMemo(() => {
+    return notifications.filter(n => {
+      const read = isNotificationRead(n);
+      if (notifFilter === 'unread') return !read;
+      if (notifFilter === 'escalations') return n.priority === 'urgent' || n.priority === 'high' || n.type?.includes('sla') || n.title?.toLowerCase().includes('sla');
+      if (notifFilter === 'system') return n.type === 'system' || n.type === 'audit' || n.type === 'sla_escalation';
+      return true;
+    });
+  }, [notifications, notifFilter]);
+
+  // Notification Action Handlers
+  const handleMarkNotificationRead = async (id, e) => {
+    if (e) e.stopPropagation();
+    try {
+      if (isBackendOnline) {
+        await crmApi.markNotificationRead(id);
+      }
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+    } catch (err) {
+      console.warn('Error marking notification read:', err);
+    }
+  };
+
+  const handleMarkAllNotificationsRead = async () => {
+    try {
+      if (isBackendOnline) {
+        await crmApi.markAllNotificationsRead();
+      }
+      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      if (onShowToast) onShowToast('All notifications marked as read', 'success');
+    } catch (err) {
+      console.warn('Error marking all notifications read:', err);
+    }
+  };
+
+  const handleDeleteNotification = async (id, e) => {
+    if (e) e.stopPropagation();
+    try {
+      if (isBackendOnline) {
+        await crmApi.deleteNotification(id);
+      }
+      setNotifications(prev => prev.filter(n => n.id !== id));
+      if (onShowToast) onShowToast('Notification dismissed', 'info');
+    } catch (err) {
+      console.warn('Error deleting notification:', err);
+    }
+  };
+
+  const handleNotificationClick = (notif) => {
+    if (!isNotificationRead(notif)) {
+      handleMarkNotificationRead(notif.id);
+    }
+    if (notif.action_url) {
+      const cleanTab = notif.action_url.replace(/^#\/?/, '').replace(/^\/admin\/?/, '');
+      if (cleanTab) {
+        setActiveTab(cleanTab);
+      }
+    } else if (notif.type === 'deal_stage_changed' || notif.title?.toLowerCase().includes('deal')) {
+      setActiveTab('deals');
+    } else if (notif.type === 'invoice_paid' || notif.title?.toLowerCase().includes('invoice') || notif.title?.toLowerCase().includes('payment')) {
+      setActiveTab('finance');
+    } else if (notif.type === 'sla_escalation' || notif.type === 'lead_created' || notif.title?.toLowerCase().includes('lead')) {
+      setActiveTab('leads');
+    } else if (notif.type === 'project_created' || notif.type === 'task_assigned') {
+      setActiveTab('projects');
+    }
+    setShowNotificationsDrawer(false);
   };
 
 
@@ -961,35 +1042,188 @@ export function AdminPage({ onShowToast }) {
           <div className="relative">
             <button
               onClick={() => setShowNotificationsDrawer(!showNotificationsDrawer)}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 relative cursor-pointer"
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 relative cursor-pointer transition-colors"
+              title="Notifications & SLA Alerts"
             >
               <BellRing className="w-4 h-4" />
-              {notifications.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-bold flex items-center justify-center animate-pulse">
-                  {notifications.length}
+              {unreadNotifsCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-rose-500 text-white rounded-full text-[9px] font-bold flex items-center justify-center animate-pulse shadow-sm">
+                  {unreadNotifsCount > 99 ? '99+' : unreadNotifsCount}
                 </span>
               )}
             </button>
 
             {/* Notifications Dropdown Drawer */}
             {showNotificationsDrawer && (
-              <div className="absolute right-0 top-12 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl p-4 z-50 space-y-3">
-                <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                  <span className="text-xs font-bold text-slate-800">Operational Alerts & SLA</span>
-                  <span className="text-[10px] text-slate-400">{notifications.length} Total</span>
-                </div>
-                <div className="max-h-64 overflow-y-auto space-y-2">
-                  {notifications.length === 0 ? (
-                    <div className="text-center py-4 text-xs text-slate-400">All alerts cleared & healthy.</div>
-                  ) : (
-                    notifications.map(n => (
-                      <div key={n.id} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1">
-                        <div className="font-bold text-slate-800">{n.title}</div>
-                        <div className="text-[11px] text-slate-600">{n.message}</div>
-                        <div className="text-[9px] text-slate-400">{n.created_at || 'Just now'}</div>
+              <div className="absolute right-0 top-12 w-96 max-w-[90vw] bg-white border border-slate-200 rounded-2xl shadow-2xl p-4 z-50 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
+                {/* Drawer Header */}
+                <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-[#0070ba] flex items-center justify-center">
+                      <BellRing className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-900">Notifications & Alerts</div>
+                      <div className="text-[10px] text-slate-400">
+                        {unreadNotifsCount} unread &bull; {notifications.length} total
                       </div>
-                    ))
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    {unreadNotifsCount > 0 && (
+                      <button
+                        onClick={handleMarkAllNotificationsRead}
+                        title="Mark all as read"
+                        className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-[#0070ba] text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                      >
+                        <Check className="w-3 h-3" />
+                        <span>Read all</span>
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setShowNotificationsDrawer(false)}
+                      className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Filter Pills */}
+                <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl text-[11px] font-semibold">
+                  <button
+                    onClick={() => setNotifFilter('all')}
+                    className={`flex-1 py-1 px-2 rounded-lg text-center transition-all cursor-pointer ${
+                      notifFilter === 'all' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    All ({notifications.length})
+                  </button>
+                  <button
+                    onClick={() => setNotifFilter('unread')}
+                    className={`flex-1 py-1 px-2 rounded-lg text-center transition-all cursor-pointer ${
+                      notifFilter === 'unread' ? 'bg-white text-[#0070ba] shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    Unread ({unreadNotifsCount})
+                  </button>
+                  <button
+                    onClick={() => setNotifFilter('escalations')}
+                    className={`flex-1 py-1 px-2 rounded-lg text-center transition-all cursor-pointer ${
+                      notifFilter === 'escalations' ? 'bg-white text-rose-600 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    SLA ({escalationsNotifsCount})
+                  </button>
+                </div>
+
+                {/* Notification List */}
+                <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
+                  {filteredNotifications.length === 0 ? (
+                    <div className="text-center py-8 space-y-2">
+                      <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+                        <CheckCircle2 className="w-5 h-5" />
+                      </div>
+                      <div className="text-xs font-semibold text-slate-700">All caught up!</div>
+                      <div className="text-[10px] text-slate-400">No {notifFilter !== 'all' ? notifFilter : ''} notifications found.</div>
+                    </div>
+                  ) : (
+                    filteredNotifications.map(n => {
+                      const isRead = isNotificationRead(n);
+                      const isUrgent = n.priority === 'urgent' || n.priority === 'high' || n.type?.includes('sla') || n.title?.toLowerCase().includes('sla');
+                      const isFinance = n.type === 'invoice_paid' || n.type === 'payment_received' || n.title?.toLowerCase().includes('invoice') || n.title?.toLowerCase().includes('payment');
+                      const isDeal = n.type === 'deal_stage_changed' || n.type === 'deal_won' || n.title?.toLowerCase().includes('deal');
+
+                      return (
+                        <div
+                          key={n.id}
+                          onClick={() => handleNotificationClick(n)}
+                          className={`group relative p-3 rounded-xl border transition-all cursor-pointer ${
+                            !isRead
+                              ? 'bg-blue-50/50 border-blue-100 hover:border-blue-200 hover:bg-blue-50/80 shadow-xs'
+                              : 'bg-slate-50/80 border-slate-100 hover:border-slate-200 hover:bg-slate-100/70 opacity-80 hover:opacity-100'
+                          }`}
+                        >
+                          <div className="flex items-start gap-2.5">
+                            {/* Icon Badge */}
+                            <div className={`w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-xs ${
+                              isUrgent
+                                ? 'bg-rose-100 text-rose-600'
+                                : isFinance
+                                ? 'bg-emerald-100 text-emerald-600'
+                                : isDeal
+                                ? 'bg-indigo-100 text-indigo-600'
+                                : 'bg-blue-100 text-[#0070ba]'
+                            }`}>
+                              {isUrgent ? <AlertTriangle className="w-3.5 h-3.5" /> : isFinance ? <DollarSign className="w-3.5 h-3.5" /> : isDeal ? <Award className="w-3.5 h-3.5" /> : <Zap className="w-3.5 h-3.5" />}
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex-1 min-w-0 pr-12">
+                              <div className="flex items-center gap-1.5">
+                                <span className={`text-xs font-bold truncate ${!isRead ? 'text-slate-900' : 'text-slate-700'}`}>
+                                  {n.title}
+                                </span>
+                                {!isRead && (
+                                  <span className="w-1.5 h-1.5 rounded-full bg-[#0070ba] shrink-0" />
+                                )}
+                              </div>
+                              <div className="text-[11px] text-slate-600 line-clamp-2 mt-0.5 leading-relaxed">
+                                {n.message}
+                              </div>
+                              <div className="flex items-center gap-2 mt-1.5 text-[9px] text-slate-400 font-medium">
+                                <Clock className="w-3 h-3" />
+                                <span>{n.created_at ? new Date(n.created_at).toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent'}</span>
+                                {n.priority && (
+                                  <span className={`px-1.5 py-0.2 rounded uppercase font-bold text-[8px] ${
+                                    isUrgent ? 'bg-rose-100 text-rose-700' : 'bg-slate-200 text-slate-600'
+                                  }`}>
+                                    {n.priority}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Hover Actions */}
+                            <div className="absolute right-2 top-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              {!isRead && (
+                                <button
+                                  onClick={(e) => handleMarkNotificationRead(n.id, e)}
+                                  title="Mark as read"
+                                  className="p-1 rounded-md bg-white border border-slate-200 text-slate-500 hover:text-emerald-600 hover:border-emerald-200 transition-colors shadow-xs"
+                                >
+                                  <Check className="w-3 h-3" />
+                                </button>
+                              )}
+                              <button
+                                onClick={(e) => handleDeleteNotification(n.id, e)}
+                                title="Dismiss notification"
+                                className="p-1 rounded-md bg-white border border-slate-200 text-slate-500 hover:text-rose-600 hover:border-rose-200 transition-colors shadow-xs"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
                   )}
+                </div>
+
+                {/* Bottom Status bar */}
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+                  <div className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span>Real-time Sync Active</span>
+                  </div>
+                  <button
+                    onClick={fetchLiveDatabase}
+                    className="text-[#0070ba] font-semibold hover:underline cursor-pointer flex items-center gap-1"
+                  >
+                    <RefreshCw className="w-2.5 h-2.5" />
+                    <span>Refresh</span>
+                  </button>
                 </div>
               </div>
             )}
