@@ -18,13 +18,16 @@ export default function MobileBottomNav({
   ].includes(activeTab);
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200/90 px-1 py-1.5 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+    <nav 
+      aria-label="Admin Mobile Navigation"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-[60] bg-white/95 backdrop-blur-xl border-t border-slate-200/90 px-1 py-1.5 pb-[calc(0.45rem+env(safe-area-inset-bottom,0px))] shadow-[0_-4px_25px_rgba(0,0,0,0.08)]"
+    >
       <div className="max-w-lg mx-auto flex items-center justify-around">
         
         {/* 1. Home / Dashboard */}
         <button
           onClick={() => onTabChange('dashboard')}
-          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all cursor-pointer relative ${
             activeTab === 'dashboard'
               ? 'text-[#0070ba]'
               : 'text-slate-400 hover:text-slate-600'
@@ -32,6 +35,9 @@ export default function MobileBottomNav({
         >
           <div className="relative">
             <LayoutDashboard className={`w-5 h-5 ${activeTab === 'dashboard' ? 'stroke-[2.5]' : 'stroke-2'}`} />
+            {activeTab === 'dashboard' && (
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0070ba]" />
+            )}
           </div>
           <span className={`text-[10px] mt-0.5 font-bold tracking-tight ${activeTab === 'dashboard' ? 'text-[#0070ba]' : 'text-slate-500'}`}>
             Home
@@ -41,7 +47,7 @@ export default function MobileBottomNav({
         {/* 2. Leads */}
         <button
           onClick={() => onTabChange('leads')}
-          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all cursor-pointer relative ${
             activeTab === 'leads'
               ? 'text-[#0070ba]'
               : 'text-slate-400 hover:text-slate-600'
@@ -56,6 +62,9 @@ export default function MobileBottomNav({
                 {leadsCount > 99 ? '99+' : leadsCount}
               </span>
             )}
+            {activeTab === 'leads' && (
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0070ba]" />
+            )}
           </div>
           <span className={`text-[10px] mt-0.5 font-bold tracking-tight ${activeTab === 'leads' ? 'text-[#0070ba]' : 'text-slate-500'}`}>
             Leads
@@ -65,7 +74,7 @@ export default function MobileBottomNav({
         {/* 3. Deals */}
         <button
           onClick={() => onTabChange('deals')}
-          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all cursor-pointer relative ${
             activeTab === 'deals'
               ? 'text-[#0070ba]'
               : 'text-slate-400 hover:text-slate-600'
@@ -80,6 +89,9 @@ export default function MobileBottomNav({
                 {dealsCount}
               </span>
             )}
+            {activeTab === 'deals' && (
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0070ba]" />
+            )}
           </div>
           <span className={`text-[10px] mt-0.5 font-bold tracking-tight ${activeTab === 'deals' ? 'text-[#0070ba]' : 'text-slate-500'}`}>
             Deals
@@ -89,7 +101,7 @@ export default function MobileBottomNav({
         {/* 4. Tasks */}
         <button
           onClick={() => onTabChange('tasks')}
-          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all cursor-pointer relative ${
             activeTab === 'tasks'
               ? 'text-[#0070ba]'
               : 'text-slate-400 hover:text-slate-600'
@@ -104,6 +116,9 @@ export default function MobileBottomNav({
                 {tasksCount}
               </span>
             )}
+            {activeTab === 'tasks' && (
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0070ba]" />
+            )}
           </div>
           <span className={`text-[10px] mt-0.5 font-bold tracking-tight ${activeTab === 'tasks' ? 'text-[#0070ba]' : 'text-slate-500'}`}>
             Tasks
@@ -113,7 +128,7 @@ export default function MobileBottomNav({
         {/* 5. More Sheet */}
         <button
           onClick={onOpenMore}
-          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
+          className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all cursor-pointer relative ${
             isMoreActive
               ? 'text-[#0070ba]'
               : 'text-slate-400 hover:text-slate-600'
@@ -123,6 +138,9 @@ export default function MobileBottomNav({
             <Grid className={`w-5 h-5 ${isMoreActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
             {hasAlerts && (
               <span className="absolute -top-0.5 -right-1 w-2 h-2 rounded-full bg-rose-500" />
+            )}
+            {isMoreActive && (
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0070ba]" />
             )}
           </div>
           <span className={`text-[10px] mt-0.5 font-bold tracking-tight ${isMoreActive ? 'text-[#0070ba]' : 'text-slate-500'}`}>

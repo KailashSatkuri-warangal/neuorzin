@@ -7,6 +7,7 @@ import { Preloader } from './components/common/Preloader';
 import { Navbar } from './components/layout/Navbar';
 import { OffcanvasMenu } from './components/layout/OffcanvasMenu';
 import { Footer } from './components/layout/Footer';
+import { PublicBottomNav } from './components/layout/PublicBottomNav';
 import { RouteProgressBar } from './components/common/RouteProgressBar';
 import { FloatingActionDock } from './components/common/FloatingActionDock';
 import { Toast } from './components/common/Toast';
@@ -178,6 +179,7 @@ export function App() {
         )}
 
         {/* Modals & Docks */}
+        {!isAdmin && <PublicBottomNav onOpenBooking={() => setIsBookingOpen(true)} />}
         {!isAdmin && <RouteProgressBar />}
         {!isAdmin && (
           <FloatingActionDock

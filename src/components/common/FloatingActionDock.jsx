@@ -49,7 +49,7 @@ export function FloatingActionDock({ onOpenBooking, onOpenSearch }) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 30, scale: 0.9 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="fixed bottom-6 right-6 z-40 flex items-center gap-1.5 p-1.5 rounded-full bg-white/95 backdrop-blur-xl border border-slate-200 shadow-2xl shadow-black/10"
+          className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-40 flex items-center gap-1.5 p-1.5 rounded-full bg-white/95 backdrop-blur-xl border border-slate-200 shadow-2xl shadow-black/10"
         >
           {/* Quick Search */}
           <button

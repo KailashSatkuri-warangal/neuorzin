@@ -2136,7 +2136,7 @@ export function AdminPage({ onShowToast }) {
           {/* =========================================================
               MOBILE-FIRST DEDICATED VIEWS (MD:HIDDEN)
              ========================================================= */}
-          <div className="block md:hidden">
+          <div className="block md:hidden pb-24 sm:pb-28">
             {activeTab === 'dashboard' && (
               <MobileDashboard
                 leads={leads}
