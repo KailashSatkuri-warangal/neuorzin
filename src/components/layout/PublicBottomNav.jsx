@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Home, Sparkles, FolderKanban, PhoneCall, Calendar } from 'lucide-react';
 
 export function PublicBottomNav({ onOpenBooking }) {
@@ -39,49 +40,93 @@ export function PublicBottomNav({ onOpenBooking }) {
   ];
 
   return (
-    <nav 
+    <nav
       aria-label="Mobile Navigation Dock"
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200/90 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] px-2 py-1.5 pb-[calc(0.4rem+env(safe-area-inset-bottom,0px))]"
+      className="lg:hidden fixed bottom-2 left-3 right-3 z-40 max-w-md mx-auto"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      <div className="max-w-md mx-auto flex items-center justify-around">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.label}
-              to={item.href}
-              className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
-                item.isActive
-                  ? 'text-[#0070ba]'
-                  : 'text-slate-400 hover:text-slate-700'
-              }`}
-            >
-              <div className="relative">
-                <Icon className={`w-5 h-5 ${item.isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
-                {item.isActive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0070ba]" />
-                )}
-              </div>
-              <span className={`text-[10px] mt-1 font-bold tracking-tight ${item.isActive ? 'text-[#0070ba]' : 'text-slate-500'}`}>
-                {item.label}
-              </span>
-            </Link>
-          );
-        })}
+      {/* Floating Glassmorphic Pill */}
+      <div className="relative rounded-2xl bg-white/85 backdrop-blur-2xl border border-white/80 shadow-[0_12px_36px_rgba(0,112,186,0.12),0_4px_16px_rgba(0,0,0,0.06)] p-1.5 overflow-hidden">
+        
+        {/* Specular glass highlight */}
+        <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/90 to-transparent" />
 
-        {/* 5. Book Consultation Action CTA */}
-        <button
-          onClick={onOpenBooking}
-          className="flex flex-col items-center justify-center min-w-[56px] py-1 px-2 rounded-xl transition-all cursor-pointer group"
-          aria-label="Book Consultation"
-        >
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0070ba] to-sky-500 text-white flex items-center justify-center shadow-md shadow-blue-500/25 group-active:scale-95 transition-transform">
-            <Calendar className="w-4 h-4 stroke-[2.5]" />
-          </div>
-          <span className="text-[10px] mt-0.5 font-bold tracking-tight text-[#0070ba]">
-            Book
-          </span>
-        </button>
+        <div className="grid grid-cols-5 items-center relative">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const active = item.isActive;
+
+            return (
+              <Link
+                key={item.label}
+                to={item.href}
+                className="relative flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-colors cursor-pointer group select-none"
+              >
+                {/* Smooth Sliding Glass Pill Indicator */}
+                {active && (
+                  <motion.div
+                    layoutId="publicActiveGlassSlide"
+                    transition={{
+                      type: 'spring',
+                      stiffness: 420,
+                      damping: 32,
+                      mass: 0.8
+                    }}
+                    className="absolute inset-0.5 rounded-xl bg-gradient-to-b from-[#0070ba]/12 to-[#0070ba]/5 border border-[#0070ba]/25 shadow-[0_2px_10px_rgba(0,112,186,0.15)] backdrop-blur-md"
+                  />
+                )}
+
+                <div className="relative z-10 flex items-center justify-center">
+                  <Icon
+                    className={`w-5 h-5 transition-all duration-200 ${
+                      active
+                        ? 'text-[#0070ba] stroke-[2.5] scale-105'
+                        : 'text-slate-400 group-hover:text-slate-600 stroke-2'
+                    }`}
+                  />
+                </div>
+
+                <span
+                  className={`relative z-10 text-[10px] mt-0.5 font-bold tracking-tight transition-colors duration-200 ${
+                    active
+                      ? 'text-[#0070ba]'
+                      : 'text-slate-500 group-hover:text-slate-700'
+                  }`}
+                >
+                  {item.label}
+                </span>
+
+                {/* Subtle active glow dot */}
+                {active && (
+                  <motion.div
+                    layoutId="publicActiveGlowDot"
+                    className="absolute bottom-0.5 w-1 h-1 rounded-full bg-[#0070ba] shadow-[0_0_6px_#0070ba]"
+                    transition={{
+                      type: 'spring',
+                      stiffness: 420,
+                      damping: 32
+                    }}
+                  />
+                )}
+              </Link>
+            );
+          })}
+
+          {/* 5. Book Consultation Action CTA */}
+          <motion.button
+            onClick={onOpenBooking}
+            whileTap={{ scale: 0.90 }}
+            className="flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer group"
+            aria-label="Book Consultation"
+          >
+            <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#0070ba] to-sky-500 text-white flex items-center justify-center shadow-md shadow-blue-500/25 group-active:scale-95 transition-transform">
+              <Calendar className="w-3.5 h-3.5 stroke-[2.5]" />
+            </div>
+            <span className="text-[10px] mt-0.5 font-bold tracking-tight text-[#0070ba]">
+              Book
+            </span>
+          </motion.button>
+        </div>
       </div>
     </nav>
   );
