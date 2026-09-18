@@ -6,6 +6,7 @@ export default function MobileHeader({
   onOpenMenu,
   onOpenSearch,
   onOpenNotifications,
+  onOpenProfile,
   unreadCount = 0,
   isBackendOnline = true,
   isRefreshing = false,
@@ -110,9 +111,13 @@ export default function MobileHeader({
           )}
         </button>
 
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0070ba] to-indigo-600 text-white font-bold text-xs flex items-center justify-center ml-0.5 shadow-xs">
+        <button
+          onClick={onOpenProfile}
+          aria-label="Admin Profile"
+          className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0070ba] to-indigo-600 text-white font-bold text-xs flex items-center justify-center ml-0.5 shadow-xs cursor-pointer active:scale-95 transition-transform"
+        >
           SA
-        </div>
+        </button>
       </div>
     </header>
   );

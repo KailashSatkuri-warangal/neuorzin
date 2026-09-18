@@ -99,6 +99,12 @@ import MobileTeamsView from '../components/admin/mobile/MobileTeamsView';
 import MobileMarketingView from '../components/admin/mobile/MobileMarketingView';
 import MobileReportsView from '../components/admin/mobile/MobileReportsView';
 import MobileSettingsView from '../components/admin/mobile/MobileSettingsView';
+import PwaInstallPrompt from '../components/admin/mobile/PwaInstallPrompt';
+import PwaOfflineBanner from '../components/admin/mobile/PwaOfflineBanner';
+import MobileQuotationDetailsSheet from '../components/admin/mobile/MobileQuotationDetailsSheet';
+import MobileInvoiceDetailsSheet from '../components/admin/mobile/MobileInvoiceDetailsSheet';
+import MobileFilesView from '../components/admin/mobile/MobileFilesView';
+import MobileProfileModal from '../components/admin/mobile/MobileProfileModal';
 import { getCachedCrmData, saveCachedCrmData } from '../data/initialCrmStore';
 import { EMAIL_CONFIG, createMailtoLink } from '../data/emailConfig';
 import { crmApi } from '../data/crmApi';
@@ -259,6 +265,9 @@ export function AdminPage({ onShowToast }) {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [mobileLeadDetail, setMobileLeadDetail] = useState(null);
   const [mobileFinanceSubTab, setMobileFinanceSubTab] = useState('quotations');
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [selectedQuoteDetail, setSelectedQuoteDetail] = useState(null);
+  const [selectedInvoiceDetail, setSelectedInvoiceDetail] = useState(null);
   const [editingCampaign, setEditingCampaign] = useState(null);
   const [editingLead, setEditingLead] = useState(null);
 
@@ -1570,12 +1579,16 @@ export function AdminPage({ onShowToast }) {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans">
       
+      {/* 0. PWA OFFLINE BANNER */}
+      <PwaOfflineBanner onRetry={fetchLiveDatabase} />
+
       {/* 1. MOBILE TOP COMMAND NAVBAR */}
       <MobileHeader
         activeTab={activeTab}
         onOpenMenu={() => setShowMobileMoreDrawer(true)}
         onOpenSearch={() => setShowMobileSearch(true)}
         onOpenNotifications={() => setShowNotificationsDrawer(true)}
+        onOpenProfile={() => setShowProfileModal(true)}
         unreadCount={unreadNotifsCount}
         isBackendOnline={isBackendOnline}
         isRefreshing={isRefreshing}
@@ -2261,6 +2274,13 @@ export function AdminPage({ onShowToast }) {
               <MobileMarketingView
                 campaigns={campaigns}
                 onAddNewCampaign={() => setShowAddCampaignModal(true)}
+              />
+            )}
+
+            {activeTab === 'files' && (
+              <MobileFilesView
+                quotations={quotations}
+                invoices={invoices}
               />
             )}
 
@@ -5393,6 +5413,53 @@ export function AdminPage({ onShowToast }) {
         }}
         onStatusChange={(id, st) => handleUpdateLeadStatus(id, st)}
       />
+
+      <MobileQuotationDetailsSheet
+        quotation={selectedQuoteDetail}
+        isOpen={!!selectedQuoteDetail}
+        onClose={() => setSelectedQuoteDetail(null)}
+        onDownloadPdf={async (q) => {
+          try {
+            await crmApi.downloadQuotationPdf(q.id, q.quote_number, q);
+            if (onShowToast) onShowToast(`Downloaded Quotation ${q.quote_number} PDF!`, 'success');
+          } catch (err) {
+            if (onShowToast) onShowToast(err.message, 'error');
+          }
+        }}
+        onStatusChange={(id, status) => handleUpdateQuotationStatus(id, status)}
+      />
+
+      <MobileInvoiceDetailsSheet
+        invoice={selectedInvoiceDetail}
+        isOpen={!!selectedInvoiceDetail}
+        onClose={() => setSelectedInvoiceDetail(null)}
+        onDownloadPdf={async (inv) => {
+          try {
+            await crmApi.downloadInvoicePdf(inv.id, inv.invoice_number, inv);
+            if (onShowToast) onShowToast(`Downloaded Invoice ${inv.invoice_number} PDF!`, 'success');
+          } catch (err) {
+            if (onShowToast) onShowToast(err.message, 'error');
+          }
+        }}
+        onRecordPayment={(inv) => {
+          setPaymentForm(prev => ({
+            ...prev,
+            invoice_id: inv.id,
+            amount: inv.total_amount,
+            customer_name: inv.customer_name
+          }));
+          setShowRecordPaymentModal(true);
+        }}
+      />
+
+      <MobileProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        onLogout={handleLogout}
+      />
+
+      {/* PWA Floating Install Prompt */}
+      <PwaInstallPrompt />
 
     </div>
   );

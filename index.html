@@ -3,8 +3,17 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NeuOrzin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>NeuOrzin CRM — Executive Command Portal</title>
+  
+  <!-- PWA & Mobile Web App Meta -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0070ba" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="NeuOrzin CRM" />
+  <link rel="apple-touch-icon" href="/assets/images/neuorzin-icon.png" />
+  <link rel="icon" type="image/png" href="/assets/images/neuorzin-icon.png" />
   <meta name="description"
     content="NeuOrzin is a modern product engineering studio helping startups and enterprises from idea to MVP to scale using modern web, mobile, cloud, data engineering, AI and quantum technologies." />
   <meta name="keywords"
@@ -45,6 +54,17 @@
   class="bg-background text-slate-100 antialiased selection:bg-primary selection:text-white overflow-x-hidden font-sans">
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then((reg) => {
+          console.log('NeuOrzin PWA Service Worker active:', reg.scope);
+        }).catch((err) => {
+          console.log('Service Worker registration skipped:', err);
+        });
+      });
+    }
+  </script>
 </body>
 
 </html>

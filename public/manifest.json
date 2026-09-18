@@ -1,0 +1,48 @@
+{
+  "name": "NeuOrzin CRM — Executive Command Portal",
+  "short_name": "NeuOrzin CRM",
+  "description": "Enterprise SaaS CRM & Agile Operations Suite for NeuOrzin",
+  "start_url": "/admin",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#07080e",
+  "theme_color": "#0070ba",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/images/neuorzin-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/images/neuorzin-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "finance"],
+  "shortcuts": [
+    {
+      "name": "Inbound Leads",
+      "url": "/admin#leads",
+      "description": "View and manage incoming customer leads"
+    },
+    {
+      "name": "Deals Pipeline",
+      "url": "/admin#deals",
+      "description": "Track enterprise commercial deals"
+    },
+    {
+      "name": "Tax Invoices",
+      "url": "/admin#invoices",
+      "description": "GST Tax Invoices and Payment collections"
+    },
+    {
+      "name": "Sprint Tasks",
+      "url": "/admin#tasks",
+      "description": "Daily works and live sprint stopwatch"
+    }
+  ]
+}
