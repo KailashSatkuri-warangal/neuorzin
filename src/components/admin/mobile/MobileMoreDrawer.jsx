@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import React from 'react';
 import {
   X,
@@ -107,6 +108,29 @@ export default function MobileMoreDrawer({
           >
             <X className="w-4 h-4" />
           </button>
+        </div>
+
+                {/* Return to Home / Public Website Banner */}
+        <div className="p-4 pb-0">
+          <Link
+            to="/"
+            onClick={onClose}
+            className="w-full flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-blue-50 via-sky-50 to-indigo-50 border border-blue-200/80 text-[#0070ba] hover:bg-blue-100/60 transition-all font-bold text-xs shadow-xs group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-[#0070ba] text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                <Home className="w-4 h-4" />
+              </div>
+              <div className="text-left">
+                <div className="text-xs font-black text-slate-900">Return to Main Website</div>
+                <div className="text-[10px] text-slate-500">Exit Admin & go to NeuOrzin Home</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-1 text-[11px] font-bold text-[#0070ba]">
+              <span>Visit</span>
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+          </Link>
         </div>
 
         {/* Scrollable Category List */}

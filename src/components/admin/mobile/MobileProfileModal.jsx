@@ -1,5 +1,6 @@
 import React from 'react';
-import { X, ShieldCheck, Mail, LogOut, Key, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { X, ShieldCheck, Mail, LogOut, Key, User, Home, Globe } from 'lucide-react';
 
 export default function MobileProfileModal({
   isOpen,
@@ -43,7 +44,18 @@ export default function MobileProfileModal({
           </div>
         </div>
 
-        <div className="pt-2">
+        <div className="pt-2 space-y-2">
+          {/* Return to Main Website Home Button */}
+          <Link
+            to="/"
+            onClick={onClose}
+            className="w-full py-3 rounded-2xl bg-blue-50 hover:bg-blue-100 text-[#0070ba] font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-xs"
+          >
+            <Home className="w-4 h-4" />
+            <span>Return to Main Website Home</span>
+          </Link>
+
+          {/* Sign Out Button */}
           <button
             onClick={() => {
               onClose();
