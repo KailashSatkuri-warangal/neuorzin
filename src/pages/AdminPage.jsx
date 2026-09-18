@@ -105,6 +105,10 @@ import MobileQuotationDetailsSheet from '../components/admin/mobile/MobileQuotat
 import MobileInvoiceDetailsSheet from '../components/admin/mobile/MobileInvoiceDetailsSheet';
 import MobileFilesView from '../components/admin/mobile/MobileFilesView';
 import MobileProfileModal from '../components/admin/mobile/MobileProfileModal';
+import MobileNotificationsView from '../components/admin/mobile/MobileNotificationsView';
+import MobileEmailsView from '../components/admin/mobile/MobileEmailsView';
+import MobileWhatsAppView from '../components/admin/mobile/MobileWhatsAppView';
+import MobileAuditView from '../components/admin/mobile/MobileAuditView';
 import { getCachedCrmData, saveCachedCrmData } from '../data/initialCrmStore';
 import { EMAIL_CONFIG, createMailtoLink } from '../data/emailConfig';
 import { crmApi } from '../data/crmApi';
@@ -2297,6 +2301,57 @@ export function AdminPage({ onShowToast }) {
               <MobileSettingsView
                 systemSettings={systemSettings}
                 isBackendOnline={isBackendOnline}
+              />
+            )}
+
+            {activeTab === 'notifications' && (
+              <MobileNotificationsView
+                notifications={notifications}
+                unreadCount={unreadNotifsCount}
+                onMarkRead={(id) => handleMarkNotificationRead(id)}
+                onMarkAllRead={handleMarkAllNotificationsRead}
+                onClearAll={handleClearAllNotifications}
+                onDelete={(id) => handleDeleteNotification(id)}
+                onNavigateTab={(tab) => handleTabChange(tab)}
+              />
+            )}
+
+            {activeTab === 'emails' && (
+              <MobileEmailsView
+                inboundEmails={inboundEmails}
+                onSelectEmail={(e) => setSelectedEmail(e)}
+              />
+            )}
+
+            {activeTab === 'whatsapp' && (
+              <MobileWhatsAppView
+                messages={whatsappMessages}
+                onSendMessage={(msg) => {
+                  const newMsg = {
+                    id: `WAM-${Date.now()}`,
+                    direction: 'Outbound',
+                    from_phone: '+91 77940 45500',
+                    to_phone: leads[0]?.phone || '+91 98765 43210',
+                    message: msg,
+                    status: 'Delivered',
+                    created_at: new Date().toISOString()
+                  };
+                  setWhatsappMessages(prev => [newMsg, ...prev]);
+                  if (onShowToast) onShowToast('WhatsApp message sent!', 'success');
+                }}
+              />
+            )}
+
+            {activeTab === 'campaigns' && (
+              <MobileMarketingView
+                campaigns={campaigns}
+                onAddNewCampaign={() => setShowAddCampaignModal(true)}
+              />
+            )}
+
+            {activeTab === 'audit' && (
+              <MobileAuditView
+                auditLogs={auditLogs}
               />
             )}
           </div>
