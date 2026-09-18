@@ -75,6 +75,7 @@ import {
   Laptop
 } from 'lucide-react';
 import { getStoredLeads, saveLeads, recordNewLead } from '../data/leadsStore';
+import { getCachedCrmData, saveCachedCrmData } from '../data/initialCrmStore';
 import { EMAIL_CONFIG, createMailtoLink } from '../data/emailConfig';
 import { crmApi } from '../data/crmApi';
 
@@ -186,18 +187,19 @@ export function AdminPage({ onShowToast }) {
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  // Live Database States
-  const [leads, setLeads] = useState([]);
-  const [deals, setDeals] = useState([]);
-  const [quotations, setQuotations] = useState([]);
-  const [invoices, setInvoices] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [activities, setActivities] = useState([]);
-  const [notifications, setNotifications] = useState([]);
-  const [auditLogs, setAuditLogs] = useState([]);
-  const [campaigns, setCampaigns] = useState([]);
-  const [whatsappMessages, setWhatsappMessages] = useState([]);
+  // Live Database States (Hydrated with full offline fallback cache so all counters show immediately)
+  const [initialData] = useState(() => getCachedCrmData());
+  const [leads, setLeads] = useState(initialData.leads || []);
+  const [deals, setDeals] = useState(initialData.deals || []);
+  const [quotations, setQuotations] = useState(initialData.quotations || []);
+  const [invoices, setInvoices] = useState(initialData.invoices || []);
+  const [projects, setProjects] = useState(initialData.projects || []);
+  const [tasks, setTasks] = useState(initialData.tasks || []);
+  const [activities, setActivities] = useState(initialData.activities || []);
+  const [notifications, setNotifications] = useState(initialData.notifications || []);
+  const [auditLogs, setAuditLogs] = useState(initialData.auditLogs || []);
+  const [campaigns, setCampaigns] = useState(initialData.campaigns || []);
+  const [whatsappMessages, setWhatsappMessages] = useState(initialData.whatsappMessages || []);
 
   // Search & Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -280,7 +282,7 @@ export function AdminPage({ onShowToast }) {
   });
 
   // 1. Live Database Fetching
-  const fetchLiveDatabase = async () => {
+  const fetchLiveDatabase = async (isManual = false) => {
     setIsRefreshing(true);
     try {
       const online = await crmApi.checkHealth();
@@ -304,24 +306,88 @@ export function AdminPage({ onShowToast }) {
           crmApi.getWhatsAppMessages()
         ]);
 
-        if (leadsRes.status === 'fulfilled' && Array.isArray(leadsRes.value)) setLeads(leadsRes.value);
-        if (dealsRes.status === 'fulfilled' && Array.isArray(dealsRes.value)) setDeals(dealsRes.value);
-        if (quotesRes.status === 'fulfilled' && Array.isArray(quotesRes.value)) setQuotations(quotesRes.value);
-        if (invsRes.status === 'fulfilled' && Array.isArray(invsRes.value)) setInvoices(invsRes.value);
-        if (projsRes.status === 'fulfilled' && Array.isArray(projsRes.value)) setProjects(projsRes.value);
-        if (tasksRes.status === 'fulfilled' && Array.isArray(tasksRes.value)) setTasks(tasksRes.value);
-        if (actsRes.status === 'fulfilled' && Array.isArray(actsRes.value)) setActivities(actsRes.value);
-        if (notifsRes.status === 'fulfilled' && Array.isArray(notifsRes.value)) setNotifications(notifsRes.value);
-        if (logsRes.status === 'fulfilled' && Array.isArray(logsRes.value)) setAuditLogs(logsRes.value);
-        if (campsRes.status === 'fulfilled' && Array.isArray(campsRes.value)) setCampaigns(campsRes.value);
-        if (waRes.status === 'fulfilled' && Array.isArray(waRes.value)) setWhatsappMessages(waRes.value);
+        let updatedLeads = null;
+        let updatedDeals = null;
+        let updatedQuotes = null;
+        let updatedInvoices = null;
+        let updatedProjects = null;
+        let updatedTasks = null;
+        let updatedActivities = null;
+        let updatedNotifications = null;
+        let updatedLogs = null;
+        let updatedCampaigns = null;
+        let updatedWa = null;
+
+        if (leadsRes.status === 'fulfilled' && Array.isArray(leadsRes.value) && leadsRes.value.length > 0) {
+          updatedLeads = leadsRes.value;
+          setLeads(leadsRes.value);
+        }
+        if (dealsRes.status === 'fulfilled' && Array.isArray(dealsRes.value) && dealsRes.value.length > 0) {
+          updatedDeals = dealsRes.value;
+          setDeals(dealsRes.value);
+        }
+        if (quotesRes.status === 'fulfilled' && Array.isArray(quotesRes.value) && quotesRes.value.length > 0) {
+          updatedQuotes = quotesRes.value;
+          setQuotations(quotesRes.value);
+        }
+        if (invsRes.status === 'fulfilled' && Array.isArray(invsRes.value) && invsRes.value.length > 0) {
+          updatedInvoices = invsRes.value;
+          setInvoices(invsRes.value);
+        }
+        if (projsRes.status === 'fulfilled' && Array.isArray(projsRes.value) && projsRes.value.length > 0) {
+          updatedProjects = projsRes.value;
+          setProjects(projsRes.value);
+        }
+        if (tasksRes.status === 'fulfilled' && Array.isArray(tasksRes.value) && tasksRes.value.length > 0) {
+          updatedTasks = tasksRes.value;
+          setTasks(tasksRes.value);
+        }
+        if (actsRes.status === 'fulfilled' && Array.isArray(actsRes.value) && actsRes.value.length > 0) {
+          updatedActivities = actsRes.value;
+          setActivities(actsRes.value);
+        }
+        if (notifsRes.status === 'fulfilled' && Array.isArray(notifsRes.value)) {
+          updatedNotifications = notifsRes.value;
+          setNotifications(notifsRes.value);
+        }
+        if (logsRes.status === 'fulfilled' && Array.isArray(logsRes.value) && logsRes.value.length > 0) {
+          updatedLogs = logsRes.value;
+          setAuditLogs(logsRes.value);
+        }
+        if (campsRes.status === 'fulfilled' && Array.isArray(campsRes.value) && campsRes.value.length > 0) {
+          updatedCampaigns = campsRes.value;
+          setCampaigns(campsRes.value);
+        }
+        if (waRes.status === 'fulfilled' && Array.isArray(waRes.value) && waRes.value.length > 0) {
+          updatedWa = waRes.value;
+          setWhatsappMessages(waRes.value);
+        }
+
+        saveCachedCrmData({
+          leads: updatedLeads || leads,
+          deals: updatedDeals || deals,
+          quotations: updatedQuotes || quotations,
+          invoices: updatedInvoices || invoices,
+          projects: updatedProjects || projects,
+          tasks: updatedTasks || tasks,
+          activities: updatedActivities || activities,
+          notifications: updatedNotifications || notifications,
+          auditLogs: updatedLogs || auditLogs,
+          campaigns: updatedCampaigns || campaigns,
+          whatsappMessages: updatedWa || whatsappMessages
+        });
+
         setLastSyncTime(new Date());
+        if (isManual && onShowToast) onShowToast('Real-time database synchronized successfully!', 'success');
       } else {
-        setLeads(getStoredLeads());
+        const stored = getStoredLeads();
+        if (stored && stored.length > 0) {
+          setLeads(stored);
+        }
+        if (isManual && onShowToast) onShowToast('Operating in high-speed offline cached mode.', 'info');
       }
     } catch (err) {
       console.warn('Sync notice:', err);
-      setLeads(getStoredLeads());
     } finally {
       setIsRefreshing(false);
     }
@@ -1032,7 +1098,7 @@ export function AdminPage({ onShowToast }) {
           </button>
 
           <button
-            onClick={fetchLiveDatabase}
+            onClick={() => fetchLiveDatabase(true)}
             title="Refresh Live Data"
             className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
           >
