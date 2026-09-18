@@ -1484,25 +1484,38 @@ export function AdminPage({ onShowToast }) {
   // -------------------------------------------------------------------
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen py-12 flex items-center justify-center px-4 bg-[#f8fafc] text-slate-900 relative font-sans">
+      <div className="min-h-screen py-8 sm:py-12 flex items-center justify-center px-4 bg-[#f8fafc] text-slate-900 relative font-sans">
         {/* Soft Blue Gradient Glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-blue-100 to-cyan-100 rounded-full blur-[120px] pointer-events-none" />
+
+        {/* Floating Top Navigation: Return to Main Website */}
+        <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
+          <Link
+            to="/"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/90 hover:bg-white backdrop-blur-md border border-slate-200/90 text-slate-700 hover:text-[#0070ba] text-xs font-bold shadow-sm hover:shadow-md transition-all group"
+          >
+            <ArrowRight className="w-3.5 h-3.5 rotate-180 group-hover:-translate-x-1 transition-transform" />
+            <span>Return to Main Website</span>
+          </Link>
+        </div>
 
         <motion.div 
           initial={{ opacity: 0, scale: 0.98, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="w-full max-w-[460px] bg-white border border-slate-200 rounded-3xl p-8 sm:p-10 shadow-xl shadow-blue-500/5 relative z-10"
+          className="w-full max-w-[460px] bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xl shadow-blue-500/5 relative z-10"
         >
-          <div className="text-center mb-8">
-            <img
-              src="/assets/images/neuorzin-logo.png"
-              alt="NeuOrzin"
-              className="h-10 w-auto mx-auto mb-3 object-contain"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = "/assets/img/logo.png";
-              }}
-            />
+          <div className="text-center mb-6 sm:mb-8">
+            <Link to="/" className="inline-block group" title="Return to Main Website">
+              <img
+                src="/assets/images/neuorzin-logo.png"
+                alt="NeuOrzin"
+                className="h-9 sm:h-10 w-auto mx-auto mb-3 object-contain group-hover:scale-105 transition-transform"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = "/assets/img/logo.png";
+                }}
+              />
+            </Link>
             <h2 className="text-xl font-black text-slate-900 font-display tracking-tight">Executive CRM Portal</h2>
             <p className="text-xs text-slate-500 mt-1">Enterprise Operations Suite</p>
           </div>
@@ -1572,6 +1585,17 @@ export function AdminPage({ onShowToast }) {
               <span>Sign In to Executive Portal</span>
             </button>
           </form>
+
+          {/* Bottom Return to Website Home Link */}
+          <div className="mt-6 pt-4 border-t border-slate-100 text-center">
+            <Link
+              to="/"
+              className="inline-flex items-center justify-center gap-2 text-xs font-bold text-slate-500 hover:text-[#0070ba] transition-colors group"
+            >
+              <ArrowRight className="w-3.5 h-3.5 rotate-180 group-hover:-translate-x-0.5 transition-transform" />
+              <span>Exit Portal & Return to Main Website</span>
+            </Link>
+          </div>
         </motion.div>
       </div>
     );
