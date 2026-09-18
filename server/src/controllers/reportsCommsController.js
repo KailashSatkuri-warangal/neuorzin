@@ -95,12 +95,15 @@ export const getNotifications = async (req, res) => {
     let query = 'SELECT * FROM notifications';
     const params = [];
     if (unread_only === 'true') {
-      query += ' WHERE is_read = FALSE OR is_read = 0';
+      query += db.isPostgres ? ' WHERE is_read = FALSE' : ' WHERE is_read = 0';
     }
     query += ' ORDER BY created_at DESC LIMIT 50';
 
     const notes = await db.all(query, params);
-    const unreadRow = await db.get('SELECT COUNT(*) as count FROM notifications WHERE is_read = FALSE OR is_read = 0');
+    const unreadSql = db.isPostgres
+      ? 'SELECT COUNT(*) as count FROM notifications WHERE is_read = FALSE'
+      : 'SELECT COUNT(*) as count FROM notifications WHERE is_read = 0';
+    const unreadRow = await db.get(unreadSql);
     const unreadCount = Number(unreadRow?.count || 0);
 
     const formatted = (notes || []).map(n => ({

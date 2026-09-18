@@ -39,6 +39,10 @@ function formatSql(sql) {
   formatted = formatted.replace(/datetime\('now'\)/gi, 'CURRENT_TIMESTAMP');
   formatted = formatted.replace(/INSERT OR IGNORE INTO/gi, 'INSERT INTO');
   formatted = formatted.replace(/status = "Active"/gi, "status = 'Active'");
+  formatted = formatted.replace(/is_read = 0/gi, 'is_read = FALSE');
+  formatted = formatted.replace(/is_read = 1/gi, 'is_read = TRUE');
+  formatted = formatted.replace(/is_active = 0/gi, 'is_active = FALSE');
+  formatted = formatted.replace(/is_active = 1/gi, 'is_active = TRUE');
   return formatted;
 }
 
