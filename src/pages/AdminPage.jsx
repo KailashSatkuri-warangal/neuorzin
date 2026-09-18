@@ -72,9 +72,12 @@ import {
   Sliders,
   Database,
   ArrowUpDown,
-  Laptop,
   Pencil,
-  Edit
+  Edit,
+  Play,
+  Pause,
+  Square,
+  RotateCcw
 } from 'lucide-react';
 import { getStoredLeads, saveLeads, recordNewLead } from '../data/leadsStore';
 import { getCachedCrmData, saveCachedCrmData } from '../data/initialCrmStore';
@@ -231,6 +234,8 @@ export function AdminPage({ onShowToast }) {
   const [editingInvoice, setEditingInvoice] = useState(null);
   const [editingProject, setEditingProject] = useState(null);
   const [editingTask, setEditingTask] = useState(null);
+  const [activeTimerTask, setActiveTimerTask] = useState(null);
+  const [dailyTodoInput, setDailyTodoInput] = useState('');
   const [editingCampaign, setEditingCampaign] = useState(null);
   const [editingLead, setEditingLead] = useState(null);
 
@@ -356,9 +361,12 @@ export function AdminPage({ onShowToast }) {
           updatedActivities = actsRes.value;
           setActivities(actsRes.value);
         }
-        if (notifsRes.status === 'fulfilled' && Array.isArray(notifsRes.value)) {
-          updatedNotifications = notifsRes.value;
-          setNotifications(notifsRes.value);
+        if (notifsRes.status === 'fulfilled') {
+          const notifList = Array.isArray(notifsRes.value) ? notifsRes.value : (notifsRes.value?.notifications || []);
+          if (notifList.length > 0 || Array.isArray(notifsRes.value)) {
+            updatedNotifications = notifList;
+            setNotifications(notifList);
+          }
         }
         if (logsRes.status === 'fulfilled' && Array.isArray(logsRes.value) && logsRes.value.length > 0) {
           updatedLogs = logsRes.value;
@@ -518,6 +526,136 @@ export function AdminPage({ onShowToast }) {
       if (onShowToast) onShowToast('All notifications marked as read', 'success');
     } catch (err) {
       console.warn('Error marking all notifications read:', err);
+    }
+  };
+
+  const getTimelineMetrics = (startDate, deadline) => {
+    if (!deadline && !startDate) return null;
+    const now = new Date();
+    const end = deadline ? new Date(deadline) : null;
+    const start = startDate ? new Date(startDate) : new Date(now.getTime() - 14 * 86400000);
+    if (!end || isNaN(end.getTime())) return null;
+
+    const diffMs = end.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    const totalMs = Math.max(1, end.getTime() - start.getTime());
+    const elapsedMs = Math.max(0, now.getTime() - start.getTime());
+    const progressPct = Math.min(100, Math.max(0, Math.round((elapsedMs / totalMs) * 100)));
+
+    return {
+      diffDays,
+      isOverdue: diffDays < 0,
+      daysLeftText: diffDays < 0 ? `Overdue by ${Math.abs(diffDays)}d` : diffDays === 0 ? 'Due Today' : `${diffDays}d left`,
+      progressPct,
+      formattedEnd: end.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })
+    };
+  };
+
+  const formatSeconds = (sec) => {
+    const h = Math.floor(sec / 3600).toString().padStart(2, '0');
+    const m = Math.floor((sec % 3600) / 60).toString().padStart(2, '0');
+    const s = (sec % 60).toString().padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  };
+
+  useEffect(() => {
+    let interval = null;
+    if (activeTimerTask && activeTimerTask.isRunning) {
+      interval = setInterval(() => {
+        setActiveTimerTask(prev => prev ? ({ ...prev, seconds: prev.seconds + 1 }) : null);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [activeTimerTask?.isRunning]);
+
+  const handleStartTimer = (task) => {
+    if (activeTimerTask?.id === task.id) {
+      setActiveTimerTask(prev => ({ ...prev, isRunning: !prev.isRunning }));
+    } else {
+      setActiveTimerTask({
+        id: task.id,
+        title: task.title,
+        project_name: task.project_name || 'Sprint Delivery',
+        seconds: 0,
+        isRunning: true
+      });
+      if (onShowToast) onShowToast(`Started stopwatch for "${task.title}"`, 'info');
+    }
+  };
+
+  const handleStopTimerAndLog = async () => {
+    if (!activeTimerTask) return;
+    const hoursToAdd = Math.max(0.1, Number((activeTimerTask.seconds / 3600).toFixed(2)));
+    const targetTask = tasks.find(t => t.id === activeTimerTask.id);
+    const currentLogged = Number(targetTask?.logged_hours || 0);
+    const updatedLogged = Number((currentLogged + hoursToAdd).toFixed(2));
+
+    await handleUpdateTask(activeTimerTask.id, {
+      logged_hours: updatedLogged,
+      status: 'In Progress'
+    });
+
+    if (onShowToast) onShowToast(`Logged +${hoursToAdd}h to "${activeTimerTask.title}"!`, 'success');
+    setActiveTimerTask(null);
+  };
+
+  const handleQuickAddDailyTodo = async (e) => {
+    if (e) e.preventDefault();
+    if (!dailyTodoInput.trim()) return;
+    const newTitle = dailyTodoInput.trim();
+    setDailyTodoInput('');
+
+    const newTaskPayload = {
+      title: newTitle,
+      project_id: projects[0]?.id || 'PRJ-001',
+      project_name: projects[0]?.name || 'Sprint Delivery',
+      department: 'Engineering',
+      priority: 'High',
+      status: 'In Progress',
+      estimated_hours: 4,
+      logged_hours: 0,
+      due_date: new Date(Date.now() + 86400000).toISOString().split('T')[0]
+    };
+
+    try {
+      let created = null;
+      if (isBackendOnline) {
+        created = await crmApi.createTask(newTaskPayload);
+      } else {
+        created = {
+          id: `TSK-${Date.now()}`,
+          task_code: `TSK-${tasks.length + 101}`,
+          ...newTaskPayload,
+          created_at: new Date().toISOString()
+        };
+      }
+      if (created) {
+        setTasks(prev => [created, ...prev]);
+        setActiveTimerTask({
+          id: created.id,
+          title: created.title,
+          project_name: created.project_name,
+          seconds: 0,
+          isRunning: true
+        });
+        if (onShowToast) onShowToast('Created daily task & started stopwatch!', 'success');
+      }
+    } catch (err) {
+      console.error('Failed to create daily task:', err);
+      if (onShowToast) onShowToast('Failed to create task', 'error');
+    }
+  };
+
+  const handleClearAllNotifications = async () => {
+    try {
+      if (isBackendOnline) {
+        await Promise.allSettled(notifications.map(n => crmApi.deleteNotification(n.id)));
+      }
+      setNotifications([]);
+      if (onShowToast) onShowToast('All notifications cleared', 'info');
+    } catch (err) {
+      setNotifications([]);
+      if (onShowToast) onShowToast('All notifications cleared', 'info');
     }
   };
 
@@ -1537,6 +1675,16 @@ export function AdminPage({ onShowToast }) {
                         <span>Read all</span>
                       </button>
                     )}
+                    {notifications.length > 0 && (
+                      <button
+                        onClick={handleClearAllNotifications}
+                        title="Clear all notifications"
+                        className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Clear</span>
+                      </button>
+                    )}
                     <button
                       onClick={() => setShowNotificationsDrawer(false)}
                       className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
@@ -1641,8 +1789,8 @@ export function AdminPage({ onShowToast }) {
                               </div>
                             </div>
 
-                            {/* Hover Actions */}
-                            <div className="absolute right-2 top-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {/* Notification Card Action Buttons */}
+                            <div className="absolute right-2 top-2 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                               {!isRead && (
                                 <button
                                   onClick={(e) => handleMarkNotificationRead(n.id, e)}
@@ -2540,7 +2688,7 @@ export function AdminPage({ onShowToast }) {
                                 <button
                                   onClick={async () => {
                                     try {
-                                      await crmApi.downloadQuotationPdf(q.id, q.quote_number);
+                                      await crmApi.downloadQuotationPdf(q.id, q.quote_number, q);
                                       if (onShowToast) onShowToast(`Downloaded Quotation ${q.quote_number} PDF!`, 'success');
                                     } catch (err) {
                                       if (onShowToast) onShowToast(err.message, 'error');
@@ -2671,7 +2819,7 @@ export function AdminPage({ onShowToast }) {
                                   <button
                                     onClick={async () => {
                                       try {
-                                        await crmApi.downloadInvoicePdf(inv.id, inv.invoice_number);
+                                        await crmApi.downloadInvoicePdf(inv.id, inv.invoice_number, inv);
                                         if (onShowToast) onShowToast(`Downloaded Invoice ${inv.invoice_number} PDF!`, 'success');
                                       } catch (err) {
                                         if (onShowToast) onShowToast(err.message, 'error');
@@ -2782,6 +2930,45 @@ export function AdminPage({ onShowToast }) {
 
                       <p className="text-xs text-slate-500 line-clamp-2">{p.description || 'Sprint architecture and deliverables.'}</p>
 
+                      {/* Project Start & End Dates with Countdown Timer */}
+                      {(() => {
+                        const tm = getTimelineMetrics(p.start_date, p.deadline);
+                        return (
+                          <div className="space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                            <div className="flex justify-between items-center text-[11px]">
+                              <span className="text-slate-600 font-medium flex items-center gap-1">
+                                <Calendar className="w-3 h-3 text-slate-400" />
+                                <span>{p.start_date ? new Date(p.start_date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : 'Kickoff'} - {p.deadline ? new Date(p.deadline).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Ongoing'}</span>
+                              </span>
+                              {tm && (
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 ${
+                                  tm.isOverdue ? 'bg-rose-100 text-rose-700' : tm.diffDays <= 5 ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-[#0070ba]'
+                                }`}>
+                                  <Clock className="w-2.5 h-2.5" />
+                                  <span>{tm.daysLeftText}</span>
+                                </span>
+                              )}
+                            </div>
+                            {tm && (
+                              <div className="space-y-1">
+                                <div className="flex justify-between text-[10px] text-slate-400 font-semibold">
+                                  <span>Sprint Timeline</span>
+                                  <span>{tm.progressPct}%</span>
+                                </div>
+                                <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                                  <div
+                                    className={`h-full rounded-full transition-all duration-500 ${
+                                      tm.isOverdue ? 'bg-rose-500' : tm.progressPct > 80 ? 'bg-amber-500' : 'bg-[#0070ba]'
+                                    }`}
+                                    style={{ width: `${tm.progressPct}%` }}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
+
                       <div className="pt-3 border-t border-slate-100 flex justify-between items-center text-xs">
                         <span className="text-slate-500">Budget: <strong className="text-slate-900 font-mono">₹{Number(p.budget || 0).toLocaleString('en-IN')}</strong></span>
                         <span className="px-2 py-0.5 rounded-lg bg-blue-50 text-[#0070ba] font-bold text-[11px]">{p.status || 'Active'}</span>
@@ -2798,11 +2985,95 @@ export function AdminPage({ onShowToast }) {
              ------------------------------------------------------------- */}
           {activeTab === 'tasks' && (
             <div className="space-y-6">
+              {/* Daily Works & Live Sprint Stopwatch Widget */}
+              <div className="bg-gradient-to-r from-slate-900 via-[#0a2540] to-slate-900 rounded-3xl p-5 text-white shadow-lg space-y-4 border border-slate-800">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                  {/* Active Stopwatch Display */}
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/15 flex items-center justify-center">
+                      <Clock className={`w-7 h-7 ${activeTimerTask?.isRunning ? 'text-emerald-400 animate-pulse' : 'text-blue-300'}`} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/15 text-blue-200">
+                          {activeTimerTask ? 'Active Daily Work Timer' : 'Daily Works Stopwatch'}
+                        </span>
+                        {activeTimerTask?.isRunning && (
+                          <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-bold">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                            Recording
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-2xl font-black font-mono tracking-tight mt-0.5 text-white">
+                        {formatSeconds(activeTimerTask?.seconds || 0)}
+                      </div>
+                      <div className="text-xs text-slate-300 font-medium truncate max-w-md">
+                        {activeTimerTask ? activeTimerTask.title : 'Select or create a daily task to start timing'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Stopwatch Controls */}
+                  {activeTimerTask && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setActiveTimerTask(prev => ({ ...prev, isRunning: !prev.isRunning }))}
+                        className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer ${
+                          activeTimerTask.isRunning
+                            ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20'
+                            : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/20'
+                        }`}
+                      >
+                        {activeTimerTask.isRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                        <span>{activeTimerTask.isRunning ? 'Pause' : 'Resume'}</span>
+                      </button>
+
+                      <button
+                        onClick={handleStopTimerAndLog}
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-all shadow-md shadow-purple-600/20 cursor-pointer"
+                      >
+                        <Square className="w-3.5 h-3.5" />
+                        <span>Save & Log Hours</span>
+                      </button>
+
+                      <button
+                        onClick={() => setActiveTimerTask(null)}
+                        className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-all cursor-pointer"
+                        title="Cancel timer"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Quick Add Daily Task / To-Do Input */}
+                <form onSubmit={handleQuickAddDailyTodo} className="pt-3 border-t border-white/10 flex flex-col sm:flex-row items-center gap-2">
+                  <div className="relative flex-1 w-full">
+                    <input
+                      type="text"
+                      placeholder="⚡ Quick Add Daily Work / Sprint Task (e.g. 'Optimize database indexes and query cache')..."
+                      value={dailyTodoInput}
+                      onChange={(e) => setDailyTodoInput(e.target.value)}
+                      className="w-full bg-white/10 border border-white/15 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:bg-white/20 focus:border-blue-400 transition-all"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[#0070ba] hover:bg-[#005a96] text-white text-xs font-bold transition-all shadow-md shadow-blue-500/30 cursor-pointer shrink-0"
+                  >
+                    <PlusCircle className="w-3.5 h-3.5" />
+                    <span>Add & Start Timer</span>
+                  </button>
+                </form>
+              </div>
+
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
                 <div>
                   <div className="text-sm font-black text-slate-900">Sprint Backlog & Timesheet Tracking</div>
                   <div className="text-[11px] text-slate-500">
-                    Engineering tasks with developer hour logging and priority management.
+                    Engineering tasks with developer hour logging, start/end deadlines, and live stopwatch.
                   </div>
                 </div>
 
@@ -2859,7 +3130,20 @@ export function AdminPage({ onShowToast }) {
                         tasks.map(t => (
                           <tr key={t.id} className="hover:bg-slate-50/80 transition-colors">
                             <td className="py-3.5 px-4">
-                              <div className="font-bold text-slate-900">{t.title}</div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-slate-900">{t.title}</span>
+                                {t.due_date && (() => {
+                                  const tm = getTimelineMetrics(t.created_at, t.due_date);
+                                  return tm ? (
+                                    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                                      tm.isOverdue ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-600'
+                                    }`}>
+                                      <Clock className="w-2.5 h-2.5" />
+                                      <span>{tm.daysLeftText}</span>
+                                    </span>
+                                  ) : null;
+                                })()}
+                              </div>
                               <div className="text-[10px] text-slate-500 font-mono">{t.task_code || `TSK-${t.id}`}</div>
                             </td>
                             <td className="py-3.5 px-4 text-slate-700 font-semibold">{t.department || 'Engineering'}</td>
@@ -2887,6 +3171,27 @@ export function AdminPage({ onShowToast }) {
                             </td>
                             <td className="py-3.5 px-4 text-right">
                               <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => handleStartTimer(t)}
+                                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors flex items-center gap-1 cursor-pointer ${
+                                    activeTimerTask?.id === t.id && activeTimerTask.isRunning
+                                      ? 'bg-amber-500 text-white border-amber-500 animate-pulse'
+                                      : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200'
+                                  }`}
+                                  title={activeTimerTask?.id === t.id && activeTimerTask.isRunning ? 'Pause Stopwatch' : 'Start Stopwatch'}
+                                >
+                                  {activeTimerTask?.id === t.id && activeTimerTask.isRunning ? (
+                                    <>
+                                      <Pause className="w-3 h-3" />
+                                      <span>Timing</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Play className="w-3 h-3" />
+                                      <span>Timer</span>
+                                    </>
+                                  )}
+                                </button>
                                 <button
                                   onClick={() => setShowLogTimeModal(t)}
                                   className="px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-[11px] border border-purple-200 cursor-pointer"

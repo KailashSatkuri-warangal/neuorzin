@@ -28,9 +28,15 @@ function createMockReqRes(body = {}, params = {}, query = {}, headers = {}, user
       responseData = data;
       return this;
     },
-    setHeader() {},
-    sendFile(filePath) {
-      responseData = { file: filePath, exists: fs.existsSync(filePath) };
+    setHeader() {
+      return this;
+    },
+    end(data) {
+      if (Buffer.isBuffer(data)) {
+        responseData = { file: 'in-memory-buffer', exists: data.length > 0, size: data.length };
+      } else {
+        responseData = data;
+      }
       return this;
     },
     getStatusCode() {
