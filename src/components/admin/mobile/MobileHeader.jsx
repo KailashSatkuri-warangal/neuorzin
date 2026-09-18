@@ -49,9 +49,15 @@ export default function MobileHeader({
         </button>
 
         <div className="flex items-center gap-2 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0070ba] to-cyan-500 flex items-center justify-center text-white font-black text-xs shadow-xs shrink-0">
-            NO
-          </div>
+          <img
+            src="/assets/images/neuorzin-icon.png"
+            alt="NeuOrzin"
+            className="w-8 h-8 object-contain rounded-xl shrink-0"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = "/assets/img/logo-icon.png";
+            }}
+          />
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 leading-none">
               <span className="text-xs font-black text-slate-900 truncate font-display">

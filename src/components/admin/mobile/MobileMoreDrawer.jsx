@@ -87,9 +87,15 @@ export default function MobileMoreDrawer({
         {/* Header Handle */}
         <div className="p-4 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#0070ba] text-white flex items-center justify-center font-bold text-xs shadow-xs">
-              NO
-            </div>
+            <img
+              src="/assets/images/neuorzin-icon.png"
+              alt="NeuOrzin"
+              className="w-8 h-8 object-contain rounded-xl shrink-0"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = "/assets/img/logo-icon.png";
+              }}
+            />
             <div>
               <h3 className="text-sm font-black text-slate-900">CRM Modules</h3>
               <p className="text-[10px] text-slate-500">Select any section to navigate</p>

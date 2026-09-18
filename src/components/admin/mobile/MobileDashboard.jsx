@@ -76,9 +76,15 @@ export default function MobileDashboard({
               <span>{currentDateFormatted}</span>
             </p>
           </div>
-          <div className="w-10 h-10 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center text-white font-bold text-sm border border-white/20">
-            NO
-          </div>
+          <img
+            src="/assets/images/neuorzin-icon.png"
+            alt="NeuOrzin"
+            className="w-10 h-10 object-contain rounded-2xl bg-white/15 backdrop-blur-md p-1 border border-white/20 shrink-0"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = "/assets/img/logo-icon.png";
+            }}
+          />
         </div>
 
         {/* Mini Highlights */}

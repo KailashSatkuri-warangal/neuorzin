@@ -1481,11 +1481,17 @@ export function AdminPage({ onShowToast }) {
           className="w-full max-w-[460px] bg-white border border-slate-200 rounded-3xl p-8 sm:p-10 shadow-xl shadow-blue-500/5 relative z-10"
         >
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#0070ba] to-cyan-500 p-3.5 mx-auto mb-4 shadow-lg shadow-blue-500/25 flex items-center justify-center text-white">
-              <ShieldCheck className="w-9 h-9" />
-            </div>
-            <h2 className="text-2xl font-black text-slate-900 font-display tracking-tight">NeuOrzin CRM</h2>
-            <p className="text-xs text-slate-500 mt-1">Enterprise Executive Portal & Operations Suite</p>
+            <img
+              src="/assets/images/neuorzin-logo.png"
+              alt="NeuOrzin"
+              className="h-10 w-auto mx-auto mb-3 object-contain"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = "/assets/img/logo.png";
+              }}
+            />
+            <h2 className="text-xl font-black text-slate-900 font-display tracking-tight">Executive CRM Portal</h2>
+            <p className="text-xs text-slate-500 mt-1">Enterprise Operations Suite</p>
           </div>
 
           {loginError && (
@@ -1579,9 +1585,15 @@ export function AdminPage({ onShowToast }) {
       {/* 2. DESKTOP TOP COMMAND NAVBAR */}
       <header className="hidden md:flex h-16 border-b border-slate-200 bg-white/95 backdrop-blur-md px-4 sm:px-8 items-center justify-between sticky top-0 z-30 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0070ba] to-cyan-500 flex items-center justify-center text-white font-black text-xs shadow-md shadow-blue-500/25">
-            NO
-          </div>
+          <img
+            src="/assets/images/neuorzin-icon.png"
+            alt="NeuOrzin"
+            className="w-9 h-9 object-contain rounded-xl shadow-xs"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = "/assets/img/logo-icon.png";
+            }}
+          />
           <div>
             <div className="text-sm font-black text-slate-900 font-display leading-none flex items-center gap-2">
               <span>NeuOrzin CRM</span>
