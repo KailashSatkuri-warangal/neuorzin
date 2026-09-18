@@ -4,7 +4,7 @@
  * Supports Offline Caching, Push Notifications, Background Sync, Periodic Sync, and Navigation Fallbacks.
  */
 
-const CACHE_NAME = 'neuorzin-crm-pwa-v2.1.0';
+const CACHE_NAME = 'neuorzin-crm-pwa-v2.2.0';
 const STATIC_ASSETS = [
   '/',
   '/admin',
@@ -71,7 +71,7 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => {
           if (event.request.mode === 'navigate') {
-            return caches.match('/admin') || caches.match('/');
+            return caches.match('/') || caches.match('/index.html');
           }
           return cachedResponse;
         });

@@ -517,6 +517,7 @@ export function AdminPage({ onShowToast }) {
     localStorage.removeItem('neuorzin_admin_auth');
     localStorage.removeItem('neuorzin_jwt_token');
     if (onShowToast) onShowToast('Signed out of Admin Portal.', 'info');
+    navigate('/');
   };
 
   // Notification Counts & Filtering
