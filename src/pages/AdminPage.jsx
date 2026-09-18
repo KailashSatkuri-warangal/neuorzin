@@ -548,11 +548,12 @@ export function AdminPage({ onShowToast }) {
 
   // 1. Dynamic Quick Update Lead Status
   const handleUpdateLeadStatus = async (leadId, newStatus) => {
+    setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status: newStatus } : l));
     try {
       if (isBackendOnline) {
         await crmApi.updateLead(leadId, { status: newStatus });
-        if (onShowToast) onShowToast(`Lead status updated to ${newStatus}`, 'success');
       }
+      if (onShowToast) onShowToast(`Lead status updated to ${newStatus}`, 'success');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -565,6 +566,13 @@ export function AdminPage({ onShowToast }) {
     const currIdx = stageFlow.indexOf(currentStage);
     const nextStage = currIdx !== -1 && currIdx < stageFlow.length - 1 ? stageFlow[currIdx + 1] : 'Won';
 
+    setDeals(prev => prev.map(d => d.id === dealId ? { 
+      ...d, 
+      stage: nextStage, 
+      status: nextStage === 'Won' ? 'Won' : 'Open',
+      probability: nextStage === 'Won' ? 100 : nextStage === 'Negotiation' ? 80 : 60 
+    } : d));
+
     try {
       if (isBackendOnline) {
         await crmApi.updateDeal(dealId, { 
@@ -572,8 +580,8 @@ export function AdminPage({ onShowToast }) {
           status: nextStage === 'Won' ? 'Won' : 'Open',
           probability: nextStage === 'Won' ? 100 : nextStage === 'Negotiation' ? 80 : 60
         });
-        if (onShowToast) onShowToast(`Deal advanced to ${nextStage}!`, 'success');
       }
+      if (onShowToast) onShowToast(`Deal advanced to ${nextStage}!`, 'success');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -582,11 +590,12 @@ export function AdminPage({ onShowToast }) {
 
   // 3. Dynamic Quick Update Task Status
   const handleUpdateTaskStatus = async (taskId, newStatus) => {
+    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
     try {
       if (isBackendOnline) {
         await crmApi.updateTask(taskId, { status: newStatus });
-        if (onShowToast) onShowToast(`Task updated to ${newStatus}`, 'success');
       }
+      if (onShowToast) onShowToast(`Task updated to ${newStatus}`, 'success');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -603,23 +612,43 @@ export function AdminPage({ onShowToast }) {
   // 5. Create Inbound Lead Action
   const handleCreateLead = async (e) => {
     e.preventDefault();
+    const newLeadObj = {
+      id: `LEAD-${Math.floor(1000 + Math.random() * 9000)}`,
+      name: leadForm.name,
+      email: leadForm.email,
+      phone: leadForm.phone,
+      company: leadForm.company || 'Direct Client',
+      service: leadForm.service || 'Enterprise Software & AI',
+      requirement_need: leadForm.requirement_need,
+      budget: leadForm.budget || '₹5,00,000 - ₹15,00,000',
+      timeline: leadForm.timeline || '3-6 Months',
+      source: 'Admin Portal Entry',
+      priority: 'High',
+      score: 85,
+      status: 'New',
+      created_at: new Date().toISOString().replace('T', ' ').slice(0, 16),
+      emailStatus: `Delivered (${leadForm.email})`
+    };
+
+    setLeads(prev => [newLeadObj, ...prev]);
+    setShowAddLeadModal(false);
+    setLeadForm({ name: '', email: '', phone: '', company: '', service: 'Enterprise Software & AI', requirement_need: '', budget: '', timeline: '' });
+
     try {
       if (isBackendOnline) {
         await crmApi.createLead({
-          name: leadForm.name,
-          email: leadForm.email,
-          phone: leadForm.phone,
-          company: leadForm.company,
-          service: leadForm.service,
-          requirement_need: leadForm.requirement_need,
-          budget: leadForm.budget || '₹5,00,000 - ₹15,00,000',
-          timeline: leadForm.timeline || '3-6 Months',
-          source: 'Admin Manual Entry'
+          name: newLeadObj.name,
+          email: newLeadObj.email,
+          phone: newLeadObj.phone,
+          company: newLeadObj.company,
+          service: newLeadObj.service,
+          requirement_need: newLeadObj.requirement_need,
+          budget: newLeadObj.budget,
+          timeline: newLeadObj.timeline,
+          source: newLeadObj.source
         });
-        if (onShowToast) onShowToast('New Lead captured in Live Database!', 'success');
       }
-      setShowAddLeadModal(false);
-      setLeadForm({ name: '', email: '', phone: '', company: '', service: 'Enterprise Software & AI', requirement_need: '', budget: '', timeline: '' });
+      if (onShowToast) onShowToast('New Lead captured in Live Database!', 'success');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -628,11 +657,27 @@ export function AdminPage({ onShowToast }) {
 
   // 6. Convert Lead to Deal
   const handleConvertLeadToDeal = async (lead) => {
+    setLeads(prev => prev.map(l => l.id === lead.id ? { ...l, status: 'Won' } : l));
+    const newDealObj = {
+      id: `DEAL-${Math.floor(1000 + Math.random() * 9000)}`,
+      pipeline_id: 'PIPE-SW',
+      title: `${lead.company || lead.name} - Enterprise Implementation`,
+      customer_name: `${lead.name} (${lead.company || 'Direct'})`,
+      company: lead.company || 'Direct Client',
+      stage: 'Won',
+      value: 500000,
+      probability: 100,
+      expected_close_date: new Date().toISOString().split('T')[0],
+      assigned_to: 'Kailash S (Super Admin)',
+      status: 'Won'
+    };
+    setDeals(prev => [newDealObj, ...prev]);
+
     try {
       if (isBackendOnline) {
         await crmApi.convertLead(lead.id, 500000);
-        if (onShowToast) onShowToast(`Converted ${lead.name} to Active Deal & Project!`, 'success');
       }
+      if (onShowToast) onShowToast(`Converted ${lead.name} to Active Deal & Project!`, 'success');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -642,21 +687,38 @@ export function AdminPage({ onShowToast }) {
   // 7. Create Deal
   const handleCreateDeal = async (e) => {
     e.preventDefault();
+    const dealVal = parseFloat(dealForm.value || 500000);
+    const newDealObj = {
+      id: `DEAL-${Math.floor(1000 + Math.random() * 9000)}`,
+      pipeline_id: dealForm.pipeline_id || 'PIPE-SW',
+      title: dealForm.title,
+      customer_name: dealForm.customer_id || 'Direct Client',
+      company: dealForm.customer_id || 'Enterprise Client',
+      stage: dealForm.stage || 'Lead Qualified',
+      value: dealVal,
+      probability: parseInt(dealForm.probability || 50, 10),
+      expected_close_date: dealForm.expected_close_date || new Date().toISOString().split('T')[0],
+      assigned_to: 'Rohan Mehta (Sales Lead)',
+      status: dealForm.stage === 'Won' ? 'Won' : 'Open'
+    };
+
+    setDeals(prev => [newDealObj, ...prev]);
+    setShowAddDealModal(false);
+    setDealForm({ title: '', customer_id: '', pipeline_id: 'PIPE-SW', stage: 'Lead Qualified', value: '', probability: 50, expected_close_date: '' });
+
     try {
       if (isBackendOnline) {
         await crmApi.createDeal({
-          title: dealForm.title,
+          title: newDealObj.title,
           customer_id: dealForm.customer_id || (leads[0]?.id || 'CUST-001'),
-          pipeline_id: dealForm.pipeline_id,
-          stage: dealForm.stage,
-          value: parseFloat(dealForm.value || 0),
-          probability: parseInt(dealForm.probability, 10),
-          expected_close_date: dealForm.expected_close_date || null
+          pipeline_id: newDealObj.pipeline_id,
+          stage: newDealObj.stage,
+          value: newDealObj.value,
+          probability: newDealObj.probability,
+          expected_close_date: newDealObj.expected_close_date
         });
-        if (onShowToast) onShowToast('Deal created in Revenue Pipeline!', 'success');
       }
-      setShowAddDealModal(false);
-      setDealForm({ title: '', customer_id: '', pipeline_id: 'PIPE-SW', stage: 'Lead Qualified', value: '', probability: 50, expected_close_date: '' });
+      if (onShowToast) onShowToast('Deal created in Revenue Pipeline!', 'success');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -666,29 +728,47 @@ export function AdminPage({ onShowToast }) {
   // 8. Create Quotation
   const handleCreateQuotation = async (e) => {
     e.preventDefault();
-    try {
-      const sub = quoteForm.items.reduce((sum, item) => sum + (Number(item.qty || 1) * Number(item.rate || 0)), 0);
-      const gst = sub * 0.18;
-      const tot = sub + gst;
+    const sub = quoteForm.items.reduce((sum, item) => sum + (Number(item.qty || 1) * Number(item.rate || 0)), 0);
+    const gst = sub * 0.18;
+    const tot = sub + gst;
 
+    const newQuoteObj = {
+      id: `QT-${Math.floor(1000 + Math.random() * 9000)}`,
+      quote_number: `QT-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+      customer_name: quoteForm.client_name || quoteForm.customer_id || (leads[0]?.name || 'Client Partner'),
+      company: quoteForm.client_name || (leads[0]?.company || 'Enterprise Client'),
+      service_title: quoteForm.service_title || 'Enterprise Software Implementation',
+      subtotal: sub,
+      discount: 0,
+      gst_rate: 18,
+      gst_amount: gst,
+      total_amount: tot,
+      status: 'Sent',
+      valid_until: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
+      created_at: new Date().toISOString().split('T')[0]
+    };
+
+    setQuotations(prev => [newQuoteObj, ...prev]);
+    setShowAddQuoteModal(false);
+    setQuoteForm({
+      customer_id: '', client_name: '', deal_id: '', service_title: '', scope_of_work: '',
+      items: [{ description: 'Phase 1: Architecture & UI/UX Design', qty: 1, rate: 50000, amount: 50000 }]
+    });
+
+    try {
       if (isBackendOnline) {
         await crmApi.createQuotation({
           customer_id: quoteForm.customer_id || quoteForm.client_name || (leads[0]?.id || 'CUST-001'),
           deal_id: quoteForm.deal_id || null,
-          service_title: quoteForm.service_title,
+          service_title: newQuoteObj.service_title,
           scope_of_work: quoteForm.scope_of_work,
           items: quoteForm.items,
           subtotal: sub,
           gst_amount: gst,
           total_amount: tot
         });
-        if (onShowToast) onShowToast('GST Quotation created with 18% Tax breakdown!', 'success');
       }
-      setShowAddQuoteModal(false);
-      setQuoteForm({
-        customer_id: '', client_name: '', deal_id: '', service_title: '', scope_of_work: '',
-        items: [{ description: 'Phase 1: Architecture & UI/UX Design', qty: 1, rate: 50000, amount: 50000 }]
-      });
+      if (onShowToast) onShowToast('GST Quotation created with 18% Tax breakdown!', 'success');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -698,32 +778,47 @@ export function AdminPage({ onShowToast }) {
   // 9. Create Invoice
   const handleCreateInvoice = async (e) => {
     e.preventDefault();
-    try {
-      const sub = invoiceForm.items.reduce((sum, item) => sum + (Number(item.qty || 1) * Number(item.rate || 0)), 0);
-      const gst = sub * 0.18;
-      const tot = sub + gst;
+    const sub = invoiceForm.items.reduce((sum, item) => sum + (Number(item.qty || 1) * Number(item.rate || 0)), 0);
+    const gst = sub * 0.18;
+    const tot = sub + gst;
 
+    const newInvObj = {
+      id: `INV-${Math.floor(1000 + Math.random() * 9000)}`,
+      invoice_number: `INV-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+      customer_name: invoiceForm.client_name || invoiceForm.customer_id || (leads[0]?.name || 'Client Partner'),
+      company: invoiceForm.client_name || (leads[0]?.company || 'Enterprise Client'),
+      issue_date: invoiceForm.issue_date,
+      due_date: invoiceForm.due_date,
+      total_amount: tot,
+      paid_amount: 0,
+      status: 'Pending',
+      gst_amount: gst
+    };
+
+    setInvoices(prev => [newInvObj, ...prev]);
+    setShowAddInvoiceModal(false);
+    setInvoiceForm({
+      customer_id: '', client_name: '', deal_id: '', issue_date: new Date().toISOString().split('T')[0],
+      due_date: new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0],
+      notes: 'Standard GST commercial tax invoice',
+      items: [{ description: 'Enterprise AI & Custom Software Implementation', sac: '998313', qty: 1, rate: 75000, amount: 75000 }]
+    });
+
+    try {
       if (isBackendOnline) {
         await crmApi.createInvoice({
           customer_id: invoiceForm.customer_id || invoiceForm.client_name || (leads[0]?.id || 'CUST-001'),
           deal_id: invoiceForm.deal_id || null,
-          issue_date: invoiceForm.issue_date,
-          due_date: invoiceForm.due_date,
+          issue_date: newInvObj.issue_date,
+          due_date: newInvObj.due_date,
           notes: invoiceForm.notes,
           items: invoiceForm.items,
           subtotal: sub,
           gst_amount: gst,
           total_amount: tot
         });
-        if (onShowToast) onShowToast('GST Tax Invoice issued successfully!', 'success');
       }
-      setShowAddInvoiceModal(false);
-      setInvoiceForm({
-        customer_id: '', client_name: '', deal_id: '', issue_date: new Date().toISOString().split('T')[0],
-        due_date: new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0],
-        notes: 'Standard GST commercial tax invoice',
-        items: [{ description: 'Enterprise AI & Custom Software Implementation', sac: '998313', qty: 1, rate: 75000, amount: 75000 }]
-      });
+      if (onShowToast) onShowToast('GST Tax Invoice issued successfully!', 'success');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -734,19 +829,31 @@ export function AdminPage({ onShowToast }) {
   const handleRecordPayment = async (e) => {
     e.preventDefault();
     if (!showRecordPaymentModal) return;
+    const paidAmt = parseFloat(paymentForm.amount || 0);
+
+    setInvoices(prev => prev.map(inv => {
+      if (inv.id === showRecordPaymentModal.id) {
+        const newPaid = (Number(inv.paid_amount || 0) + paidAmt);
+        const isFull = newPaid >= Number(inv.total_amount || 0);
+        return { ...inv, paid_amount: newPaid, status: isFull ? 'Paid' : 'Partially Paid' };
+      }
+      return inv;
+    }));
+
+    const modalData = showRecordPaymentModal;
+    setShowRecordPaymentModal(null);
 
     try {
       if (isBackendOnline) {
         await crmApi.recordPayment({
-          invoice_id: showRecordPaymentModal.id,
-          amount: parseFloat(paymentForm.amount),
+          invoice_id: modalData.id,
+          amount: paidAmt,
           payment_method: paymentForm.payment_method,
           transaction_ref: paymentForm.transaction_ref,
           notes: paymentForm.notes
         });
-        if (onShowToast) onShowToast('Payment reconciled in GST Ledger!', 'success');
       }
-      setShowRecordPaymentModal(null);
+      if (onShowToast) onShowToast('Payment reconciled in GST Ledger!', 'success');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -756,20 +863,39 @@ export function AdminPage({ onShowToast }) {
   // 11. Create Project
   const handleCreateProject = async (e) => {
     e.preventDefault();
+    const projBudget = parseFloat(projectForm.budget || 500000);
+    const newProjObj = {
+      id: `PRJ-${Math.floor(1000 + Math.random() * 9000)}`,
+      project_code: `PRJ-NEU-${Math.floor(100 + Math.random() * 900)}`,
+      name: projectForm.name,
+      customer_name: projectForm.customer_id || 'Enterprise Client',
+      company: projectForm.customer_id || 'Client Partner',
+      project_manager: 'Vikram Sen (PM)',
+      start_date: new Date().toISOString().split('T')[0],
+      deadline: projectForm.deadline || '2026-12-31',
+      budget: projBudget,
+      priority: 'High',
+      status: 'Kickoff',
+      health: 'Good',
+      progress: 10
+    };
+
+    setProjects(prev => [newProjObj, ...prev]);
+    setShowAddProjectModal(false);
+    setProjectForm({ name: '', customer_id: '', budget: '500000', department: 'Development', deadline: '', description: '' });
+
     try {
       if (isBackendOnline) {
         await crmApi.createProject({
-          name: projectForm.name,
+          name: newProjObj.name,
           customer_id: projectForm.customer_id || (leads[0]?.id || 'CUST-001'),
-          budget: parseFloat(projectForm.budget || 0),
+          budget: newProjObj.budget,
           department: projectForm.department,
-          deadline: projectForm.deadline || null,
+          deadline: newProjObj.deadline,
           description: projectForm.description
         });
-        if (onShowToast) onShowToast('Agile Delivery Project initialized!', 'success');
       }
-      setShowAddProjectModal(false);
-      setProjectForm({ name: '', customer_id: '', budget: '500000', department: 'Development', deadline: '', description: '' });
+      if (onShowToast) onShowToast('Agile Delivery Project initialized!', 'success');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -779,20 +905,35 @@ export function AdminPage({ onShowToast }) {
   // 12. Create Sprint Task
   const handleCreateTask = async (e) => {
     e.preventDefault();
+    const newTaskObj = {
+      id: `TSK-${Math.floor(1000 + Math.random() * 9000)}`,
+      project_id: taskForm.project_id || (projects[0]?.id || 'PRJ-001'),
+      project_name: projects.find(p => p.id === taskForm.project_id)?.name || 'Enterprise Implementation Project',
+      title: taskForm.title,
+      assigned_to: 'Aditya Verma (Lead Dev)',
+      priority: taskForm.priority || 'High',
+      status: 'To Do',
+      estimated_hours: parseFloat(taskForm.estimated_hours || 16),
+      logged_hours: 0,
+      due_date: taskForm.due_date || '2026-10-15'
+    };
+
+    setTasks(prev => [newTaskObj, ...prev]);
+    setShowAddTaskModal(false);
+    setTaskForm({ title: '', project_id: '', department: 'Development', priority: 'High', estimated_hours: '16', due_date: '' });
+
     try {
       if (isBackendOnline) {
         await crmApi.createTask({
-          title: taskForm.title,
-          project_id: taskForm.project_id || (projects[0]?.id || null),
+          title: newTaskObj.title,
+          project_id: newTaskObj.project_id,
           department: taskForm.department,
-          priority: taskForm.priority,
-          estimated_hours: parseFloat(taskForm.estimated_hours || 0),
-          due_date: taskForm.due_date || null
+          priority: newTaskObj.priority,
+          estimated_hours: newTaskObj.estimated_hours,
+          due_date: newTaskObj.due_date
         });
-        if (onShowToast) onShowToast('Engineering Task created in backlog!', 'success');
       }
-      setShowAddTaskModal(false);
-      setTaskForm({ title: '', project_id: '', department: 'Development', priority: 'High', estimated_hours: '16', due_date: '' });
+      if (onShowToast) onShowToast('Engineering Task created in backlog!', 'success');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -803,18 +944,28 @@ export function AdminPage({ onShowToast }) {
   const handleLogTimesheet = async (e) => {
     e.preventDefault();
     if (!showLogTimeModal) return;
+    const addHours = parseFloat(timesheetForm.hours || 0);
+
+    setTasks(prev => prev.map(t => {
+      if (t.id === showLogTimeModal.id) {
+        return { ...t, logged_hours: (Number(t.logged_hours || 0) + addHours) };
+      }
+      return t;
+    }));
+
+    const modalData = showLogTimeModal;
+    setShowLogTimeModal(null);
 
     try {
       if (isBackendOnline) {
         await crmApi.logTimesheet({
-          task_id: showLogTimeModal.id,
-          hours: parseFloat(timesheetForm.hours),
+          task_id: modalData.id,
+          hours: addHours,
           notes: timesheetForm.notes,
           date: timesheetForm.date
         });
-        if (onShowToast) onShowToast('Timesheet logged & task hours updated!', 'success');
       }
-      setShowLogTimeModal(null);
+      if (onShowToast) onShowToast('Timesheet logged & task hours updated!', 'success');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -824,16 +975,28 @@ export function AdminPage({ onShowToast }) {
   // 14. Send WhatsApp Message
   const handleSendWhatsApp = async (e) => {
     e.preventDefault();
+    const newWaObj = {
+      id: `WA-${Math.floor(1000 + Math.random() * 9000)}`,
+      sender_type: 'Agent',
+      customer_name: waForm.phone_number,
+      phone: waForm.phone_number,
+      message: waForm.message,
+      timestamp: new Date().toISOString().replace('T', ' ').slice(0, 16),
+      status: 'Delivered'
+    };
+
+    setWhatsappMessages(prev => [newWaObj, ...prev]);
+    setShowDispatchWhatsAppModal(false);
+    setWaForm({ phone_number: '', message: '' });
+
     try {
       if (isBackendOnline) {
         await crmApi.sendWhatsAppMessage({
-          phone_number: waForm.phone_number,
-          message: waForm.message
+          phone_number: newWaObj.phone,
+          message: newWaObj.message
         });
-        if (onShowToast) onShowToast('WhatsApp message dispatched via Live Gateway!', 'success');
       }
-      setShowDispatchWhatsAppModal(false);
-      setWaForm({ phone_number: '', message: '' });
+      if (onShowToast) onShowToast('WhatsApp message dispatched via Live Gateway!', 'success');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -843,18 +1006,33 @@ export function AdminPage({ onShowToast }) {
   // 15. Create Marketing Campaign
   const handleCreateCampaign = async (e) => {
     e.preventDefault();
+    const newCampObj = {
+      id: `CAMP-${Math.floor(1000 + Math.random() * 9000)}`,
+      name: campaignForm.name,
+      channel: campaignForm.platform || 'Google Ads',
+      status: 'Active',
+      budget: parseFloat(campaignForm.budget || 0),
+      spent: 0,
+      leads_generated: 0,
+      conversions: 0,
+      cac: 0,
+      revenue_generated: 0
+    };
+
+    setCampaigns(prev => [newCampObj, ...prev]);
+    setShowAddCampaignModal(false);
+
     try {
       if (isBackendOnline) {
         await crmApi.createCampaign({
-          name: campaignForm.name,
-          platform: campaignForm.platform,
+          name: newCampObj.name,
+          platform: newCampObj.channel,
           utm_source: campaignForm.utm_source,
           utm_campaign: campaignForm.utm_campaign,
-          budget: parseFloat(campaignForm.budget || 0)
+          budget: newCampObj.budget
         });
-        if (onShowToast) onShowToast('Marketing Campaign created with UTM attribution!', 'success');
       }
-      setShowAddCampaignModal(false);
+      if (onShowToast) onShowToast('Marketing Campaign created with UTM attribution!', 'success');
       fetchLiveDatabase();
     } catch (err) {
       if (onShowToast) onShowToast(err.message, 'error');
@@ -2107,8 +2285,11 @@ export function AdminPage({ onShowToast }) {
                                 {q.status !== 'Accepted' && (
                                   <button
                                     onClick={async () => {
+                                      setQuotations(prev => prev.map(item => item.id === q.id ? { ...item, status: 'Accepted' } : item));
                                       try {
-                                        await crmApi.updateQuotationStatus(q.id, 'Accepted');
+                                        if (isBackendOnline) {
+                                          await crmApi.updateQuotationStatus(q.id, 'Accepted');
+                                        }
                                         if (onShowToast) onShowToast(`Quotation ${q.quote_number} accepted! Auto-created Won Deal, Project & Advance Invoice.`, 'success');
                                         fetchLiveDatabase();
                                       } catch (err) {
