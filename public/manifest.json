@@ -1,13 +1,28 @@
 {
-  "name": "NeuOrzin CRM — Executive Command Portal",
+  "name": "NeuOrzin CRM \u2014 Executive Command Portal",
   "short_name": "NeuOrzin CRM",
-  "description": "Enterprise SaaS CRM & Agile Operations Suite for NeuOrzin",
+  "description": "Enterprise SaaS CRM & Agile Operations Suite for NeuOrzin. Real-time Lead Scoring, GST Invoicing, Pipeline Automation, and Project Delivery.",
   "start_url": "/admin",
   "scope": "/",
+  "id": "com.neuorzin.crm.app",
   "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
   "background_color": "#07080e",
   "theme_color": "#0070ba",
-  "orientation": "portrait-primary",
+  "orientation": "any",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": [
+    "business",
+    "productivity",
+    "finance",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "/assets/images/neuorzin-icon.png",
@@ -22,27 +37,152 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["business", "productivity", "finance"],
+  "screenshots": [
+    {
+      "src": "/assets/images/neuorzin-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Executive CRM Command Center Dashboard"
+    },
+    {
+      "src": "/assets/images/neuorzin-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile Operations Suite"
+    }
+  ],
   "shortcuts": [
     {
       "name": "Inbound Leads",
-      "url": "/admin#leads",
-      "description": "View and manage incoming customer leads"
+      "short_name": "Leads",
+      "url": "/admin/leads",
+      "description": "View and manage incoming customer leads",
+      "icons": [
+        {
+          "src": "/assets/images/neuorzin-icon.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Deals Pipeline",
-      "url": "/admin#deals",
-      "description": "Track enterprise commercial deals"
+      "short_name": "Deals",
+      "url": "/admin/deals",
+      "description": "Track enterprise commercial deals and pipeline stages",
+      "icons": [
+        {
+          "src": "/assets/images/neuorzin-icon.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Tax Invoices",
-      "url": "/admin#invoices",
-      "description": "GST Tax Invoices and Payment collections"
+      "short_name": "Invoices",
+      "url": "/admin/invoices",
+      "description": "GST Tax Invoices and Payment collections ledger",
+      "icons": [
+        {
+          "src": "/assets/images/neuorzin-icon.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Sprint Tasks",
-      "url": "/admin#tasks",
-      "description": "Daily works and live sprint stopwatch"
+      "short_name": "Tasks",
+      "url": "/admin/tasks",
+      "description": "Daily works and live sprint stopwatch timesheets",
+      "icons": [
+        {
+          "src": "/assets/images/neuorzin-icon.png",
+          "sizes": "192x192"
+        }
+      ]
     }
-  ]
+  ],
+  "launch_handler": {
+    "client_mode": [
+      "navigate-existing",
+      "auto"
+    ]
+  },
+  "share_target": {
+    "action": "/admin/leads?shared=1",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "file_handlers": [
+    {
+      "action": "/admin/leads?action=import",
+      "accept": {
+        "application/json": [
+          ".json"
+        ],
+        "text/csv": [
+          ".csv"
+        ]
+      },
+      "icons": [
+        {
+          "src": "/assets/images/neuorzin-icon.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ],
+      "launch_type": "single-client"
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+neuorzin",
+      "url": "/admin?protocol=%s"
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 460
+  },
+  "widgets": [
+    {
+      "name": "NeuOrzin Quick Summary",
+      "description": "Live KPI summary of revenue, active leads, and deals",
+      "tag": "neuorzin-crm-summary",
+      "template": "widget",
+      "ms_ac_template": "/widget.json",
+      "data": "/api/metrics",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/assets/images/neuorzin-logo.png",
+          "sizes": "512x512",
+          "label": "CRM Live Summary"
+        }
+      ],
+      "icons": [
+        {
+          "src": "/assets/images/neuorzin-icon.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "tab_strip": {
+    "home_tab": {
+      "scope_patterns": [
+        "/admin/*"
+      ]
+    },
+    "new_tab_button": {
+      "url": "/admin/leads"
+    }
+  },
+  "note_taking": {
+    "new_note_url": "/admin/tasks?quick_note=1"
+  }
 }
