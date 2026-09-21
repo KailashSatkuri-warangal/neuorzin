@@ -28,12 +28,24 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // Mount API Router
 app.use('/api', apiRoutes);
 
-// Root Status
-app.get('/', (req, res) => {
-  res.json({
-    message: 'NEUORZIN CRM Enterprise Backend Server is running',
-    version: '2.0.0',
-    documentation: '/api/health'
+// Serve Vite Frontend Build (Single Full-Stack Node.js Deployment)
+const distPath = path.join(__dirname, '../../dist');
+app.use(express.static(distPath));
+
+// Fallback to index.html for React SPA client routing
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+    return res.status(404).json({ error: 'API route not found' });
+  }
+  const indexPath = path.join(distPath, 'index.html');
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      res.status(200).json({
+        message: 'NEUORZIN CRM Backend Server is running',
+        version: '2.0.0',
+        documentation: '/api/health'
+      });
+    }
   });
 });
 
