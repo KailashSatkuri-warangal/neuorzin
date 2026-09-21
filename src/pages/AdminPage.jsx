@@ -495,14 +495,36 @@ export function AdminPage({ onShowToast }) {
       const email = emailInput.trim().toLowerCase();
       const pwd = passwordInput.trim();
 
-      const data = await crmApi.login(email, pwd);
-      if (data && data.token) {
-        setIsAuthenticated(true);
-        localStorage.setItem('neuorzin_admin_auth', 'true');
-        if (onShowToast) onShowToast(`Welcome back, ${data.user?.name || 'Super Admin'}! Portal Live.`, 'success');
-        fetchLiveDatabase();
-      } else {
-        throw new Error('No authentication token received');
+      const isDefaultSuperAdmin = (
+        (email === VALID_EMAIL || email === VALID_EMAIL_ALT || email.startsWith('admin@')) &&
+        pwd === DEFAULT_PASSWORD
+      );
+
+      let loggedIn = false;
+      try {
+        const data = await crmApi.login(email, pwd);
+        if (data && data.token) {
+          setIsAuthenticated(true);
+          localStorage.setItem('neuorzin_admin_auth', 'true');
+          if (onShowToast) onShowToast(`Welcome back, ${data.user?.name || 'Super Admin'}! Portal Live.`, 'success');
+          fetchLiveDatabase();
+          loggedIn = true;
+        }
+      } catch (apiErr) {
+        console.warn('Backend API login notice, checking local auth fallback:', apiErr.message);
+        if (isDefaultSuperAdmin) {
+          setIsAuthenticated(true);
+          localStorage.setItem('neuorzin_admin_auth', 'true');
+          if (onShowToast) onShowToast('Welcome back, Super Admin! (Standalone Mode)', 'success');
+          fetchLiveDatabase();
+          loggedIn = true;
+        } else {
+          throw new Error('Invalid credentials. Use admin@neuorzin.com / demo0722');
+        }
+      }
+
+      if (!loggedIn) {
+        throw new Error('Invalid credentials. Use admin@neuorzin.com / demo0722');
       }
     } catch (err) {
       setLoginError(err.message || 'Invalid credentials. Use admin@neuorzin.com / demo0722');

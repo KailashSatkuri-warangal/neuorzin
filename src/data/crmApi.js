@@ -24,6 +24,11 @@ async function request(endpoint, options = {}) {
       headers
     });
 
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error(`Backend API route '${endpoint}' not responding with JSON. (Status: ${res.status})`);
+    }
+
     if (!res.ok) {
       const errBody = await res.json().catch(() => ({}));
       throw new Error(errBody.error || `HTTP ${res.status}: ${res.statusText}`);
@@ -164,7 +169,8 @@ export const crmApi = {
   checkHealth: async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/health`, { method: 'GET' });
-      return res.ok;
+      const ct = res.headers.get('content-type') || '';
+      return res.ok && ct.includes('application/json');
     } catch {
       return false;
     }
