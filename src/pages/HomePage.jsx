@@ -7,6 +7,7 @@ import { ExpertiseAccordion } from '../components/sections/ExpertiseAccordion';
 import { CaseStudiesSection } from '../components/sections/CaseStudiesSection';
 import { BrandMarquee } from '../components/sections/BrandMarquee';
 import { TestimonialsSection } from '../components/sections/TestimonialsSection';
+import { ClientSpotlightSection } from '../components/sections/ClientSpotlightSection';
 import { FunFactorSection } from '../components/sections/FunFactorSection';
 import { FaqSection } from '../components/sections/FaqSection';
 import { BlogSection } from '../components/sections/BlogSection';
@@ -30,6 +31,9 @@ export function HomePage({ onOpenBooking, onSelectProject, onSelectArticle }) {
       {/* 5. Selected Case Studies & Brand Marquee */}
       {/* <CaseStudiesSection onSelectProject={onSelectProject} /> - Hidden temporarily */}
       {/* <BrandMarquee /> - Hidden temporarily */}
+
+      {/* 5. Client Spotlight: Technology Built Around the Way You Work */}
+      <ClientSpotlightSection onOpenBooking={onOpenBooking} />
 
       {/* 6. Testimonials (Animated 01 ── 04 Slider) */}
       <TestimonialsSection />
