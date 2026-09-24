@@ -1,5 +1,5 @@
 import { AdminPage } from './pages/AdminPage';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTheme } from './hooks/useTheme';
@@ -77,6 +77,30 @@ export function App() {
   };
 
   const isAdmin = location.pathname.startsWith('/admin');
+
+  // Dynamic Document Title based on active route
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.startsWith('/admin')) {
+      document.title = 'NeuOrzin CRM — Executive Command Portal';
+    } else if (path.startsWith('/services')) {
+      document.title = 'Services & Solutions | NeuOrzin';
+    } else if (path.startsWith('/about') || path.startsWith('/company')) {
+      document.title = 'About Us | NeuOrzin';
+    } else if (path.startsWith('/projects') || path.startsWith('/work')) {
+      document.title = 'Case Studies & Projects | NeuOrzin';
+    } else if (path.startsWith('/contact')) {
+      document.title = 'Contact Us | NeuOrzin';
+    } else if (path.startsWith('/careers') || path.startsWith('/team')) {
+      document.title = 'Careers & Team | NeuOrzin';
+    } else if (path.startsWith('/industries')) {
+      document.title = 'Industries | NeuOrzin';
+    } else if (path.startsWith('/insights') || path.startsWith('/newsroom')) {
+      document.title = 'Insights & Newsroom | NeuOrzin';
+    } else {
+      document.title = 'Technology That Powers Digital Growth | NeuOrzin';
+    }
+  }, [location.pathname]);
 
   return (
     <>
