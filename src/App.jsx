@@ -55,14 +55,8 @@ export function App() {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
-  // Run preloader ONCE per browser session
-  const [isLoading, setIsLoading] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const sessionPreloaded = sessionStorage.getItem('neuorzin_preloaded') === 'true';
-      return !sessionPreloaded;
-    }
-    return false;
-  });
+  // Instant rendering without render-blocking preloader delay for high mobile PageSpeed
+  const [isLoading, setIsLoading] = useState(false);
 
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
