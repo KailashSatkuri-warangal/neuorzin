@@ -16,7 +16,7 @@ export function Footer({ onOpenBooking, onShowToast, theme }) {
   return (
     <footer className="relative bg-[#040d43] text-white pt-12 sm:pt-16 pb-8 overflow-hidden border-t border-slate-800">
       <div className="fixed-shape absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
-        <img src="/assets/img/map.svg" alt="Shape" className="w-full max-w-5xl h-auto" />
+        <img src="/assets/img/map.svg" alt="Global Network" width="1000" height="500" className="w-full max-w-5xl h-auto object-contain" />
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-8 sm:pb-10">
@@ -24,7 +24,7 @@ export function Footer({ onOpenBooking, onShowToast, theme }) {
           {/* Col 1: About Brand & Subscribe */}
           <div className="lg:col-span-4 space-y-4 text-left">
             <Link to="/">
-              <img src="/assets/images/neuorzin-logo-white.png" alt="NeuOrzin" className="h-8 w-auto object-contain" />
+              <img src="/assets/images/neuorzin-logo-white.png" alt="NeuOrzin" width="1024" height="202" className="h-8 w-auto object-contain" />
             </Link>
             <p className="text-slate-300 text-xs leading-relaxed max-w-sm">
               NeuOrzin delivers enterprise-grade software engineering, sovereign AI agent networks, and high-performance cloud architectures.
@@ -87,7 +87,16 @@ export function Footer({ onOpenBooking, onShowToast, theme }) {
               </li>
               <li className="flex items-center gap-2">
                 <i className="fas fa-envelope-open text-[#0070ba]"></i>
-                <a href={`mailto:${EMAIL_CONFIG.general}`} className="hover:text-[#0070ba] transition-colors">{EMAIL_CONFIG.general}</a>
+                <a 
+                  href="mailto:info@neuorzin.com" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = `mailto:${'info' + '@' + 'neuorzin.com'}`;
+                  }}
+                  className="hover:text-[#0070ba] transition-colors"
+                >
+                  info&#64;neuorzin.com
+                </a>
               </li>
               <li className="flex items-center gap-2">
                 <i className="fas fa-phone text-[#0070ba]"></i>

@@ -51,10 +51,14 @@
   <meta name="twitter:description" content="We build apps, data platforms, and AI systems for growing startups." />
   <meta name="twitter:image" content="https://neuorzin.com/assets/images/logo.png" />
 
-  <!-- Google Fonts Preconnect & Optimized Font Loading -->
+  <!-- Google Fonts Preconnect & Non-blocking Font Loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Kanit:wght@500;600;700;800&family=Yantramanav:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Kanit:wght@500;600;700;800&family=Yantramanav:wght@400;500;700;900&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Kanit:wght@500;600;700;800&family=Yantramanav:wght@400;500;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Kanit:wght@500;600;700;800&family=Yantramanav:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  </noscript>
 
   <!-- Valid Schema.org Structured Data (JSON-LD) -->
   <script type="application/ld+json">
@@ -77,7 +81,12 @@
         },
         "description": "Product engineering studio helping startups from idea to MVP to scale using modern web, mobile, data, and AI technologies.",
         "telephone": "+91-77940-45500",
-        "email": "info@neuorzin.com",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+91-77940-45500",
+          "contactType": "Customer Support",
+          "url": "https://neuorzin.com/contact"
+        },
         "address": {
           "@type": "PostalAddress",
           "addressCountry": "IN"

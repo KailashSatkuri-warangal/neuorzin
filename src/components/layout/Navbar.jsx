@@ -26,8 +26,8 @@ export function Navbar({ onOpenBooking, onOpenSearch, onOpenOffcanvas }) {
           <Link to="/" className="flex items-center focus:outline-none group">
             <img
               src="/assets/images/neuorzin-logo.png"
-              width="160"
-              height="36"
+              width="1024"
+              height="202"
               fetchPriority="high"
               className="h-7 sm:h-8 md:h-9 w-auto object-contain transition-transform group-hover:scale-[1.02]"
               alt="NeuOrzin"

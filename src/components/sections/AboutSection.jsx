@@ -10,8 +10,8 @@ export function AboutSection({ onOpenBooking }) {
           {/* Left Visual Column - Clean image without the 20+ overlay */}
           <div className="lg:col-span-6">
             <SlideRight distance={30} className="thumb relative max-w-lg mx-auto lg:max-w-none">
-              <img src="/assets/img/about/1.jpg" alt="About NeuOrzin" className="rounded-3xl shadow-xl w-full object-cover" />
-              <img src="/assets/img/about/2.jpg" alt="Team Work" className="rounded-2xl shadow-2xl absolute -bottom-8 -right-4 sm:-bottom-10 sm:-right-8 w-1/2 border-4 border-white hidden sm:block object-cover" />
+              <img src="/assets/img/about/1.jpg" alt="About NeuOrzin" width="800" height="600" loading="lazy" decoding="async" className="rounded-3xl shadow-xl w-full h-auto aspect-[4/3] object-cover" />
+              <img src="/assets/img/about/2.jpg" alt="Team Work" width="800" height="600" loading="lazy" decoding="async" className="rounded-2xl shadow-2xl absolute -bottom-8 -right-4 sm:-bottom-10 sm:-right-8 w-1/2 h-auto aspect-[4/3] border-4 border-white hidden sm:block object-cover" />
             </SlideRight>
           </div>
 

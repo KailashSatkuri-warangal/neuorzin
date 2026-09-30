@@ -44,7 +44,11 @@ export function IndustriesSection({ onOpenBooking }) {
               <img
                 src="/assets/img/illustration/11.png"
                 alt="Industries We Serve"
-                className="w-full h-auto object-contain drop-shadow-md"
+                width="800"
+                height="784"
+                loading="lazy"
+                decoding="async"
+                className="w-full h-auto aspect-[800/784] object-contain drop-shadow-md"
               />
             </div>
           </div>

@@ -180,3 +180,16 @@ html.dark body {
 button, a, select, input {
   touch-action: manipulation;
 }
+
+/* Below-the-fold content visibility for ultra-fast mobile rendering */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 600px;
+}
+
+/* GPU acceleration for animated elements */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}

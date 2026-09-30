@@ -94,8 +94,8 @@ export function HeroSection({ onOpenBooking }) {
                 <img
                   src="/assets/img/illustration/2.png"
                   alt="NeuOrzin Product Engineering & AI Platform Architecture"
-                  width="460"
-                  height="380"
+                  width="807"
+                  height="622"
                   fetchPriority="high"
                   decoding="async"
                   className="w-full h-auto object-contain drop-shadow-xl"

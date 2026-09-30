@@ -13,6 +13,8 @@ export function CapabilitiesSection({ onOpenBooking }) {
       title: 'Product Engineering – Web, Mobile & MVP',
       desc: 'Design and build scalable web and mobile applications, from MVP to full products, delivering seamless user experiences and fast market launches',
       illustration: '/assets/img/illustration/2.png',
+      width: 807,
+      height: 622,
       href: '/services'
     },
     {
@@ -20,6 +22,8 @@ export function CapabilitiesSection({ onOpenBooking }) {
       title: 'Data Engineering & Analytics',
       desc: 'Develop robust data pipelines, optimize costs, and migrate legacy systems to Snowflake. Transform raw data into actionable insights with dashboards using PowerBI',
       illustration: '/assets/img/illustration/5.png',
+      width: 659,
+      height: 683,
       href: '/services'
     },
     {
@@ -27,6 +31,8 @@ export function CapabilitiesSection({ onOpenBooking }) {
       title: 'Sales and Marketing',
       desc: 'Create sales plans, marketing strategies, SEO, content, and social media management. Drive lead generation, brand growth, and advertising campaigns across platforms',
       illustration: '/assets/img/illustration/7.png',
+      width: 800,
+      height: 800,
       href: '/services'
     },
     {
@@ -34,6 +40,8 @@ export function CapabilitiesSection({ onOpenBooking }) {
       title: 'AI & Automation',
       desc: 'Implement AI agents, automate workflows, and integrate large language models to streamline operations, boost efficiency, and unlock intelligent insights.',
       illustration: '/assets/img/illustration/12.png',
+      width: 583,
+      height: 510,
       href: '/services'
     }
   ];
@@ -61,16 +69,16 @@ export function CapabilitiesSection({ onOpenBooking }) {
             <StaggerItem key={item.id}>
               <div className="group h-full flex flex-col justify-between text-left p-5 sm:p-7 rounded-2xl bg-[#fafcff] sm:bg-white hover:bg-[#f8fafc] border border-slate-200/80 sm:border-slate-100 hover:border-slate-300 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div>
-                  {/* Compact Illustration on Mobile */}
+                  {/* Compact Illustration on Mobile with Exact Aspect Ratio */}
                   <div className="h-28 sm:h-36 w-full flex items-center justify-center mb-4 sm:mb-6 overflow-hidden">
                     <img
                       src={item.illustration}
                       alt={item.title}
                       loading="lazy"
                       decoding="async"
-                      width="180"
-                      height="144"
-                      className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
+                      width={item.width}
+                      height={item.height}
+                      className="max-h-full max-w-full w-auto h-auto object-contain group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
 

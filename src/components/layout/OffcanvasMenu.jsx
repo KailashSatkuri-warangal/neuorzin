@@ -47,6 +47,8 @@ export function OffcanvasMenu({ isOpen, onClose, onOpenBooking }) {
               <img
                 src="/assets/images/neuorzin-logo.png"
                 alt="NeuOrzin"
+                width="1024"
+                height="202"
                 className="h-8 w-auto object-contain"
               />
             </Link>

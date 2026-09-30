@@ -32,6 +32,8 @@ export function Preloader({ onComplete }) {
         <img
           src="/assets/images/neuorzin-logo.png"
           alt="NeuOrzin"
+          width="1024"
+          height="202"
           className="h-12 sm:h-16 w-auto object-contain drop-shadow-sm animate-pulse"
         />
 

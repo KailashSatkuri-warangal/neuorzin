@@ -8,7 +8,7 @@
 
   # 2. Redirect WWW to Non-WWW (Canonical Domain)
   RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
-  RewriteRule ^(.*)$ https://%1/ [R=301,L]
+  RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
 
   # 3. Route /api requests to PHP Backend
   RewriteRule ^api/(.*)$ api/index.php [QSA,L]
@@ -21,6 +21,9 @@
   RewriteCond %{REQUEST_FILENAME} !-l
   RewriteRule . /index.html [L]
 </IfModule>
+
+# Custom 404 Error Page
+ErrorDocument 404 /404.html
 
 # 5. GZIP Compression for Performance
 <IfModule mod_deflate.c>
@@ -51,7 +54,10 @@
   <FilesMatch "\.(html|htm)$">
     Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
   </FilesMatch>
+  # Strict-Transport-Security (HSTS Security Standard)
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
   Header always set X-Content-Type-Options "nosniff"
   Header always set X-XSS-Protection "1; mode=block"
+  Header always set X-Frame-Options "SAMEORIGIN"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>

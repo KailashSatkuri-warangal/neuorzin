@@ -16,42 +16,43 @@ import { QuickContactBanner } from '../components/sections/QuickContactBanner';
 export function HomePage({ onOpenBooking, onSelectProject, onSelectArticle }) {
   return (
     <div className="flex flex-col w-full overflow-x-hidden">
-      {/* 1. Hero Section */}
+      {/* 1. Hero Section (Above the fold, rendered immediately) */}
       <HeroSection onOpenBooking={onOpenBooking} />
 
       {/* 2. Processing / Core Capabilities (Product Eng, Data Eng, Sales & Mktg, AI & Auto) */}
-      <CapabilitiesSection onOpenBooking={onOpenBooking} />
+      <div className="content-visibility-auto">
+        <CapabilitiesSection onOpenBooking={onOpenBooking} />
+      </div>
 
-      {/* 3. Solutions for Every Industry / Industries We Serve (01 Fintech .. 05 Education) */}
-      <IndustriesSection onOpenBooking={onOpenBooking} />
+      {/* 3. Solutions for Every Industry / Industries We Serve */}
+      <div className="content-visibility-auto">
+        <IndustriesSection onOpenBooking={onOpenBooking} />
+      </div>
 
       {/* 4. Our Core Expertise (Dark Section with 5 Accordion Pillars) */}
-      <ExpertiseAccordion onOpenBooking={onOpenBooking} />
-
-      {/* 5. Selected Case Studies & Brand Marquee */}
-      {/* <CaseStudiesSection onSelectProject={onSelectProject} /> - Hidden temporarily */}
-      {/* <BrandMarquee /> - Hidden temporarily */}
+      <div className="content-visibility-auto">
+        <ExpertiseAccordion onOpenBooking={onOpenBooking} />
+      </div>
 
       {/* 5. Client Spotlight: Technology Built Around the Way You Work */}
-      <ClientSpotlightSection onOpenBooking={onOpenBooking} />
+      <div className="content-visibility-auto">
+        <ClientSpotlightSection onOpenBooking={onOpenBooking} />
+      </div>
 
-      {/* 6. Testimonials (Animated 01 ── 04 Slider) */}
-      <TestimonialsSection />
+      {/* 6. Testimonials (Animated Slider) */}
+      <div className="content-visibility-auto">
+        <TestimonialsSection />
+      </div>
 
       {/* Approach Methodology Section */}
-      <ApproachSection onOpenBooking={onOpenBooking} />
-
-      {/* 7. Fun Factor (687+ Clients, 2,348+ Projects, 450+ Experts, 1,200+ Media) */}
-      {/* <FunFactorSection /> - Hidden temporarily */}
-
-      {/* 8. Frequently Asked Questions */}
-      {/* <FaqSection onOpenBooking={onOpenBooking} /> - Hidden temporarily */}
-
-      {/* 9. Insights & Newsroom (Updated Journal) */}
-      {/* <BlogSection onSelectArticle={onSelectArticle} /> - Hidden temporarily */}
+      <div className="content-visibility-auto">
+        <ApproachSection onOpenBooking={onOpenBooking} />
+      </div>
 
       {/* 10. Closing CTA Banner */}
-      <QuickContactBanner onOpenBooking={onOpenBooking} />
+      <div className="content-visibility-auto">
+        <QuickContactBanner onOpenBooking={onOpenBooking} />
+      </div>
     </div>
   );
 }

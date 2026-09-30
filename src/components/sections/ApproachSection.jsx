@@ -37,7 +37,11 @@ export function ApproachSection({ onOpenBooking }) {
                 <img
                   src="/assets/img/illustration/7.png"
                   alt="NeuOrzin Strategic Engineering Approach"
-                  className="w-full h-auto object-contain drop-shadow-2xl select-none"
+                  width="800"
+                  height="800"
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-auto aspect-square object-contain drop-shadow-2xl select-none"
                 />
               </FloatingElement>
             </CinematicReveal>
