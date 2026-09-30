@@ -27,27 +27,29 @@ export function HeroSection({ onOpenBooking }) {
               </div>
             </CinematicReveal>
 
-            {/* Movie Title Style Word Reveal */}
-            <div>
+            {/* Movie Title Style Word Reveal with Semantic H1 for SEO */}
+            <h1 className="m-0 p-0 font-display text-left">
               <WordReveal
                 text="We build apps, data platforms, and"
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-[50px] font-black text-slate-900 leading-[1.16] font-display"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-[50px] font-black text-slate-900 leading-[1.16]"
                 wordClassName="text-slate-900"
                 delay={0.1}
                 stagger={0.03}
               />
               <CinematicReveal intensity="strong" delay={0.2}>
-                <div className="text-3xl sm:text-4xl md:text-5xl lg:text-[50px] font-black leading-[1.16] font-display text-transparent bg-clip-text bg-gradient-to-r from-[#0070ba] via-[#0094e8] to-[#00c6ff] mt-1">
+                <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-[50px] font-black leading-[1.16] text-transparent bg-clip-text bg-gradient-to-r from-[#0070ba] via-[#0094e8] to-[#00c6ff] mt-1">
                   AI systems for growing startups
-                </div>
+                </span>
               </CinematicReveal>
-            </div>
+            </h1>
 
             <CinematicReveal intensity="medium" delay={0.25}>
               <div className="p-3.5 sm:p-4 rounded-2xl bg-white/80 border border-slate-200/80 backdrop-blur-xs max-w-xl">
-                <div className="text-[11px] font-bold uppercase tracking-wider text-[#0070ba] mb-1">About NeuOrzin</div>
+                <div className="text-[11px] font-bold uppercase tracking-wider text-[#0070ba] mb-1">
+                  <a href="/about" className="hover:underline text-[#0070ba]">About NeuOrzin</a>
+                </div>
                 <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                  NeuOrzin is a product engineering studio helping startups from idea → MVP → scale using modern web, mobile, data, and AI technologies.
+                  NeuOrzin is a <a href="/services" className="text-[#0070ba] font-semibold hover:underline">product engineering studio</a> helping startups from idea → MVP → scale using modern web, mobile, data platforms, and AI technologies.
                 </p>
               </div>
             </CinematicReveal>
@@ -76,9 +78,9 @@ export function HeroSection({ onOpenBooking }) {
                     <span className="text-[10px] text-slate-500 font-semibold block leading-none">
                       For Enquiries
                     </span>
-                    <h5 className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-[#0070ba] m-0 leading-tight mt-0.5 transition-colors">
+                    <span className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-[#0070ba] block leading-tight mt-0.5 transition-colors">
                       {companyContact.phone}
-                    </h5>
+                    </span>
                   </div>
                 </a>
               </div>
@@ -91,7 +93,11 @@ export function HeroSection({ onOpenBooking }) {
               <FloatingElement duration={5} yOffset={8}>
                 <img
                   src="/assets/img/illustration/2.png"
-                  alt="NeuOrzin Product Engineering"
+                  alt="NeuOrzin Product Engineering & AI Platform Architecture"
+                  width="460"
+                  height="380"
+                  fetchPriority="high"
+                  decoding="async"
                   className="w-full h-auto object-contain drop-shadow-xl"
                 />
               </FloatingElement>

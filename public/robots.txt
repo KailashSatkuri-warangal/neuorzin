@@ -1,0 +1,8 @@
+# robots.txt for https://neuorzin.com
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Sitemap Location
+Sitemap: https://neuorzin.com/sitemap.xml

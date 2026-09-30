@@ -66,6 +66,10 @@ export function CapabilitiesSection({ onOpenBooking }) {
                     <img
                       src={item.illustration}
                       alt={item.title}
+                      loading="lazy"
+                      decoding="async"
+                      width="180"
+                      height="144"
                       className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
