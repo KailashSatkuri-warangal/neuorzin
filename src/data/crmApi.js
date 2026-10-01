@@ -329,7 +329,63 @@ export const crmApi = {
   },
   markNotificationRead: (id) => request(`/notifications/${id}/read`, { method: 'PUT' }),
   markAllNotificationsRead: () => request('/notifications/read-all', { method: 'PUT' }),
-  deleteNotification: (id) => request(`/notifications/${id}`, { method: 'DELETE' })
+  deleteNotification: (id) => request(`/notifications/${id}`, { method: 'DELETE' }),
+
+  // Blog CMS & Taxonomy
+  getBlogs: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/blogs${query ? `?${query}` : ''}`);
+  },
+  getBlogById: (id) => request(`/blogs/${id}`),
+  createBlog: (blogData) => request('/blogs', { method: 'POST', body: JSON.stringify(blogData) }),
+  updateBlog: (id, updates) => request(`/blogs/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
+  deleteBlog: (id) => request(`/blogs/${id}`, { method: 'DELETE' }),
+  publishBlog: (id) => request(`/blogs/${id}/publish`, { method: 'POST' }),
+  unpublishBlog: (id) => request(`/blogs/${id}/unpublish`, { method: 'POST' }),
+
+  // Blog Categories & Tags
+  getCategories: () => request('/blog-categories'),
+  createCategory: (catData) => request('/blog-categories', { method: 'POST', body: JSON.stringify(catData) }),
+  deleteCategory: (id) => request(`/blog-categories/${id}`, { method: 'DELETE' }),
+  getTags: () => request('/blog-tags'),
+  createTag: (tagData) => request('/blog-tags', { method: 'POST', body: JSON.stringify(tagData) }),
+
+  // AI / Gemini Blog Generation & Settings
+  getAiConfig: () => request('/admin/ai-config'),
+  saveAiConfig: (configData) => request('/admin/ai-config', { method: 'PUT', body: JSON.stringify(configData) }),
+  testAiConfig: (testData) => request('/admin/ai-config/test', { method: 'POST', body: JSON.stringify(testData || {}) }),
+  generateBlogWithGemini: (promptData) => request('/blogs/generate', { method: 'POST', body: JSON.stringify(promptData) }),
+
+  // User Management & RBAC
+  getUserById: (id) => request(`/users/${id}`),
+  createUser: (userData) => request('/users', { method: 'POST', body: JSON.stringify(userData) }),
+  updateUser: (id, updates) => request(`/users/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
+  deleteUser: (id) => request(`/users/${id}`, { method: 'DELETE' }),
+  updateUserRole: (id, role) => request(`/users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ role }) }),
+  updateUserStatus: (id, status) => request(`/users/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  updateProfile: (profileData) => request('/users/profile', { method: 'PUT', body: JSON.stringify(profileData) }),
+
+  // Password Recovery
+  forgotPassword: (email) => request('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
+  resetPassword: (token, newPassword) => request('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, new_password: newPassword }) }),
+  changePassword: (userId, currentPassword, newPassword) => request('/auth/change-password', { method: 'POST', body: JSON.stringify({ user_id: userId, current_password: currentPassword, new_password: newPassword }) }),
+
+  // Image & File Upload
+  uploadImage: async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = getAuthToken();
+    const res = await fetch(`${API_BASE_URL}/upload`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to upload image');
+    }
+    return await res.json();
+  }
 };
 
 export default crmApi;

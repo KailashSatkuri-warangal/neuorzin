@@ -56,36 +56,44 @@ export function ArticleModal({ article, isOpen, onClose, onOpenBooking }) {
 
         {/* Human-Written Sections with Semantic HTML */}
         <div className="space-y-6 text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
-          {sections.map((sec, sIdx) => (
-            <div key={sIdx} className="space-y-3 pt-2">
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-display border-b border-slate-100 dark:border-slate-800 pb-1.5">
-                {sec.heading}
-              </h3>
-              
-              {sec.paragraphs && sec.paragraphs.map((p, pIdx) => (
-                <p key={pIdx} className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                  {p}
-                </p>
-              ))}
+          {sections && sections.length > 0 ? (
+            sections.map((sec, sIdx) => (
+              <div key={sIdx} className="space-y-3 pt-2">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-display border-b border-slate-100 dark:border-slate-800 pb-1.5">
+                  {sec.heading}
+                </h3>
+                
+                {sec.paragraphs && sec.paragraphs.map((p, pIdx) => (
+                  <p key={pIdx} className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                    {p}
+                  </p>
+                ))}
 
-              {sec.callout && (
-                <div className="my-3 p-4 rounded-xl bg-slate-100 dark:bg-slate-800/80 border-l-4 border-[#0070ba] text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 italic">
-                  "{sec.callout}"
-                </div>
-              )}
+                {sec.callout && (
+                  <div className="my-3 p-4 rounded-xl bg-slate-100 dark:bg-slate-800/80 border-l-4 border-[#0070ba] text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 italic">
+                    "{sec.callout}"
+                  </div>
+                )}
 
-              {sec.list && (
-                <ul className="space-y-2 pt-1 pl-1">
-                  {sec.list.map((item, lIdx) => (
-                    <li key={lIdx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
-                      <CheckCircle2 className="w-4 h-4 text-[#0070ba] shrink-0 mt-0.5" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
+                {sec.list && (
+                  <ul className="space-y-2 pt-1 pl-1">
+                    {sec.list.map((item, lIdx) => (
+                      <li key={lIdx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+                        <CheckCircle2 className="w-4 h-4 text-[#0070ba] shrink-0 mt-0.5" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))
+          ) : (
+            article.content && (
+              <div className="space-y-4 pt-2 whitespace-pre-line leading-relaxed text-slate-700 dark:text-slate-300">
+                {article.content}
+              </div>
+            )
+          )}
 
           {/* Conclusion */}
           {conclusionText && (
@@ -96,6 +104,18 @@ export function ArticleModal({ article, isOpen, onClose, onOpenBooking }) {
               <p className="text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
                 {conclusionText}
               </p>
+            </div>
+          )}
+
+          {/* Recommended Tags */}
+          {Array.isArray(article.tags) && article.tags.length > 0 && (
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold text-slate-400">Keywords & Focus:</span>
+              {article.tags.map((t, idx) => (
+                <span key={idx} className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+                  #{t}
+                </span>
+              ))}
             </div>
           )}
         </div>

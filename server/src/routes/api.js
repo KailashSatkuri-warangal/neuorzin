@@ -2,6 +2,7 @@ import express from 'express';
 import { authenticateToken, authorizeRoles } from '../middleware/authMiddleware.js';
 
 import * as authController from '../controllers/authController.js';
+import * as blogsController from '../controllers/blogsController.js';
 import * as leadsController from '../controllers/leadsController.js';
 import * as followupsController from '../controllers/followupsController.js';
 import * as dealsController from '../controllers/dealsController.js';
@@ -16,10 +17,11 @@ router.get('/', (req, res) => {
   res.json({
     status: 'online',
     service: 'NeuOrzin CRM Enterprise Backend API',
-    version: '2.0.0',
+    version: '2.5.0',
     documentation: {
       health: '/api/health',
       dashboard: '/api/reports/dashboard',
+      blogs: '/api/blogs',
       leads: '/api/leads',
       deals: '/api/deals',
       quotations: '/api/quotations',
@@ -38,13 +40,22 @@ router.get('/health', (req, res) => {
   res.json({
     status: 'online',
     service: 'NEUORZIN CRM Enterprise Backend',
-    version: '2.0.0',
+    version: '2.5.0',
     timestamp: new Date().toISOString()
   });
 });
 
 // Auth Routes (Public)
 router.post('/auth/login', authController.login);
+router.post('/auth/forgot-password', authController.forgotPassword);
+router.post('/auth/reset-password', authController.resetPassword);
+
+// Public Blog Routes (Published Only)
+router.get('/blogs', blogsController.getBlogs);
+router.get('/blogs/recommendations', blogsController.getTopicRecommendations);
+router.get('/blogs/:id', blogsController.getBlogById);
+router.get('/blog-categories', blogsController.getCategories);
+router.get('/blog-tags', blogsController.getTags);
 
 // Inbound Lead Capture (Public Webhook / Contact Form endpoint)
 router.post('/leads/inbound', leadsController.createLead);
@@ -55,8 +66,33 @@ router.use(authenticateToken);
 
 // Auth & Users
 router.get('/auth/me', authController.getMe);
+router.post('/auth/change-password', authController.changePassword);
+router.put('/users/profile', authController.updateProfile);
 router.get('/users', authController.getUsers);
 router.post('/users', authorizeRoles('Super Admin', 'Admin'), authController.createUser);
+router.put('/users/:id', authorizeRoles('Super Admin', 'Admin'), authController.updateUser);
+router.delete('/users/:id', authorizeRoles('Super Admin'), authController.deleteUser);
+router.patch('/users/:id/role', authorizeRoles('Super Admin'), authController.updateRole);
+router.patch('/users/:id/status', authorizeRoles('Super Admin', 'Admin'), authController.updateStatus);
+
+// Blog Management (Admin/Editor)
+router.post('/blogs', authorizeRoles('Super Admin', 'Admin', 'Editor'), blogsController.createBlog);
+router.put('/blogs/:id', authorizeRoles('Super Admin', 'Admin', 'Editor'), blogsController.updateBlog);
+router.delete('/blogs/:id', authorizeRoles('Super Admin', 'Admin'), blogsController.deleteBlog);
+router.post('/blogs/:id/publish', authorizeRoles('Super Admin', 'Admin', 'Editor'), blogsController.publishBlog);
+router.post('/blogs/:id/unpublish', authorizeRoles('Super Admin', 'Admin', 'Editor'), blogsController.unpublishBlog);
+
+// Blog Taxonomy (Categories & Tags)
+router.post('/blog-categories', authorizeRoles('Super Admin', 'Admin'), blogsController.createCategory);
+router.post('/blog-categories/sync-services', authorizeRoles('Super Admin', 'Admin'), blogsController.syncServicesToCategories);
+router.delete('/blog-categories/:id', authorizeRoles('Super Admin', 'Admin'), blogsController.deleteCategory);
+router.post('/blog-tags', authorizeRoles('Super Admin', 'Admin', 'Editor'), blogsController.createTag);
+
+// AI / Gemini Blog Generation & Settings
+router.get('/admin/ai-config', authorizeRoles('Super Admin', 'Admin'), blogsController.getAiConfig);
+router.put('/admin/ai-config', authorizeRoles('Super Admin', 'Admin'), blogsController.saveAiConfig);
+router.post('/admin/ai-config/test', authorizeRoles('Super Admin', 'Admin'), blogsController.testAiConfig);
+router.post('/blogs/generate', authorizeRoles('Super Admin', 'Admin', 'Editor'), blogsController.generateBlogWithGemini);
 
 // Leads
 router.get('/leads', leadsController.getLeads);

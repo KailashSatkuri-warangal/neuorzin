@@ -113,6 +113,14 @@ import { getCachedCrmData, saveCachedCrmData } from '../data/initialCrmStore';
 import { EMAIL_CONFIG, createMailtoLink } from '../data/emailConfig';
 import { crmApi } from '../data/crmApi';
 
+// Admin CMS, AI Settings, Users, Profile & Auth
+import BlogManagementView from '../components/admin/cms/BlogManagementView';
+import TaxonomyManagementView from '../components/admin/cms/TaxonomyManagementView';
+import AiSettingsView from '../components/admin/ai/AiSettingsView';
+import UserManagementView from '../components/admin/users/UserManagementView';
+import AdminProfileView from '../components/admin/profile/AdminProfileView';
+import ForgotPasswordModal from '../components/admin/auth/ForgotPasswordModal';
+
 const VALID_EMAIL = 'admin@neuorzin.com';
 const VALID_EMAIL_ALT = 'admin@neuorzin';
 const DEFAULT_PASSWORD = 'demo0722';
@@ -186,10 +194,28 @@ export function AdminPage({ onShowToast }) {
       whatsapp: 'WhatsApp Business Inbox | NeuOrzin',
       campaigns: 'Ad Campaigns & ROI Attribution | NeuOrzin',
       audit: 'Tamper-Evident Audit Trail | NeuOrzin',
-      settings: 'Enterprise System Settings | NeuOrzin'
+      settings: 'Enterprise System Settings | NeuOrzin',
+      blogs: 'Blog & Content CMS | NeuOrzin',
+      blog: 'Blog & Content CMS | NeuOrzin',
+      taxonomy: 'Categories & Taxonomy | NeuOrzin',
+      'ai-settings': 'Gemini AI Configuration | NeuOrzin',
+      users: 'User Management & RBAC | NeuOrzin',
+      profile: 'Administrator Profile | NeuOrzin'
     };
     document.title = titles[activeTab] || 'Enterprise Admin Portal | NeuOrzin';
   }, [activeTab]);
+
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const stored = localStorage.getItem('neuorzin_admin_user');
+      return stored ? JSON.parse(stored) : { name: 'Super Admin', email: 'admin@neuorzin.com', role: 'Super Admin' };
+    } catch {
+      return { name: 'Super Admin', email: 'admin@neuorzin.com', role: 'Super Admin' };
+    }
+  });
+
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+  const [blogsCount, setBlogsCount] = useState(0);
 
   const [isBackendOnline, setIsBackendOnline] = useState(true);
   const [lastSyncTime, setLastSyncTime] = useState(new Date());
@@ -506,7 +532,10 @@ export function AdminPage({ onShowToast }) {
         if (data && data.token) {
           setIsAuthenticated(true);
           localStorage.setItem('neuorzin_admin_auth', 'true');
-          if (onShowToast) onShowToast(`Welcome back, ${data.user?.name || 'Super Admin'}! Portal Live.`, 'success');
+          const userObj = data.user || { name: 'Super Admin', email, role: 'Super Admin' };
+          setCurrentUser(userObj);
+          localStorage.setItem('neuorzin_admin_user', JSON.stringify(userObj));
+          if (onShowToast) onShowToast(`Welcome back, ${userObj.name}! Portal Live.`, 'success');
           fetchLiveDatabase();
           loggedIn = true;
         }
@@ -515,6 +544,9 @@ export function AdminPage({ onShowToast }) {
         if (isDefaultSuperAdmin) {
           setIsAuthenticated(true);
           localStorage.setItem('neuorzin_admin_auth', 'true');
+          const userObj = { name: 'Super Admin', email: 'admin@neuorzin.com', role: 'Super Admin' };
+          setCurrentUser(userObj);
+          localStorage.setItem('neuorzin_admin_user', JSON.stringify(userObj));
           if (onShowToast) onShowToast('Welcome back, Super Admin! (Standalone Mode)', 'success');
           fetchLiveDatabase();
           loggedIn = true;
@@ -538,6 +570,7 @@ export function AdminPage({ onShowToast }) {
     setIsAuthenticated(false);
     localStorage.removeItem('neuorzin_admin_auth');
     localStorage.removeItem('neuorzin_jwt_token');
+    localStorage.removeItem('neuorzin_admin_user');
     if (onShowToast) onShowToast('Signed out of Admin Portal.', 'info');
     navigate('/');
   };
@@ -1599,6 +1632,17 @@ export function AdminPage({ onShowToast }) {
               </div>
             </div>
 
+            <div className="flex justify-between items-center text-xs pt-1">
+              <span className="text-[11px] text-slate-500">Need help with access?</span>
+              <button
+                type="button"
+                onClick={() => setShowForgotPasswordModal(true)}
+                className="text-xs font-bold text-[#0070ba] hover:underline cursor-pointer"
+              >
+                Forgot Password?
+              </button>
+            </div>
+
             <button
               type="submit"
               disabled={isLoggingIn}
@@ -1620,6 +1664,13 @@ export function AdminPage({ onShowToast }) {
             </Link>
           </div>
         </motion.div>
+
+        {/* Forgot Password Modal */}
+        <ForgotPasswordModal
+          isOpen={showForgotPasswordModal}
+          onClose={() => setShowForgotPasswordModal(false)}
+          onShowToast={onShowToast}
+        />
       </div>
     );
   }
@@ -1948,13 +1999,21 @@ export function AdminPage({ onShowToast }) {
 
           {/* User Badge */}
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0070ba] to-indigo-600 flex items-center justify-center text-white font-bold text-xs">
-              SA
-            </div>
-            <div className="hidden lg:block text-left">
-              <div className="text-xs font-bold text-slate-900 leading-tight">Super Admin</div>
-              <div className="text-[10px] text-[#0070ba] font-medium">admin@neuorzin.com</div>
-            </div>
+            <button
+              onClick={() => handleTabChange('profile')}
+              className="flex items-center gap-2 text-left hover:opacity-80 transition-opacity cursor-pointer group"
+              title="View & Edit Administrator Profile"
+            >
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0070ba] to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-xs">
+                {currentUser.name ? currentUser.name.slice(0, 2).toUpperCase() : 'SA'}
+              </div>
+              <div className="hidden lg:block text-left">
+                <div className="text-xs font-bold text-slate-900 group-hover:text-[#0070ba] transition-colors leading-tight">
+                  {currentUser.name || 'Super Admin'}
+                </div>
+                <div className="text-[10px] text-[#0070ba] font-medium">{currentUser.email || 'admin@neuorzin.com'}</div>
+              </div>
+            </button>
             <button
               onClick={handleLogout}
               title="Sign Out"
@@ -2046,6 +2105,53 @@ export function AdminPage({ onShowToast }) {
             </button>
 
             <div className="px-3 pt-3 pb-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+              Content & Blog CMS
+            </div>
+
+            <button
+              onClick={() => handleTabChange('blogs')}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                activeTab === 'blogs' || activeTab === 'blog'
+                  ? 'bg-gradient-to-r from-[#0070ba] to-[#0284c7] text-white shadow-md shadow-blue-500/20'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <FileText className="w-4 h-4" />
+                <span>Blog & Articles</span>
+              </div>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                activeTab === 'blogs' || activeTab === 'blog' ? 'bg-white/20 text-white' : 'bg-blue-50 text-[#0070ba]'
+              }`}>
+                Live
+              </span>
+            </button>
+
+            <button
+              onClick={() => handleTabChange('taxonomy')}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                activeTab === 'taxonomy' || activeTab === 'categories'
+                  ? 'bg-gradient-to-r from-[#0070ba] to-[#0284c7] text-white shadow-md shadow-blue-500/20'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <Layers className="w-4 h-4" />
+              <span>Categories & Tags</span>
+            </button>
+
+            <button
+              onClick={() => handleTabChange('ai-settings')}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                activeTab === 'ai-settings' || activeTab === 'ai'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                  : 'text-purple-700 hover:text-purple-900 hover:bg-purple-50/70 font-semibold'
+              }`}
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Gemini AI Engine</span>
+            </button>
+
+            <div className="px-3 pt-3 pb-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
               Finance & Commercials
             </div>
 
@@ -2114,8 +2220,32 @@ export function AdminPage({ onShowToast }) {
             </button>
 
             <div className="px-3 pt-3 pb-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-              Channels & Settings
+              Channels & Governance
             </div>
+
+            <button
+              onClick={() => handleTabChange('users')}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                activeTab === 'users'
+                  ? 'bg-gradient-to-r from-[#0070ba] to-[#0284c7] text-white shadow-md shadow-blue-500/20'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <User className="w-4 h-4" />
+              <span>User Accounts (RBAC)</span>
+            </button>
+
+            <button
+              onClick={() => handleTabChange('profile')}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                activeTab === 'profile'
+                  ? 'bg-gradient-to-r from-[#0070ba] to-[#0284c7] text-white shadow-md shadow-blue-500/20'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <ShieldCheck className="w-4 h-4" />
+              <span>Admin Profile</span>
+            </button>
 
             <button
               onClick={() => handleTabChange('whatsapp')}
@@ -2400,6 +2530,26 @@ export function AdminPage({ onShowToast }) {
               <MobileAuditView
                 auditLogs={auditLogs}
               />
+            )}
+
+            {(activeTab === 'blogs' || activeTab === 'blog') && (
+              <BlogManagementView onShowToast={onShowToast} currentUser={currentUser} />
+            )}
+
+            {(activeTab === 'taxonomy' || activeTab === 'categories') && (
+              <TaxonomyManagementView onShowToast={onShowToast} />
+            )}
+
+            {(activeTab === 'ai-settings' || activeTab === 'ai') && (
+              <AiSettingsView onShowToast={onShowToast} currentUser={currentUser} />
+            )}
+
+            {activeTab === 'users' && (
+              <UserManagementView onShowToast={onShowToast} currentUser={currentUser} />
+            )}
+
+            {activeTab === 'profile' && (
+              <AdminProfileView onShowToast={onShowToast} currentUser={currentUser} onUserUpdated={setCurrentUser} />
             )}
           </div>
 
@@ -3863,6 +4013,41 @@ export function AdminPage({ onShowToast }) {
                 </form>
               </div>
             </div>
+          )}
+
+          {/* -------------------------------------------------------------
+              PAGE 13: BLOG CMS & ARTICLES
+             ------------------------------------------------------------- */}
+          {(activeTab === 'blogs' || activeTab === 'blog') && (
+            <BlogManagementView onShowToast={onShowToast} currentUser={currentUser} />
+          )}
+
+          {/* -------------------------------------------------------------
+              PAGE 14: TAXONOMY (CATEGORIES & TAGS)
+             ------------------------------------------------------------- */}
+          {(activeTab === 'taxonomy' || activeTab === 'categories') && (
+            <TaxonomyManagementView onShowToast={onShowToast} />
+          )}
+
+          {/* -------------------------------------------------------------
+              PAGE 15: GEMINI AI ENGINE CONFIGURATION
+             ------------------------------------------------------------- */}
+          {(activeTab === 'ai-settings' || activeTab === 'ai') && (
+            <AiSettingsView onShowToast={onShowToast} currentUser={currentUser} />
+          )}
+
+          {/* -------------------------------------------------------------
+              PAGE 16: USER MANAGEMENT & RBAC
+             ------------------------------------------------------------- */}
+          {activeTab === 'users' && (
+            <UserManagementView onShowToast={onShowToast} currentUser={currentUser} />
+          )}
+
+          {/* -------------------------------------------------------------
+              PAGE 17: ADMINISTRATOR PROFILE
+             ------------------------------------------------------------- */}
+          {activeTab === 'profile' && (
+            <AdminProfileView onShowToast={onShowToast} currentUser={currentUser} onUserUpdated={setCurrentUser} />
           )}
 
           </div>

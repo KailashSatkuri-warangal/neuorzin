@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { blogPosts } from '../data/blogData';
+import { blogPosts as fallbackPosts } from '../data/blogData';
+import { crmApi } from '../data/crmApi';
 import { 
-  Calendar, User, ArrowRight, Search, Sparkles, TrendingUp
+  Calendar, User, ArrowRight, Search, Sparkles, TrendingUp, Loader2
 } from 'lucide-react';
 import { 
   CinematicReveal, 
@@ -12,13 +13,44 @@ import {
 import { QuickContactBanner } from '../components/sections/QuickContactBanner';
 
 export function BlogPage({ onSelectArticle, onOpenBooking }) {
+  const [posts, setPosts] = useState(fallbackPosts);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredPosts = blogPosts.filter((post) => {
+  // Fetch live published blogs from database
+  useEffect(() => {
+    let isMounted = true;
+    async function loadPublishedBlogs() {
+      try {
+        const live = await crmApi.getBlogs();
+        if (isMounted && Array.isArray(live) && live.length > 0) {
+          // Format fields to match frontend expectations
+          const formatted = live.map(b => ({
+            ...b,
+            id: b.id || b.slug,
+            slug: b.slug || b.id,
+            readTime: b.read_time || b.readTime || '5 min read',
+            authorRole: b.author_role || b.authorRole || 'Growth & Marketing Lead',
+            date: b.published_at ? new Date(b.published_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : (b.date || 'March 2026'),
+            image: b.image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+            tags: Array.isArray(b.tags) ? b.tags : []
+          }));
+          setPosts(formatted);
+        }
+      } catch (err) {
+        console.info('[BlogPage] Using local fallback posts:', err.message);
+      }
+    }
+    loadPublishedBlogs();
+    return () => { isMounted = false; };
+  }, []);
+
+  const filteredPosts = posts.filter((post) => {
     return searchQuery === '' 
       ? true 
-      : post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      : (post.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (post.excerpt || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (post.category || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         (post.tags && post.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())));
   });
 

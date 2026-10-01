@@ -33,6 +33,14 @@ export default function MobileMoreDrawer({
 
   const sections = [
     {
+      title: 'Content & Blog CMS',
+      items: [
+        { id: 'blogs', label: 'Blog & Articles CMS', icon: FileText, count: counts.blogs, badgeColor: 'bg-blue-50 text-[#0070ba]' },
+        { id: 'taxonomy', label: 'Categories & Tags', icon: FolderLock },
+        { id: 'ai-settings', label: 'Gemini AI Engine', icon: Sliders, badgeColor: 'bg-purple-50 text-purple-700' },
+      ]
+    },
+    {
       title: 'Sales & Customer Relationship',
       items: [
         { id: 'customers', label: 'Customers & CRM', icon: Users, count: counts.customers, badgeColor: 'bg-blue-50 text-[#0070ba]' },
@@ -68,6 +76,8 @@ export default function MobileMoreDrawer({
     {
       title: 'Administration & Governance',
       items: [
+        { id: 'users', label: 'User Accounts & RBAC', icon: Users, count: counts.users, badgeColor: 'bg-indigo-50 text-indigo-700' },
+        { id: 'profile', label: 'Administrator Profile', icon: UserCheck },
         { id: 'notifications', label: 'Notifications Center', icon: Bell, count: counts.notifications, badgeColor: 'bg-rose-50 text-rose-700' },
         { id: 'audit', label: 'Audit Trail & Compliance', icon: ShieldCheck },
         { id: 'settings', label: 'System Settings & API Keys', icon: Sliders },

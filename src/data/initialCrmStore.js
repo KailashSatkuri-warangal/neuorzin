@@ -721,10 +721,171 @@ export const INITIAL_CRM_DATA = {
       timestamp: '2026-09-18 09:30',
       status: 'Read'
     }
-  ]
+  ],
+  blogs: [
+    {
+      id: 'how-we-grew-organic-pipeline-in-2026-seo-playbook',
+      slug: 'how-we-grew-organic-pipeline-in-2026-seo-playbook',
+      title: 'How We Grew Organic Pipeline in 2026: Why Traditional SEO Failed and What Actually Worked',
+      section: 'Digital Marketing',
+      category: 'Digital Marketing',
+      date: 'March 2026',
+      read_time: '6 min read',
+      readTime: '6 min read',
+      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+      tags: ['Organic Growth', 'AI Search', 'Content Strategy', 'B2B Lead Gen', 'GEO'],
+      excerpt: 'If you opened your analytics over the past few months and saw search impressions rise while clicks softened, you are not imagining things. Here is how we adapted our marketing strategy to win high-intent enterprise pipeline in the new search landscape.',
+      author: 'Rajesh Varma',
+      authorRole: 'Head of Growth Marketing',
+      author_role: 'Head of Growth Marketing',
+      status: 'Published',
+      is_featured: 1,
+      seo_title: 'How We Grew Organic Pipeline in 2026 | NeuOrzin Growth Playbook',
+      seo_description: 'How to adapt your B2B SEO and content strategy to win high-intent enterprise pipeline in the era of AI search engines.',
+      seo_keywords: 'B2B SEO, AI Search, Pipeline Growth, Organic Search',
+      published_at: '2026-03-01 10:00:00',
+      created_at: '2026-03-01 10:00:00',
+      intro: 'If you opened your analytics dashboard over the past few months and saw search impressions rise while direct click-through rates softened, you are not imagining things. Between AI-generated overviews and direct-answer search engines, the era of capturing easy traffic with 2,000-word generic keyword articles is officially over.',
+      sections: [
+        {
+          heading: '1. The Day Our Standard Keywords Stopped Converting',
+          paragraphs: [
+            'For years, the B2B playbook was simple: find high-volume informational keywords, write comprehensive guides, build a few backlinks, and wait for the demo requests to roll in.',
+            'Early this year, we noticed a distinct shift. Our informational articles still ranked in the top 3, but the traffic was no longer clicking through. AI search summaries were answering surface-level questions directly on the results page. The casual readers got their quick answer and left, while high-intent decision-makers were looking for something much deeper.'
+          ],
+          callout: 'Traffic volume is a vanity metric; qualified pipeline velocity is what pays the bills. Winning today means being the source of truth that AI models cite when high-intent buyers ask specific questions.'
+        },
+        {
+          heading: '2. What AI Engines Actually Look For (And It Is Not Keyword Density)',
+          paragraphs: [
+            'When conversational search models synthesize an answer, they evaluate source credibility and data freshness rather than repetitive keyword density.',
+            'We completely overhauled our editorial workflow around three practical rules:'
+          ],
+          list: [
+            'Publish Original Benchmark Data: Real numbers from our client audits and engineering benchmarks get cited 4x more often than generic opinion pieces.',
+            'Direct Answer Architecture: We answer the core question clearly in the very first two sentences before expanding into architectural details.',
+            'Proprietary Frameworks: Giving unique, memorable names to our methodologies makes our concepts recognizable across the web.'
+          ]
+        },
+        {
+          heading: '3. Why Real Human Experience Beats Mass Content Every Time',
+          paragraphs: [
+            'The web is currently flooded with generic AI-written articles that all say the exact same thing in slightly different words. Decision-makers can spot automated fluff within three seconds.',
+            'What builds genuine trust—and what actually converts enterprise prospects—is unfiltered practitioner experience: sharing real mistakes, specific configuration hurdles, and the exact trade-offs made during real client implementations.'
+          ]
+        },
+        {
+          heading: '4. What You Should Change on Your Website Next Week',
+          paragraphs: [
+            'If you want to protect your inbound pipeline, start with these three high-impact adjustments:'
+          ],
+          list: [
+            'Audit your top 10 revenue pages and remove introductory fluff—get straight to the actionable insight.',
+            'Add structured comparison tables, key takeaways, and clear summary cards that search crawlers can parse instantly.',
+            'Interview your customer-facing engineers and sales reps to write about the actual edge-case problems your clients ask during sales calls.'
+          ]
+        }
+      ],
+      conclusion: 'Organic search is far from dead—it has simply grown up. The brands winning in 2026 are the ones providing genuine, authoritative human insight that both search engines and executive buyers can rely on.'
+    },
+    {
+      id: 'honest-guide-to-b2b-revenue-attribution-and-capi',
+      slug: 'honest-guide-to-b2b-revenue-attribution-and-capi',
+      title: 'Where Did Our Ad Budget Go? An Honest Guide to Fixing B2B Attribution',
+      section: 'Digital Marketing',
+      category: 'Digital Marketing',
+      date: 'March 2026',
+      read_time: '7 min read',
+      readTime: '7 min read',
+      image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80',
+      tags: ['RevOps', 'Server-Side Tracking', 'Meta / Google CAPI', 'Attribution', 'CAC Optimization'],
+      excerpt: 'Every marketing leader knows the pain of seeing ad dashboards report 50 conversions while the sales team insists they only met 3 qualified prospects. Here is the exact server-side tracking setup that fixed our funnel.',
+      author: 'Aparna Sundaram',
+      authorRole: 'Principal Revenue Operations Lead',
+      author_role: 'Principal Revenue Operations Lead',
+      status: 'Published',
+      is_featured: 0,
+      seo_title: 'An Honest Guide to Fixing B2B Attribution & CAPI | NeuOrzin',
+      seo_description: 'How to implement server-side tracking (CAPI) and closed-loop CRM attribution to reduce CAC and optimize marketing ROI.',
+      seo_keywords: 'Server-Side Tracking, CAPI, B2B Attribution, RevOps',
+      published_at: '2026-03-05 14:30:00',
+      created_at: '2026-03-05 14:30:00',
+      intro: 'Every marketing director knows the sinking feeling of looking at an ad manager dashboard showing 50 reported conversions, only to have the VP of Sales walk in and ask why the team only received 3 qualified enterprise leads that week.',
+      sections: [
+        {
+          heading: '1. The 40% Telemetry Blind Spot We Did Not Know We Had',
+          paragraphs: [
+            'For a long time, marketing teams relied on browser-side JavaScript pixels to measure ad effectiveness. But with modern browser tracking restrictions, mobile privacy updates, and ad-blockers, client-side tracking now misses between 30% and 45% of real conversion signals.',
+            'When your ad platforms are operating with half the data, their automated bidding algorithms end up optimizing for low-quality form-fills and spam bots instead of real enterprise buyers.'
+          ],
+          callout: 'If your ad platform only optimizes for form submissions instead of qualified sales opportunities, you are essentially training your budget to find tire-kickers.'
+        },
+        {
+          heading: '2. Moving to Server-Side Tracking Without the Headache',
+          paragraphs: [
+            'The fix is moving from client-side browser tags to server-side event tracking (Conversions API / CAPI).',
+            'Instead of hoping the user browser sends the conversion event back to Meta or Google, our server captures the action directly and passes verified identifiers (hashed email, timestamp, transaction ID) over a secure API connection.'
+          ],
+          list: [
+            'Direct Server-to-Server Connection: Zero interference from ad-blockers or browser cookie clearing.',
+            'Higher Signal Quality: Event match quality scores jump from 4.5/10 to over 8.8/10, giving ad bidding algorithms the clarity they need.',
+            'Full Privacy Compliance: We control exactly what data is sanitized and sent, ensuring complete GDPR and CCPA adherence.'
+          ]
+        },
+        {
+          heading: '3. The Magic of Feeding CRM Deal Stages Back to Ad Engines',
+          paragraphs: [
+            'The biggest breakthrough happened when we connected our CRM (HubSpot / Salesforce) directly back to Google Ads and LinkedIn Campaign Manager.',
+            'Instead of telling Google "someone filled a form," we trigger an offline conversion event only when an opportunity reaches "Demo Completed & Qualified" in the CRM. The ad algorithms immediately shifted spend toward companies matching our exact ideal customer profile.'
+          ]
+        },
+        {
+          heading: '4. The Results After 90 Days',
+          paragraphs: [
+            'Once the closed-loop tracking was live for a quarter, the results spoke for themselves:'
+          ],
+          list: [
+            'Our Customer Acquisition Cost (CAC) dropped by 34% because we stopped wasting budget on unengaged audiences.',
+            'Sales qualification rates on inbound demo requests jumped from 22% to over 54%.',
+            'Marketing and sales finally look at the exact same pipeline numbers during weekly executive reviews.'
+          ]
+        }
+      ],
+      conclusion: 'Fixing attribution is not about chasing vanity metrics—it is about giving your growth budget the intelligence it needs to invest in channels that produce real enterprise revenue.'
+    }
+  ],
+  categories: [
+    { id: 'CAT-001', name: 'Digital Marketing', slug: 'digital-marketing', description: 'Performance marketing, SEO, conversion rate optimization, and brand scaling.', blog_count: 2 },
+    { id: 'CAT-002', name: 'AI & Automation', slug: 'ai-automation', description: 'Autonomous agents, LLM integrations, and workflow automation.', blog_count: 0 },
+    { id: 'CAT-003', name: 'Product Engineering', slug: 'product-engineering', description: 'Modern web, mobile apps, MVP development, and architecture.', blog_count: 0 },
+    { id: 'CAT-004', name: 'Data Platforms', slug: 'data-platforms', description: 'Snowflake, cloud data pipelines, telemetry, and business intelligence.', blog_count: 0 }
+  ],
+  tags: [
+    { id: 'TAG-001', name: 'Organic Growth', slug: 'organic-growth' },
+    { id: 'TAG-002', name: 'AI Search', slug: 'ai-search' },
+    { id: 'TAG-003', name: 'Content Strategy', slug: 'content-strategy' },
+    { id: 'TAG-004', name: 'B2B Lead Gen', slug: 'b2b-lead-gen' },
+    { id: 'TAG-005', name: 'RevOps', slug: 'revops' },
+    { id: 'TAG-006', name: 'Server-Side Tracking', slug: 'server-side-tracking' },
+    { id: 'TAG-007', name: 'Attribution', slug: 'attribution' },
+    { id: 'TAG-008', name: 'Machine Learning', slug: 'machine-learning' }
+  ],
+  users: [
+    { id: 'USR-001', name: 'Kailash S (Super Admin)', email: 'admin@neuorzin.com', role: 'Super Admin', department: 'Executive', phone: '+91 77940 45500', status: 'Active', created_at: '2026-01-01 10:00:00' },
+    { id: 'USR-002', name: 'Rohan Mehta (Sales Lead)', email: 'rohan.sales@neuorzin.com', role: 'Sales Manager', department: 'Sales', phone: '+91 98201 12345', status: 'Active', created_at: '2026-01-15 10:00:00' },
+    { id: 'USR-003', name: 'Ananya Roy (Senior AE)', email: 'ananya.ae@neuorzin.com', role: 'Sales Executive', department: 'Sales', phone: '+91 98402 54321', status: 'Active', created_at: '2026-02-01 10:00:00' },
+    { id: 'USR-004', name: 'Vikram Sen (PM)', email: 'vikram.pm@neuorzin.com', role: 'Project Manager', department: 'Development', phone: '+91 97112 88990', status: 'Active', created_at: '2026-02-10 10:00:00' },
+    { id: 'USR-005', name: 'Aditya Verma (Lead Dev)', email: 'aditya.dev@neuorzin.com', role: 'Developer', department: 'Development', phone: '+91 96541 22334', status: 'Active', created_at: '2026-02-20 10:00:00' }
+  ],
+  aiConfig: {
+    is_configured: false,
+    masked_key: '',
+    model_name: 'gemini-1.5-pro',
+    temperature: 0.70
+  }
 };
 
-const CACHE_STORAGE_KEY = 'neuorzin_crm_cache_v2';
+const CACHE_STORAGE_KEY = 'neuorzin_crm_cache_v3';
 
 export function getCachedCrmData() {
   if (typeof window === 'undefined') return INITIAL_CRM_DATA;
@@ -744,7 +905,12 @@ export function getCachedCrmData() {
           notifications: (Array.isArray(parsed.notifications) && parsed.notifications.length > 0) ? parsed.notifications : INITIAL_CRM_DATA.notifications,
           auditLogs: (Array.isArray(parsed.auditLogs) && parsed.auditLogs.length > 0) ? parsed.auditLogs : INITIAL_CRM_DATA.auditLogs,
           campaigns: (Array.isArray(parsed.campaigns) && parsed.campaigns.length > 0) ? parsed.campaigns : INITIAL_CRM_DATA.campaigns,
-          whatsappMessages: (Array.isArray(parsed.whatsappMessages) && parsed.whatsappMessages.length > 0) ? parsed.whatsappMessages : INITIAL_CRM_DATA.whatsappMessages
+          whatsappMessages: (Array.isArray(parsed.whatsappMessages) && parsed.whatsappMessages.length > 0) ? parsed.whatsappMessages : INITIAL_CRM_DATA.whatsappMessages,
+          blogs: (Array.isArray(parsed.blogs) && parsed.blogs.length > 0) ? parsed.blogs : INITIAL_CRM_DATA.blogs,
+          categories: (Array.isArray(parsed.categories) && parsed.categories.length > 0) ? parsed.categories : INITIAL_CRM_DATA.categories,
+          tags: (Array.isArray(parsed.tags) && parsed.tags.length > 0) ? parsed.tags : INITIAL_CRM_DATA.tags,
+          users: (Array.isArray(parsed.users) && parsed.users.length > 0) ? parsed.users : INITIAL_CRM_DATA.users,
+          aiConfig: parsed.aiConfig || INITIAL_CRM_DATA.aiConfig
         };
       }
     }
@@ -762,3 +928,4 @@ export function saveCachedCrmData(data) {
     console.warn('[CRM Cache] Failed saving cache snapshot:', err);
   }
 }
+
