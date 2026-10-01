@@ -495,26 +495,53 @@ You MUST return your response as a valid JSON object matching this exact schema:
 
 Return ONLY the raw JSON object without markdown fences or extraneous text.`;
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.7,
-            responseMimeType: 'application/json'
-          }
-        })
-      });
+      const candidateModels = [
+        'gemini-1.5-flash-latest',
+        'gemini-2.0-flash',
+        'gemini-1.5-flash-8b',
+        'gemini-1.5-pro-latest',
+        'gemini-1.5-pro',
+        'gemini-pro'
+      ];
 
-      const data = await response.json();
-      if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        const rawText = data.candidates[0].content.parts[0].text;
-        const clean = rawText.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
-        const parsed = JSON.parse(clean);
-        return { success: true, data: parsed };
+      let generatedArticle = null;
+      let lastErr = 'Gemini generation failed';
+
+      for (const m of candidateModels) {
+        try {
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: {
+                temperature: 0.7,
+                responseMimeType: 'application/json'
+              }
+            })
+          });
+
+          const data = await response.json();
+          if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            const rawText = data.candidates[0].content.parts[0].text;
+            const clean = rawText.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
+            const parsed = JSON.parse(clean);
+            if (parsed && parsed.title) {
+              generatedArticle = parsed;
+              break;
+            }
+          } else {
+            lastErr = data.error?.message || `HTTP ${response.status}`;
+          }
+        } catch (fetchErr) {
+          lastErr = fetchErr.message;
+        }
       }
-      throw new Error(data.error?.message || err.message || 'Gemini generation failed');
+
+      if (generatedArticle) {
+        return { success: true, data: generatedArticle };
+      }
+      throw new Error(lastErr);
     }
   },
 

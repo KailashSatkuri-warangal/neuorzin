@@ -160,11 +160,22 @@ export default function BlogManagementView({ onShowToast, currentUser }) {
     setPreviewModalOpen(true);
   };
 
-  const handleSaveBlog = async (savedBlog) => {
-    setEditorOpen(false);
-    setSelectedBlogForEdit(null);
-    await loadData();
-    if (onShowToast) onShowToast('Article saved successfully!', 'success');
+  const handleSaveBlog = async (savedBlog, isEdit) => {
+    try {
+      if (isEdit && savedBlog.id) {
+        await crmApi.updateBlog(savedBlog.id, savedBlog);
+      } else {
+        await crmApi.createBlog(savedBlog);
+      }
+      setEditorOpen(false);
+      setSelectedBlogForEdit(null);
+      await loadData();
+      if (onShowToast) onShowToast(isEdit ? 'Article updated successfully!' : 'New article saved to database!', 'success');
+    } catch (err) {
+      console.error('Error saving blog article:', err);
+      if (onShowToast) onShowToast('Failed to save article: ' + err.message, 'error');
+      throw err;
+    }
   };
 
   const handleApplyAiGenerated = (generatedData) => {

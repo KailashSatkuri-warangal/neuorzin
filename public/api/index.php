@@ -701,7 +701,16 @@ if ($endpoint === "/admin/ai-config/test" && $method === "POST") {
         send_json(["error" => "No Gemini API key provided or saved. Please enter an API key first."], 400);
     }
 
-    $url = "https://generativelanguage.googleapis.com/v1beta/models/" . urlencode($modelName) . ":generateContent?key=" . urlencode($testKey);
+    $modelsToTry = array_unique([
+        $modelName,
+        "gemini-1.5-flash-latest",
+        "gemini-2.0-flash",
+        "gemini-1.5-flash-8b",
+        "gemini-1.5-pro-latest",
+        "gemini-1.5-pro",
+        "gemini-pro"
+    ]);
+
     $payload = [
         "contents" => [
             [
@@ -712,32 +721,45 @@ if ($endpoint === "/admin/ai-config/test" && $method === "POST") {
         ]
     ];
 
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $testSuccess = false;
+    $lastErr = "";
+    $workingModel = "";
 
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $err = curl_error($ch);
-    curl_close($ch);
+    foreach ($modelsToTry as $candidateModel) {
+        if (empty($candidateModel)) continue;
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/" . urlencode($candidateModel) . ":generateContent?key=" . urlencode($testKey);
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-    if ($err) {
-        send_json(["error" => "Network error connecting to Gemini API: " . $err], 500);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err = curl_error($ch);
+        curl_close($ch);
+
+        if (!$err && $httpCode >= 200 && $httpCode < 300) {
+            $resData = json_decode($response, true);
+            if (!empty($resData["candidates"])) {
+                $testSuccess = true;
+                $workingModel = $candidateModel;
+                break;
+            }
+        }
+        $resData = json_decode($response, true);
+        $lastErr = $resData["error"]["message"] ?? ($err ?: ("HTTP " . $httpCode));
     }
 
-    $resData = json_decode($response, true);
-    if ($httpCode >= 200 && $httpCode < 300 && isset($resData["candidates"])) {
+    if ($testSuccess) {
         send_json([
             "success" => true,
-            "message" => "Gemini API Connection Verified! Model '{$modelName}' is online and responsive."
+            "message" => "Gemini API Connection Verified! Model '{$workingModel}' is online and responsive."
         ]);
     } else {
-        $errMsg = $resData["error"]["message"] ?? ("HTTP Error " . $httpCode);
-        send_json(["error" => "Gemini API test failed: " . $errMsg], 400);
+        send_json(["error" => "Gemini API test failed: " . $lastErr], 400);
     }
 }
 
@@ -755,13 +777,13 @@ if ($endpoint === "/blogs/generate" && $method === "POST") {
     // Fetch API Key server-side
     $stmt = $pdo->query("SELECT gemini_api_key, model_name, temperature FROM ai_config WHERE id = 'default' LIMIT 1");
     $aiRow = $stmt->fetch();
-    $apiKey = $aiRow["gemini_api_key"] ?? "";
-    $modelName = $aiRow["model_name"] ?? "gemini-1.5-pro";
+    $apiKey = $aiRow["gemini_api_key"] ?? ($input["api_key"] ?? "");
+    $modelName = $aiRow["model_name"] ?? ($input["model"] ?? "gemini-1.5-flash-latest");
     $temperature = floatval($aiRow["temperature"] ?? 0.70);
 
     if (empty($apiKey)) {
         send_json([
-            "error" => "Gemini API Key is not configured. Please go to Admin Settings -> AI / Gemini Configuration and enter your API Key."
+            "error" => "Gemini API Key is not configured. Please go to Admin Settings -> Gemini AI Engine and enter your API Key."
         ], 400);
     }
 
@@ -811,7 +833,16 @@ You MUST return your response as a valid JSON object matching this exact schema:
 
 Return ONLY the raw JSON object without markdown code fences or conversational text.";
 
-    $url = "https://generativelanguage.googleapis.com/v1beta/models/" . urlencode($modelName) . ":generateContent?key=" . urlencode($apiKey);
+    $modelsToTry = array_unique([
+        $modelName,
+        "gemini-1.5-flash-latest",
+        "gemini-2.0-flash",
+        "gemini-1.5-flash-8b",
+        "gemini-1.5-pro-latest",
+        "gemini-1.5-pro",
+        "gemini-pro"
+    ]);
+
     $payload = [
         "contents" => [
             [
@@ -826,43 +857,53 @@ Return ONLY the raw JSON object without markdown code fences or conversational t
         ]
     ];
 
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-    curl_setopt($ch, CURLOPT_TIMEOUT, 60);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $genSuccess = false;
+    $articleData = null;
+    $lastErr = "";
 
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $err = curl_error($ch);
-    curl_close($ch);
+    foreach ($modelsToTry as $candidateModel) {
+        if (empty($candidateModel)) continue;
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/" . urlencode($candidateModel) . ":generateContent?key=" . urlencode($apiKey);
 
-    if ($err) {
-        send_json(["error" => "Error calling Gemini API: " . $err], 500);
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err = curl_error($ch);
+        curl_close($ch);
+
+        if (!$err && $httpCode >= 200 && $httpCode < 300) {
+            $resData = json_decode($response, true);
+            if (!empty($resData["candidates"][0]["content"]["parts"][0]["text"])) {
+                $rawText = $resData["candidates"][0]["content"]["parts"][0]["text"];
+                $cleanJson = preg_replace('/^```json\s*/i', '', trim($rawText));
+                $cleanJson = preg_replace('/```$/i', '', trim($cleanJson));
+                $parsed = json_decode($cleanJson, true);
+                if ($parsed && isset($parsed["title"])) {
+                    $articleData = $parsed;
+                    $genSuccess = true;
+                    break;
+                }
+            }
+        }
+        $resData = json_decode($response, true);
+        $lastErr = $resData["error"]["message"] ?? ($err ?: ("Gemini Error HTTP " . $httpCode));
     }
 
-    $resData = json_decode($response, true);
-    if ($httpCode >= 200 && $httpCode < 300 && isset($resData["candidates"][0]["content"]["parts"][0]["text"])) {
-        $rawText = $resData["candidates"][0]["content"]["parts"][0]["text"];
-        // Clean possible markdown fences
-        $cleanJson = preg_replace('/^```json\s*/i', '', trim($rawText));
-        $cleanJson = preg_replace('/```$/i', '', trim($cleanJson));
-        
-        $articleData = json_decode($cleanJson, true);
-        if ($articleData && isset($articleData["title"])) {
-            log_audit($pdo, "AI", "gemini", "Generated Blog Draft", null, "Gemini AI", ["topic" => $topic]);
-            send_json([
-                "success" => true,
-                "data" => $articleData
-            ]);
-        } else {
-            send_json(["error" => "Failed to parse generated article JSON", "raw" => $rawText], 500);
-        }
+    if ($genSuccess && $articleData) {
+        log_audit($pdo, "AI", "gemini", "Generated Blog Draft", null, "Gemini AI", ["topic" => $topic]);
+        send_json([
+            "success" => true,
+            "data" => $articleData
+        ]);
     } else {
-        $errMsg = $resData["error"]["message"] ?? ("Gemini Error HTTP " . $httpCode);
-        send_json(["error" => "Gemini generation failed: " . $errMsg], 400);
+        send_json(["error" => "Gemini generation failed: " . $lastErr], 400);
     }
 }
 

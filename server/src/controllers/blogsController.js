@@ -454,28 +454,57 @@ You MUST return your response as a valid JSON object matching this exact schema:
 
 Return ONLY the raw JSON object without markdown fences or extraneous text.`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature,
-          responseMimeType: 'application/json'
-        }
-      })
-    });
+    const modelsToTry = Array.from(new Set([
+      modelName,
+      'gemini-1.5-flash-latest',
+      'gemini-2.0-flash',
+      'gemini-1.5-flash-8b',
+      'gemini-1.5-pro-latest',
+      'gemini-1.5-pro',
+      'gemini-pro'
+    ]));
 
-    const data = await response.json();
-    if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-      const rawText = data.candidates[0].content.parts[0].text;
-      const clean = rawText.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
-      const parsed = JSON.parse(clean);
+    let generatedArticle = null;
+    let lastErrorMsg = 'Gemini generation failed';
+
+    for (const m of modelsToTry) {
+      if (!m) continue;
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature,
+              responseMimeType: 'application/json'
+            }
+          })
+        });
+
+        const data = await response.json();
+        if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+          const rawText = data.candidates[0].content.parts[0].text;
+          const clean = rawText.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
+          const parsed = JSON.parse(clean);
+          if (parsed && parsed.title) {
+            generatedArticle = parsed;
+            break;
+          }
+        } else {
+          lastErrorMsg = data.error?.message || `HTTP ${response.status}`;
+        }
+      } catch (callErr) {
+        lastErrorMsg = callErr.message;
+      }
+    }
+
+    if (generatedArticle) {
       await logAudit('AI', 'gemini', 'Generated Blog Draft', req.user?.id, req.user?.name, { topic });
-      res.json({ success: true, data: parsed });
+      res.json({ success: true, data: generatedArticle });
     } else {
-      res.status(400).json({ error: data.error?.message || 'Gemini generation failed' });
+      res.status(400).json({ error: lastErrorMsg });
     }
   } catch (err) {
     res.status(500).json({ error: 'Server AI error: ' + err.message });
