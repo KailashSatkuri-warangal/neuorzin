@@ -651,16 +651,18 @@ if ($endpoint === "/admin/ai-config") {
             $masked = substr($k, 0, 6) . "..." . substr($k, -4);
         }
         send_json([
+            "has_key" => $hasKey,
             "is_configured" => (bool)($cfg["is_configured"] ?? 0) || $hasKey,
             "masked_key" => $masked,
-            "model_name" => $cfg["model_name"] ?? "gemini-1.5-pro",
+            "model" => $cfg["model_name"] ?? "gemini-1.5-flash",
+            "model_name" => $cfg["model_name"] ?? "gemini-1.5-flash",
             "temperature" => (float)($cfg["temperature"] ?? 0.70),
             "updated_at" => $cfg["updated_at"] ?? null
         ]);
     } elseif ($method === "PUT" || $method === "POST") {
         $data = get_json_input();
-        $apiKey = trim($data["gemini_api_key"] ?? "");
-        $model = $data["model_name"] ?? "gemini-1.5-pro";
+        $apiKey = trim($data["api_key"] ?? $data["gemini_api_key"] ?? "");
+        $model = $data["model"] ?? $data["model_name"] ?? "gemini-1.5-flash";
         $temp = floatval($data["temperature"] ?? 0.70);
 
         if (!empty($apiKey)) {
@@ -673,7 +675,11 @@ if ($endpoint === "/admin/ai-config") {
 
         log_audit($pdo, "AIConfig", "default", "Update AI Gemini Configuration", null, "Admin", ["model" => $model]);
 
-        send_json(["success" => true, "message" => "Gemini AI Configuration saved securely on server."]);
+        send_json([
+            "success" => true,
+            "has_key" => true,
+            "message" => "Gemini AI Configuration saved securely in server database."
+        ]);
     }
 }
 

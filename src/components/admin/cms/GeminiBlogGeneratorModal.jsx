@@ -36,6 +36,24 @@ export function GeminiBlogGeneratorModal({ isOpen, onClose, onApplyContent, onSh
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedData, setGeneratedData] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
+  const [quickApiKey, setQuickApiKey] = useState('');
+  const [isSavingKey, setIsSavingKey] = useState(false);
+
+  const handleSaveQuickKey = async (e) => {
+    e.preventDefault();
+    if (!quickApiKey.trim()) return;
+    setIsSavingKey(true);
+    try {
+      await crmApi.saveAiConfig({ api_key: quickApiKey.trim() });
+      setErrorMsg('');
+      setQuickApiKey('');
+      if (onShowToast) onShowToast('✨ Gemini API Key configured and ready!', 'success');
+    } catch (err) {
+      if (onShowToast) onShowToast('Failed to save key: ' + err.message, 'error');
+    } finally {
+      setIsSavingKey(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -169,11 +187,32 @@ export function GeminiBlogGeneratorModal({ isOpen, onClose, onApplyContent, onSh
         {/* Scrollable Content Body */}
         <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1 text-left">
           {errorMsg && (
-            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-3">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <strong>Generation Notice: </strong> {errorMsg}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-50 via-purple-50/40 to-indigo-50/30 border border-rose-200 text-slate-800 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
+                <div>
+                  <strong className="text-rose-700">Generation Notice: </strong>
+                  <span className="text-slate-600">{errorMsg}</span>
+                </div>
               </div>
+              
+              {/* Quick Inline API Key Input */}
+              <form onSubmit={handleSaveQuickKey} className="flex items-center gap-2 w-full sm:w-auto shrink-0 mt-1 sm:mt-0">
+                <input
+                  type="password"
+                  placeholder="Paste Gemini API Key here..."
+                  value={quickApiKey}
+                  onChange={(e) => setQuickApiKey(e.target.value)}
+                  className="px-3 py-1.5 rounded-xl border border-purple-200 bg-white text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 w-full sm:w-60 shadow-inner"
+                />
+                <button
+                  type="submit"
+                  disabled={!quickApiKey.trim() || isSavingKey}
+                  className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-xs transition-all disabled:opacity-50 cursor-pointer shrink-0"
+                >
+                  {isSavingKey ? 'Saving...' : 'Save & Activate'}
+                </button>
+              </form>
             </div>
           )}
 

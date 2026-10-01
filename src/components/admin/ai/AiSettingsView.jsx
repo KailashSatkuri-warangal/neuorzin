@@ -48,11 +48,13 @@ export default function AiSettingsView({ onShowToast, currentUser }) {
     try {
       const config = await crmApi.getAiConfig();
       if (config) {
-        if (config.has_key) {
+        if (config.has_key || config.is_configured || config.masked_key) {
           setHasExistingKey(true);
           setMaskedKey(config.masked_key || 'AIzaSy••••••••••••••••••••');
+        } else {
+          setHasExistingKey(false);
         }
-        if (config.model) setModel(config.model);
+        if (config.model || config.model_name) setModel(config.model || config.model_name);
         if (config.temperature !== undefined) setTemperature(Number(config.temperature));
         if (config.max_tokens !== undefined) setMaxTokens(Number(config.max_tokens));
         if (config.system_context) setSystemContext(config.system_context);
@@ -70,17 +72,25 @@ export default function AiSettingsView({ onShowToast, currentUser }) {
     try {
       const payload = {
         model,
+        model_name: model,
         temperature,
         max_tokens: maxTokens,
         system_context: systemContext
       };
-      // Only attach api_key if the admin typed a new one
+      // Attach api_key if the admin typed a new one
       if (apiKey.trim()) {
         payload.api_key = apiKey.trim();
+        payload.gemini_api_key = apiKey.trim();
       }
 
-      await crmApi.saveAiConfig(payload);
-      if (onShowToast) onShowToast('AI & Gemini configuration saved securely server-side!', 'success');
+      const res = await crmApi.saveAiConfig(payload);
+      if (onShowToast) onShowToast(res?.message || 'AI & Gemini configuration saved securely server-side!', 'success');
+      
+      if (apiKey.trim()) {
+        const k = apiKey.trim();
+        setMaskedKey(k.slice(0, 6) + '...' + k.slice(-4));
+        setHasExistingKey(true);
+      }
       setApiKey('');
       setShowKeyInput(false);
       await loadAiConfig();
@@ -213,20 +223,26 @@ export default function AiSettingsView({ onShowToast, currentUser }) {
               </label>
 
               {hasExistingKey && !showKeyInput ? (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 font-mono text-xs text-slate-700">
-                    <span className="truncate">{maskedKey}</span>
-                    <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                      Active
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 font-mono text-xs text-slate-800 shadow-2xs">
+                    <div className="flex items-center gap-2 truncate">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                      <span className="truncate font-semibold tracking-wider text-emerald-950">{maskedKey}</span>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider shrink-0 shadow-2xs">
+                      Saved in DB
                     </span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowKeyInput(true)}
-                    className="text-xs text-[#0070ba] hover:underline font-bold cursor-pointer"
-                  >
-                    Change / Update API Key
-                  </button>
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-[11px] text-slate-500 font-medium">Encrypted on server</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowKeyInput(true)}
+                      className="text-xs text-[#0070ba] hover:text-[#00508a] font-bold cursor-pointer transition-colors"
+                    >
+                      Change / Replace Key
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-2">

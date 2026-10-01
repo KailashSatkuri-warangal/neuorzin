@@ -316,9 +316,11 @@ export async function getAiConfig(req, res) {
       masked = k.slice(0, 6) + '...' + k.slice(-4);
     }
     res.json({
+      has_key: hasKey,
       is_configured: Boolean(row?.is_configured || hasKey),
       masked_key: masked,
-      model_name: row?.model_name || 'gemini-1.5-pro',
+      model: row?.model_name || 'gemini-1.5-flash',
+      model_name: row?.model_name || 'gemini-1.5-flash',
       temperature: Number(row?.temperature || 0.70),
       updated_at: row?.updated_at || null
     });
@@ -329,19 +331,22 @@ export async function getAiConfig(req, res) {
 
 export async function saveAiConfig(req, res) {
   try {
-    const { gemini_api_key, model_name = 'gemini-1.5-pro', temperature = 0.70 } = req.body;
-    if (gemini_api_key) {
+    const apiKey = (req.body.api_key || req.body.gemini_api_key || '').trim();
+    const model = req.body.model || req.body.model_name || 'gemini-1.5-flash';
+    const temperature = Number(req.body.temperature || 0.70);
+
+    if (apiKey) {
       await db.run(
         `INSERT INTO ai_config (id, gemini_api_key, model_name, temperature, is_configured, updated_at)
          VALUES ('default', ?, ?, ?, 1, CURRENT_TIMESTAMP)
          ON CONFLICT(id) DO UPDATE SET gemini_api_key = excluded.gemini_api_key, model_name = excluded.model_name, temperature = excluded.temperature, is_configured = 1, updated_at = CURRENT_TIMESTAMP`,
-        [gemini_api_key.trim(), model_name, temperature]
+        [apiKey, model, temperature]
       );
     } else {
-      await db.run("UPDATE ai_config SET model_name = ?, temperature = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 'default'", [model_name, temperature]);
+      await db.run("UPDATE ai_config SET model_name = ?, temperature = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 'default'", [model, temperature]);
     }
-    await logAudit('AIConfig', 'default', 'Update AI Gemini Configuration', req.user?.id, req.user?.name, { model: model_name });
-    res.json({ success: true, message: 'Gemini AI configuration saved securely.' });
+    await logAudit('AIConfig', 'default', 'Update AI Gemini Configuration', req.user?.id, req.user?.name, { model });
+    res.json({ success: true, has_key: true, message: 'Gemini AI configuration saved securely in server database.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
