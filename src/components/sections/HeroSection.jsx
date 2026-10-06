@@ -27,29 +27,21 @@ export function HeroSection({ onOpenBooking }) {
               </div>
             </CinematicReveal>
 
-            {/* Movie Title Style Word Reveal with Semantic H1 for SEO */}
-            <h1 className="m-0 p-0 font-display text-left">
-              <WordReveal
-                text="We build apps, data platforms, and"
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-[50px] font-black text-slate-900 leading-[1.16]"
-                wordClassName="text-slate-900"
-                delay={0.1}
-                stagger={0.03}
-              />
-              <CinematicReveal intensity="strong" delay={0.2}>
-                <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-[50px] font-black leading-[1.16] text-transparent bg-clip-text bg-gradient-to-r from-[#0070ba] via-[#0094e8] to-[#00c6ff] mt-1">
-                  AI systems for growing startups
-                </span>
-              </CinematicReveal>
+            {/* High-Intent Semantic H1 with Commercial Keywords */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[46px] font-black text-slate-900 leading-[1.18] tracking-tight font-display text-left">
+              <span>Technology That Powers Digital Growth — </span>
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#0070ba] via-[#0094e8] to-[#00c6ff] mt-1">
+                Enterprise AI, Cloud & Data Solutions
+              </span>
             </h1>
 
             <CinematicReveal intensity="medium" delay={0.25}>
               <div className="p-3.5 sm:p-4 rounded-2xl bg-white/80 border border-slate-200/80 backdrop-blur-xs max-w-xl">
                 <div className="text-[11px] font-bold uppercase tracking-wider text-[#0070ba] mb-1">
-                  <a href="/about" className="hover:underline text-[#0070ba]">About NeuOrzin</a>
+                  <a href="/about" className="hover:underline text-[#0070ba]">About NeuOrzin India</a>
                 </div>
                 <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                  NeuOrzin is a <a href="/services" className="text-[#0070ba] font-semibold hover:underline">product engineering studio</a> helping startups from idea → MVP → scale using modern web, mobile, data platforms, and AI technologies.
+                  NeuOrzin is an enterprise technology and <a href="/services" className="text-[#0070ba] font-semibold hover:underline">product engineering company in Hyderabad, India</a> delivering custom AI agents, scalable cloud architectures, modern data pipelines, and <a href="/blog" className="text-[#0070ba] font-semibold hover:underline">growth marketing solutions</a> from MVP to global scale.
                 </p>
               </div>
             </CinematicReveal>

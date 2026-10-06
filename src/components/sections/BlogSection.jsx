@@ -15,25 +15,50 @@ export function BlogSection({ onSelectArticle }) {
 
   useEffect(() => {
     let isMounted = true;
-    crmApi.getBlogs({ status: 'Published' }).then(live => {
-      if (isMounted && Array.isArray(live) && live.length > 0) {
-        const publishedOnly = live.filter(b => b.status === 'Published');
-        if (publishedOnly.length > 0) {
-          const formatted = publishedOnly.map(b => ({
-            ...b,
-            id: b.id || b.slug,
-            slug: b.slug || b.id,
-            readTime: b.read_time || b.readTime || '5 min read',
-            authorRole: b.author_role || b.authorRole || 'Growth & Marketing Lead',
-            date: b.published_at ? new Date(b.published_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : (b.date || 'March 2026'),
-            image: b.image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
-            tags: Array.isArray(b.tags) ? b.tags : []
-          }));
+    const fetchBlogs = () => {
+      crmApi.getBlogs({ status: 'Published' }).then(live => {
+        if (isMounted && Array.isArray(live) && live.length > 0) {
+          const publishedOnly = live.filter(b => (b.status || 'published').toLowerCase() === 'published');
+          const toFormat = publishedOnly.length > 0 ? publishedOnly : live;
+          const formatted = toFormat.map(b => {
+            let parsedTags = [];
+            if (Array.isArray(b.tags)) {
+              parsedTags = b.tags;
+            } else if (typeof b.tags === 'string') {
+              try {
+                const json = JSON.parse(b.tags);
+                parsedTags = Array.isArray(json) ? json : b.tags.split(',').map(s => s.trim()).filter(Boolean);
+              } catch {
+                parsedTags = b.tags.split(',').map(s => s.trim()).filter(Boolean);
+              }
+            }
+            return {
+              ...b,
+              id: b.id || b.slug,
+              slug: b.slug || b.id,
+              readTime: b.read_time || b.readTime || '5 min read',
+              authorRole: b.author_role || b.authorRole || 'Growth & Marketing Lead',
+              date: b.published_at 
+                ? new Date(b.published_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) 
+                : (b.created_at ? new Date(b.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently Published'),
+              image: b.image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+              tags: parsedTags
+            };
+          });
           setPosts(formatted);
         }
-      }
-    }).catch(() => {});
-    return () => { isMounted = false; };
+      }).catch(() => {});
+    };
+
+    fetchBlogs();
+    window.addEventListener('focus', fetchBlogs);
+    window.addEventListener('storage', fetchBlogs);
+
+    return () => { 
+      isMounted = false;
+      window.removeEventListener('focus', fetchBlogs);
+      window.removeEventListener('storage', fetchBlogs);
+    };
   }, []);
 
   const filterCategories = ['All', 'Insights', 'Newsroom', 'Autonomous AI', 'Data Engineering', 'Cloud Platform', 'Quantum Computing'];

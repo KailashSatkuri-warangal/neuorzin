@@ -347,27 +347,47 @@ export const crmApi = {
     try {
       const res = await request(`/blogs${query ? `?${query}` : ''}`);
       if (Array.isArray(res)) {
-        if (params.all || !params.status) {
-          localStorage.setItem('neuorzin_blogs_local', JSON.stringify(res));
+        if (res.length > 0) {
+          try {
+            const existingLocal = JSON.parse(localStorage.getItem('neuorzin_blogs_local') || '[]');
+            const serverIds = new Set(res.map(b => b.id || b.slug));
+            const unsynced = existingLocal.filter(b => !serverIds.has(b.id) && !serverIds.has(b.slug));
+            localStorage.setItem('neuorzin_blogs_local', JSON.stringify([...res, ...unsynced]));
+          } catch {}
+          return res;
+        } else {
+          // If server returns empty array, check if we have authored blogs in local storage
+          const local = JSON.parse(localStorage.getItem('neuorzin_blogs_local') || '[]');
+          if (local.length > 0) {
+            if (params.status && params.status !== 'All') {
+              const target = params.status.toLowerCase();
+              return local.filter(b => (b.status || 'published').toLowerCase() === target);
+            }
+            return local;
+          }
+          return [];
         }
-        return res;
       }
     } catch (err) {
       console.warn('Backend getBlogs notice, checking local cache:', err.message);
     }
     const local = JSON.parse(localStorage.getItem('neuorzin_blogs_local') || '[]');
     if (params.status && params.status !== 'All') {
-      return local.filter(b => b.status === params.status);
+      const target = params.status.toLowerCase();
+      return local.filter(b => (b.status || 'published').toLowerCase() === target);
     }
     return local;
   },
   getBlogById: (id) => request(`/blogs/${encodeURIComponent(id)}`),
   createBlog: async (blogData) => {
+    const normStatus = blogData.status ? (blogData.status.toLowerCase() === 'draft' ? 'Draft' : 'Published') : 'Published';
     const payload = {
       ...blogData,
+      status: normStatus,
       id: blogData.id || ('blog-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7)),
       slug: blogData.slug || blogData.title?.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '') || ('article-' + Date.now()),
-      created_at: blogData.created_at || new Date().toISOString()
+      created_at: blogData.created_at || new Date().toISOString(),
+      published_at: normStatus === 'Published' ? (blogData.published_at || new Date().toISOString()) : null
     };
 
     // Update local cache immediately
@@ -386,15 +406,21 @@ export const crmApi = {
     }
   },
   updateBlog: async (id, updates) => {
+    const normStatus = updates.status ? (updates.status.toLowerCase() === 'draft' ? 'Draft' : 'Published') : undefined;
+    const cleanUpdates = {
+      ...updates,
+      ...(normStatus ? { status: normStatus } : {})
+    };
+
     // Update local cache immediately
     try {
       const current = JSON.parse(localStorage.getItem('neuorzin_blogs_local') || '[]');
-      const updated = current.map(b => (b.id === id || b.slug === id) ? { ...b, ...updates, updated_at: new Date().toISOString() } : b);
+      const updated = current.map(b => (b.id === id || b.slug === id) ? { ...b, ...cleanUpdates, updated_at: new Date().toISOString() } : b);
       localStorage.setItem('neuorzin_blogs_local', JSON.stringify(updated));
     } catch {}
 
     try {
-      const res = await request(`/blogs/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(updates) });
+      const res = await request(`/blogs/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(cleanUpdates) });
       return res;
     } catch (err) {
       console.warn('Backend updateBlog notice (updated in local store):', err.message);

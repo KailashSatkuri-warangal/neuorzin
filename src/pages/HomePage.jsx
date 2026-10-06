@@ -44,12 +44,27 @@ export function HomePage({ onOpenBooking, onSelectProject, onSelectArticle }) {
         <TestimonialsSection />
       </div>
 
-      {/* Approach Methodology Section */}
+      {/* 7. Featured Case Studies */}
+      <div className="content-visibility-auto">
+        <CaseStudiesSection onSelectProject={onSelectProject} onOpenBooking={onOpenBooking} />
+      </div>
+
+      {/* 8. Approach Methodology Section */}
       <div className="content-visibility-auto">
         <ApproachSection onOpenBooking={onOpenBooking} />
       </div>
 
-      {/* 10. Closing CTA Banner */}
+      {/* 9. Live Strategic Guides & Insights from Database */}
+      <div className="content-visibility-auto">
+        <BlogSection onSelectArticle={onSelectArticle} />
+      </div>
+
+      {/* 10. Frequently Asked Questions */}
+      <div className="content-visibility-auto">
+        <FaqSection onOpenBooking={onOpenBooking} />
+      </div>
+
+      {/* 11. Closing CTA Banner */}
       <div className="content-visibility-auto">
         <QuickContactBanner onOpenBooking={onOpenBooking} />
       </div>

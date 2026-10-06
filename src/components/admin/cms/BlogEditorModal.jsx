@@ -79,7 +79,7 @@ export function BlogEditorModal({ isOpen, onClose, blog, initialData, onSave, on
       setAuthor('Rajesh Varma');
       setAuthorRole('Head of Growth Marketing');
       setReadTime('5 min read');
-      setStatus('Draft');
+      setStatus('Published');
       setIsFeatured(false);
       setTags(['Digital Marketing', 'Growth']);
       setSections([

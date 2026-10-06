@@ -12,9 +12,9 @@ export async function getBlogs(req, res) {
     const params = [];
 
     if (!showAll) {
-      where.push("status = 'Published'");
+      where.push("(LOWER(status) = 'published' OR status IS NULL OR status = '')");
     } else if (status && status !== 'All') {
-      where.push('status = ?');
+      where.push('LOWER(status) = LOWER(?)');
       params.push(status);
     }
 
@@ -111,7 +111,8 @@ export async function createBlog(req, res) {
     const author = data.author || req.user?.name || 'NeuOrzin Editorial';
     const author_role = data.authorRole || data.author_role || 'Growth & Marketing Lead';
     const tags = data.tags ? JSON.stringify(data.tags) : JSON.stringify(['Digital Marketing']);
-    const status = ['Draft', 'Published', 'Archived'].includes(data.status) ? data.status : 'Draft';
+    const rawStatus = (data.status || '').trim();
+    const status = rawStatus ? (rawStatus.toLowerCase() === 'draft' ? 'Draft' : 'Published') : 'Published';
     const read_time = data.readTime || data.read_time || '5 min read';
     const is_featured = data.is_featured ? 1 : 0;
     const seo_title = data.seo_title || title;
@@ -149,7 +150,8 @@ export async function updateBlog(req, res) {
     const author = data.author || 'NeuOrzin Editorial';
     const author_role = data.authorRole || data.author_role || 'Growth & Marketing Lead';
     const tags = data.tags ? JSON.stringify(data.tags) : null;
-    const status = data.status || 'Draft';
+    const rawStatus = (data.status || '').trim();
+    const status = rawStatus ? (rawStatus.toLowerCase() === 'draft' ? 'Draft' : 'Published') : 'Published';
     const read_time = data.readTime || data.read_time || '5 min read';
     const is_featured = data.is_featured ? 1 : 0;
     const seo_title = data.seo_title || title;

@@ -451,9 +451,9 @@ if ($endpoint === "/blogs") {
         $params = [];
 
         if (!$showAll) {
-            $where[] = "status = 'Published'";
-        } elseif ($status && $status !== "All") {
-            $where[] = "status = ?";
+            $where[] = "(LOWER(status) = 'published' OR status IS NULL OR status = '')";
+        } elseif ($status && strtolower($status) !== "all") {
+            $where[] = "LOWER(status) = LOWER(?)";
             $params[] = $status;
         }
 
@@ -525,7 +525,8 @@ if ($endpoint === "/blogs") {
             $author = $data["author"] ?? "Rajesh Varma";
             $author_role = $data["authorRole"] ?? ($data["author_role"] ?? "Head of Growth Marketing");
             $tags = isset($data["tags"]) ? (is_array($data["tags"]) ? json_encode($data["tags"], JSON_UNESCAPED_UNICODE) : $data["tags"]) : json_encode(["Digital Marketing"]);
-            $status = in_array($data["status"] ?? "", ["Draft", "Published", "Archived"]) ? $data["status"] : "Draft";
+            $inputStatus = ucfirst(strtolower(trim($data["status"] ?? "")));
+            $status = in_array($inputStatus, ["Draft", "Published", "Archived"]) ? $inputStatus : "Published";
             $read_time = $data["readTime"] ?? ($data["read_time"] ?? "5 min read");
             $is_featured = !empty($data["is_featured"]) ? 1 : 0;
             $seo_title = $data["seo_title"] ?? $title;
@@ -604,7 +605,8 @@ if (preg_match("#^/blogs/([^/]+)(?:/(publish|unpublish))?$#", $endpoint, $m)) {
                 $author = $data["author"] ?? "Rajesh Varma";
                 $author_role = $data["authorRole"] ?? ($data["author_role"] ?? "Head of Growth Marketing");
                 $tags = isset($data["tags"]) ? (is_array($data["tags"]) ? json_encode($data["tags"], JSON_UNESCAPED_UNICODE) : $data["tags"]) : null;
-                $status = $data["status"] ?? "Draft";
+                $inputStatus = !empty($data["status"]) ? ucfirst(strtolower(trim($data["status"]))) : null;
+                $status = $inputStatus && in_array($inputStatus, ["Draft", "Published", "Archived"]) ? $inputStatus : "Published";
                 $read_time = $data["readTime"] ?? ($data["read_time"] ?? "5 min read");
                 $is_featured = !empty($data["is_featured"]) ? 1 : 0;
                 $seo_title = $data["seo_title"] ?? $title;

@@ -50,36 +50,39 @@ export function Footer({ onOpenBooking, onShowToast, theme }) {
 
           {/* Col 2: Company */}
           <div className="lg:col-span-2 text-left">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-3 sm:mb-4">Company</h4>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-white mb-3 sm:mb-4">Company</h3>
             <ul className="space-y-2 text-xs text-slate-300">
-              <li><Link to="/about" className="hover:text-[#0070ba] transition-colors">About Us</Link></li>
-              <li><Link to="/approach" className="hover:text-[#0070ba] transition-colors">Our Approach</Link></li>
-              <li><Link to="/careers" className="hover:text-[#0070ba] transition-colors">Meet Our Team</Link></li>
-              <li><Link to="/insights" className="hover:text-[#0070ba] transition-colors">Insights</Link></li>
-              <li><Link to="/newsroom" className="hover:text-[#0070ba] transition-colors">Newsroom</Link></li>
-              <li><Link to="/journal" className="hover:text-[#0070ba] transition-colors">Blog</Link></li>
-              <li><Link to="/contact" className="hover:text-[#0070ba] transition-colors">Contact Us</Link></li>
-              <li><Link to="/faq" className="hover:text-[#0070ba] transition-colors">FAQ</Link></li>
+              <li><Link to="/about" className="hover:text-[#0070ba] transition-colors">About NeuOrzin</Link></li>
+              <li><Link to="/approach" className="hover:text-[#0070ba] transition-colors">Our Approach & Process</Link></li>
+              <li><Link to="/careers" className="hover:text-[#0070ba] transition-colors">Careers & Team</Link></li>
+              <li><Link to="/projects" className="hover:text-[#0070ba] transition-colors">Case Studies & Work</Link></li>
+              <li><Link to="/industries" className="hover:text-[#0070ba] transition-colors">Industries We Serve</Link></li>
+              <li><Link to="/insights" className="hover:text-[#0070ba] transition-colors">Research & Insights</Link></li>
+              <li><Link to="/newsroom" className="hover:text-[#0070ba] transition-colors">Press & Newsroom</Link></li>
+              <li><Link to="/blog" className="hover:text-[#0070ba] transition-colors">Digital Marketing Blog</Link></li>
+              <li><Link to="/contact" className="hover:text-[#0070ba] transition-colors">Contact Us (Hyderabad)</Link></li>
+              <li><Link to="/faq" className="hover:text-[#0070ba] transition-colors">Frequently Asked Questions</Link></li>
             </ul>
           </div>
 
           {/* Col 3: Core Pillars */}
           <div className="lg:col-span-3 text-left">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-3 sm:mb-4">Core Pillars</h4>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-white mb-3 sm:mb-4">Enterprise Solutions</h3>
             <ul className="space-y-2 text-xs text-slate-300">
-              <li><Link to="/services/intelligent-autonomous-systems" className="hover:text-[#0070ba] transition-colors">Product Intelligence</Link></li>
-              <li><Link to="/services/sales-marketing" className="hover:text-[#0070ba] transition-colors">Sales & Marketing Growth</Link></li>
-              <li><Link to="/services/crm-revenue-operations" className="hover:text-[#0070ba] transition-colors">CRM & Revenue Operations</Link></li>
-              <li><Link to="/services/enterprise-data-operations" className="hover:text-[#0070ba] transition-colors">Data & AI</Link></li>
-              <li><Link to="/services/cloud-performance-management" className="hover:text-[#0070ba] transition-colors">Cloud Platform</Link></li>
-              <li><Link to="/services/quantum-enhanced-machine-learning" className="hover:text-[#0070ba] transition-colors">Quantum Computing</Link></li>
-              <li><Link to="/services/cloud-cost-intelligence" className="hover:text-[#0070ba] transition-colors">Cloud FinOps</Link></li>
+              <li><Link to="/services/intelligent-autonomous-systems" className="hover:text-[#0070ba] transition-colors">Enterprise AI & Agentic Systems</Link></li>
+              <li><Link to="/services/sales-marketing" className="hover:text-[#0070ba] transition-colors">Programmatic SEO & Growth Marketing</Link></li>
+              <li><Link to="/services/crm-revenue-operations" className="hover:text-[#0070ba] transition-colors">CRM Automation & RevOps Consulting</Link></li>
+              <li><Link to="/services/enterprise-data-operations" className="hover:text-[#0070ba] transition-colors">Data Engineering & Snowflake Architecture</Link></li>
+              <li><Link to="/services/cloud-performance-management" className="hover:text-[#0070ba] transition-colors">Cloud Performance & Kubernetes</Link></li>
+              <li><Link to="/services/cloud-cost-intelligence" className="hover:text-[#0070ba] transition-colors">FinOps & Cloud Cost Optimization</Link></li>
+              <li><Link to="/services/seamless-cloud-transitioning" className="hover:text-[#0070ba] transition-colors">Zero-Downtime Cloud Migration</Link></li>
+              <li><Link to="/services/quantum-enhanced-machine-learning" className="hover:text-[#0070ba] transition-colors">Quantum AI & Quantum Computing</Link></li>
             </ul>
           </div>
 
           {/* Col 4: Contact Info */}
           <div className="lg:col-span-3 text-left">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-3 sm:mb-4">Contact Info</h4>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-white mb-3 sm:mb-4">Contact Info</h3>
             <ul className="space-y-2.5 text-xs text-slate-300">
               <li className="flex items-start gap-2">
                 <i className="fas fa-map-marker-alt text-[#0070ba] mt-0.5"></i>

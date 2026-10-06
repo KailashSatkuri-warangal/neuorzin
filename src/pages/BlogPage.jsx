@@ -25,17 +25,54 @@ export function BlogPage({ onSelectArticle, onOpenBooking }) {
         const live = await crmApi.getBlogs({ status: 'Published' });
         if (isMounted) {
           if (Array.isArray(live) && live.length > 0) {
-            const publishedOnly = live.filter(b => b.status === 'Published');
-            const formatted = publishedOnly.map(b => ({
-              ...b,
-              id: b.id || b.slug,
-              slug: b.slug || b.id,
-              readTime: b.read_time || b.readTime || '5 min read',
-              authorRole: b.author_role || b.authorRole || 'Growth & Marketing Lead',
-              date: b.published_at ? new Date(b.published_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently Published',
-              image: b.image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
-              tags: Array.isArray(b.tags) ? b.tags : []
-            }));
+            // Case-insensitive check for published status; if all returned are from DB, display them
+            const publishedOnly = live.filter(b => {
+              const st = (b.status || 'published').toLowerCase();
+              return st === 'published';
+            });
+            const listToDisplay = publishedOnly.length > 0 ? publishedOnly : live;
+
+            const formatted = listToDisplay.map(b => {
+              let parsedTags = [];
+              if (Array.isArray(b.tags)) {
+                parsedTags = b.tags;
+              } else if (typeof b.tags === 'string') {
+                try {
+                  const json = JSON.parse(b.tags);
+                  parsedTags = Array.isArray(json) ? json : b.tags.split(',').map(s => s.trim()).filter(Boolean);
+                } catch {
+                  parsedTags = b.tags.split(',').map(s => s.trim()).filter(Boolean);
+                }
+              }
+
+              let parsedSections = [];
+              if (Array.isArray(b.sections)) {
+                parsedSections = b.sections;
+              } else if (typeof b.sections_json === 'string') {
+                try { parsedSections = JSON.parse(b.sections_json); } catch {}
+              }
+
+              return {
+                ...b,
+                id: b.id || b.slug,
+                slug: b.slug || b.id,
+                title: b.title || 'Untitled Strategic Guide',
+                category: b.category || b.section || 'Digital Marketing',
+                excerpt: b.excerpt || (b.content ? b.content.slice(0, 160) + '...' : 'Real-world performance teardown and digital architecture insights.'),
+                content: b.content || '',
+                intro: b.intro || '',
+                sections: parsedSections,
+                conclusion: b.conclusion || '',
+                author: b.author || 'NeuOrzin Editorial',
+                readTime: b.read_time || b.readTime || '5 min read',
+                authorRole: b.author_role || b.authorRole || 'Growth & Marketing Lead',
+                date: b.published_at 
+                  ? new Date(b.published_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) 
+                  : (b.created_at ? new Date(b.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently Published'),
+                image: b.image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+                tags: parsedTags
+              };
+            });
             setPosts(formatted);
           } else {
             setPosts([]);
@@ -47,8 +84,19 @@ export function BlogPage({ onSelectArticle, onOpenBooking }) {
         if (isMounted) setIsLoading(false);
       }
     }
+
     loadPublishedBlogs();
-    return () => { isMounted = false; };
+
+    // Auto-sync when returning to tab or when admin updates blogs in another window
+    const handleSync = () => { loadPublishedBlogs(); };
+    window.addEventListener('focus', handleSync);
+    window.addEventListener('storage', handleSync);
+
+    return () => { 
+      isMounted = false; 
+      window.removeEventListener('focus', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
   }, []);
 
   const filteredPosts = posts.filter((post) => {

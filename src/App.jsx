@@ -74,27 +74,33 @@ export function App() {
 
   const isAdmin = location.pathname.startsWith('/admin');
 
-  // Dynamic Document Title based on active route
+  // Dynamic Document Title based on active route (closely matches on-page content)
   useEffect(() => {
     const path = location.pathname;
     if (path.startsWith('/admin')) {
       document.title = 'NeuOrzin CRM — Executive Command Portal';
+    } else if (path.startsWith('/blog') || path.startsWith('/journal') || path.startsWith('/resources')) {
+      document.title = 'Digital Marketing & Technology Insights — Strategic Guides | NeuOrzin';
     } else if (path.startsWith('/services')) {
-      document.title = 'Services & Solutions | NeuOrzin';
+      document.title = 'Enterprise AI, Cloud & Data Engineering Solutions | NeuOrzin';
     } else if (path.startsWith('/about') || path.startsWith('/company')) {
-      document.title = 'About Us | NeuOrzin';
+      document.title = 'About NeuOrzin — Enterprise AI & Technology Company | Hyderabad, India';
     } else if (path.startsWith('/projects') || path.startsWith('/work')) {
-      document.title = 'Case Studies & Projects | NeuOrzin';
+      document.title = 'Engineering Case Studies & Enterprise Milestones | NeuOrzin';
     } else if (path.startsWith('/contact')) {
-      document.title = 'Contact Us | NeuOrzin';
+      document.title = 'Contact NeuOrzin — Enterprise AI & Cloud Consulting | Hyderabad, India';
     } else if (path.startsWith('/careers') || path.startsWith('/team')) {
-      document.title = 'Careers & Team | NeuOrzin';
+      document.title = 'Careers & Engineering Team | NeuOrzin';
     } else if (path.startsWith('/industries')) {
-      document.title = 'Industries | NeuOrzin';
-    } else if (path.startsWith('/insights') || path.startsWith('/newsroom')) {
-      document.title = 'Insights & Newsroom | NeuOrzin';
+      document.title = 'Industry-Specific AI & Cloud Engineering Solutions | NeuOrzin';
+    } else if (path.startsWith('/insights')) {
+      document.title = 'Technology Research, Architecture Whitepapers & Insights | NeuOrzin';
+    } else if (path.startsWith('/newsroom') || path.startsWith('/newspaper')) {
+      document.title = 'Press Center & Official Announcements | NeuOrzin Newsroom';
+    } else if (path.startsWith('/faq')) {
+      document.title = 'Frequently Asked Questions — Enterprise Tech & AI | NeuOrzin';
     } else {
-      document.title = 'Technology That Powers Digital Growth | NeuOrzin';
+      document.title = 'Technology That Powers Digital Growth — Enterprise AI, Cloud & Data Solutions | NeuOrzin';
     }
   }, [location.pathname]);
 
