@@ -8,8 +8,9 @@ import { crmApi } from '../../../data/crmApi';
 import { GeminiBlogGeneratorModal } from './GeminiBlogGeneratorModal';
 import { NEUORZIN_SERVICE_CATEGORIES } from '../../../data/serviceCategories';
 
-export function BlogEditorModal({ isOpen, onClose, blog, onSave, onShowToast, categories = [] }) {
-  const isEdit = Boolean(blog && (blog.id || blog.slug));
+export function BlogEditorModal({ isOpen, onClose, blog, initialData, onSave, onShowToast, categories = [], tags: propTags = [], onOpenGemini }) {
+  const currentBlog = blog || initialData;
+  const isEdit = Boolean(currentBlog && (currentBlog.id || currentBlog.slug));
 
   const [activeTab, setActiveTab] = useState('content'); // 'content' | 'sections' | 'seo' | 'publishing'
   const [showAiModal, setShowAiModal] = useState(false);
@@ -46,25 +47,25 @@ export function BlogEditorModal({ isOpen, onClose, blog, onSave, onShowToast, ca
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    if (blog) {
-      setTitle(blog.title || '');
-      setSlug(blog.slug || blog.id || '');
-      setCategory(blog.category || categories[0]?.name || 'Digital Marketing');
-      setExcerpt(blog.excerpt || '');
-      setContent(blog.content || '');
-      setIntro(blog.intro || '');
-      setConclusion(blog.conclusion || '');
-      setImage(blog.image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80');
-      setAuthor(blog.author || 'Rajesh Varma');
-      setAuthorRole(blog.authorRole || blog.author_role || 'Head of Growth Marketing');
-      setReadTime(blog.readTime || blog.read_time || '5 min read');
-      setStatus(blog.status || 'Draft');
-      setIsFeatured(Boolean(blog.is_featured));
-      setTags(Array.isArray(blog.tags) ? blog.tags : (blog.tags ? [blog.tags] : ['Digital Marketing']));
-      setSections(Array.isArray(blog.sections) ? blog.sections : []);
-      setSeoTitle(blog.seo_title || blog.title || '');
-      setSeoDescription(blog.seo_description || blog.excerpt || '');
-      setSeoKeywords(blog.seo_keywords || '');
+    if (currentBlog) {
+      setTitle(currentBlog.title || '');
+      setSlug(currentBlog.slug || currentBlog.id || '');
+      setCategory(currentBlog.category || categories[0]?.name || 'Digital Marketing');
+      setExcerpt(currentBlog.excerpt || '');
+      setContent(currentBlog.content || '');
+      setIntro(currentBlog.intro || '');
+      setConclusion(currentBlog.conclusion || '');
+      setImage(currentBlog.image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80');
+      setAuthor(currentBlog.author || 'Rajesh Varma');
+      setAuthorRole(currentBlog.authorRole || currentBlog.author_role || 'Head of Growth Marketing');
+      setReadTime(currentBlog.readTime || currentBlog.read_time || '5 min read');
+      setStatus(currentBlog.status || 'Draft');
+      setIsFeatured(Boolean(currentBlog.is_featured));
+      setTags(Array.isArray(currentBlog.tags) ? currentBlog.tags : (currentBlog.tags ? [currentBlog.tags] : ['Digital Marketing']));
+      setSections(Array.isArray(currentBlog.sections) ? currentBlog.sections : []);
+      setSeoTitle(currentBlog.seo_title || currentBlog.title || '');
+      setSeoDescription(currentBlog.seo_description || currentBlog.excerpt || '');
+      setSeoKeywords(currentBlog.seo_keywords || '');
     } else {
       // New Blog Defaults
       setTitle('');
@@ -90,7 +91,7 @@ export function BlogEditorModal({ isOpen, onClose, blog, onSave, onShowToast, ca
       setSeoDescription('');
       setSeoKeywords('');
     }
-  }, [blog, categories, isOpen]);
+  }, [currentBlog, categories, isOpen]);
 
   // Auto-generate slug when title changes in Create mode
   const handleTitleChange = (val) => {
@@ -216,9 +217,10 @@ export function BlogEditorModal({ isOpen, onClose, blog, onSave, onShowToast, ca
       return;
     }
 
+    const targetSlug = slug.trim() || title.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '');
     const payload = {
-      id: blog?.id || slug || title.toLowerCase().replace(/[^a-z0-9-]+/g, '-'),
-      slug: slug || title.toLowerCase().replace(/[^a-z0-9-]+/g, '-'),
+      id: currentBlog?.id || ('blog-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7)),
+      slug: targetSlug || ('article-' + Date.now()),
       title: title.trim(),
       category,
       section: category,
@@ -239,7 +241,7 @@ export function BlogEditorModal({ isOpen, onClose, blog, onSave, onShowToast, ca
       seo_title: seoTitle.trim() || title.trim(),
       seo_description: seoDescription.trim() || excerpt.trim(),
       seo_keywords: seoKeywords.trim(),
-      published_at: status === 'Published' ? (blog?.published_at || new Date().toISOString()) : null
+      published_at: status === 'Published' ? (currentBlog?.published_at || new Date().toISOString()) : null
     };
 
     setIsSaving(true);

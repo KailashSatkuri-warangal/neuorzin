@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { blogPosts as fallbackPosts } from '../data/blogData';
 import { crmApi } from '../data/crmApi';
 import { 
-  Calendar, User, ArrowRight, Search, Sparkles, TrendingUp, Loader2
+  Calendar, User, ArrowRight, Search, Sparkles, TrendingUp, Loader2, BookOpen
 } from 'lucide-react';
 import { 
   CinematicReveal, 
@@ -13,32 +12,39 @@ import {
 import { QuickContactBanner } from '../components/sections/QuickContactBanner';
 
 export function BlogPage({ onSelectArticle, onOpenBooking }) {
-  const [posts, setPosts] = useState(fallbackPosts);
-  const [isLoading, setIsLoading] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch live published blogs from database
+  // Fetch live published blogs dynamically from database
   useEffect(() => {
     let isMounted = true;
     async function loadPublishedBlogs() {
+      setIsLoading(true);
       try {
-        const live = await crmApi.getBlogs();
-        if (isMounted && Array.isArray(live) && live.length > 0) {
-          // Format fields to match frontend expectations
-          const formatted = live.map(b => ({
-            ...b,
-            id: b.id || b.slug,
-            slug: b.slug || b.id,
-            readTime: b.read_time || b.readTime || '5 min read',
-            authorRole: b.author_role || b.authorRole || 'Growth & Marketing Lead',
-            date: b.published_at ? new Date(b.published_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : (b.date || 'March 2026'),
-            image: b.image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
-            tags: Array.isArray(b.tags) ? b.tags : []
-          }));
-          setPosts(formatted);
+        const live = await crmApi.getBlogs({ status: 'Published' });
+        if (isMounted) {
+          if (Array.isArray(live) && live.length > 0) {
+            const publishedOnly = live.filter(b => b.status === 'Published');
+            const formatted = publishedOnly.map(b => ({
+              ...b,
+              id: b.id || b.slug,
+              slug: b.slug || b.id,
+              readTime: b.read_time || b.readTime || '5 min read',
+              authorRole: b.author_role || b.authorRole || 'Growth & Marketing Lead',
+              date: b.published_at ? new Date(b.published_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently Published',
+              image: b.image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+              tags: Array.isArray(b.tags) ? b.tags : []
+            }));
+            setPosts(formatted);
+          } else {
+            setPosts([]);
+          }
         }
       } catch (err) {
-        console.info('[BlogPage] Using local fallback posts:', err.message);
+        if (isMounted) setPosts([]);
+      } finally {
+        if (isMounted) setIsLoading(false);
       }
     }
     loadPublishedBlogs();
@@ -102,9 +108,20 @@ export function BlogPage({ onSelectArticle, onOpenBooking }) {
         </div>
 
         {/* Articles Grid */}
-        {filteredPosts.length === 0 ? (
-          <div className="text-center py-16 text-slate-400 text-sm">
-            No articles found matching "{searchQuery}".
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-24 text-slate-400">
+            <Loader2 className="w-8 h-8 animate-spin text-[#0070ba] mb-3" />
+            <p className="text-sm font-medium">Loading published articles...</p>
+          </div>
+        ) : filteredPosts.length === 0 ? (
+          <div className="text-center py-20 px-4 bg-white/60 dark:bg-slate-900/60 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 text-slate-500 max-w-lg mx-auto">
+            <BookOpen className="w-10 h-10 text-slate-400 mx-auto mb-3 opacity-60" />
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 mb-1">
+              {searchQuery ? 'No matching articles found' : 'No articles published yet'}
+            </h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              {searchQuery ? `We could not find any articles matching "${searchQuery}". Try a different keyword.` : 'New strategic insights will appear here once published from the Admin CMS.'}
+            </p>
           </div>
         ) : (
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-8">

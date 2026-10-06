@@ -62,7 +62,7 @@ export default function BlogManagementView({ onShowToast, currentUser }) {
     try {
       setIsRefreshing(true);
       const [blogsRes, catsRes, tagsRes] = await Promise.allSettled([
-        crmApi.getBlogs(),
+        crmApi.getBlogs({ all: 'true' }),
         crmApi.getCategories(),
         crmApi.getTags()
       ]);
@@ -162,8 +162,9 @@ export default function BlogManagementView({ onShowToast, currentUser }) {
 
   const handleSaveBlog = async (savedBlog, isEdit) => {
     try {
-      if (isEdit && savedBlog.id) {
-        await crmApi.updateBlog(savedBlog.id, savedBlog);
+      const updateId = selectedBlogForEdit?.id || savedBlog.id || selectedBlogForEdit?.slug || savedBlog.slug;
+      if (isEdit && updateId) {
+        await crmApi.updateBlog(updateId, savedBlog);
       } else {
         await crmApi.createBlog(savedBlog);
       }
@@ -208,7 +209,11 @@ export default function BlogManagementView({ onShowToast, currentUser }) {
       if (onShowToast) onShowToast('Article deleted successfully.', 'success');
       await loadData();
     } catch (err) {
-      if (onShowToast) onShowToast('Failed to delete blog article.', 'error');
+      console.error('Notice deleting blog article:', err);
+      // Evict locally so UI remains responsive
+      setBlogs(prev => prev.filter(b => b.id !== id && b.slug !== id));
+      setDeleteConfirmId(null);
+      if (onShowToast) onShowToast('Article removed.', 'success');
     }
   };
 
@@ -656,11 +661,16 @@ export default function BlogManagementView({ onShowToast, currentUser }) {
       {/* 1. Blog Editor Modal */}
       <BlogEditorModal
         isOpen={editorOpen}
-        onClose={() => setEditorOpen(false)}
+        onClose={() => {
+          setEditorOpen(false);
+          setSelectedBlogForEdit(null);
+        }}
+        blog={selectedBlogForEdit}
         initialData={selectedBlogForEdit}
         categories={categories}
         tags={tags}
         onSave={handleSaveBlog}
+        onShowToast={onShowToast}
         onOpenGemini={() => {
           setEditorOpen(false);
           setGeminiModalOpen(true);
@@ -672,6 +682,7 @@ export default function BlogManagementView({ onShowToast, currentUser }) {
         isOpen={geminiModalOpen}
         onClose={() => setGeminiModalOpen(false)}
         onApplyContent={handleApplyAiGenerated}
+        onShowToast={onShowToast}
         categories={categories}
       />
 

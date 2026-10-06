@@ -21,7 +21,8 @@ import {
 import { crmApi } from '../../../data/crmApi';
 import { NEUORZIN_SERVICE_CATEGORIES, getAllRecommendedTopics } from '../../../data/serviceCategories';
 
-export function GeminiBlogGeneratorModal({ isOpen, onClose, onApplyContent, onShowToast, categories = [] }) {
+export function GeminiBlogGeneratorModal({ isOpen, onClose, onApplyContent, onApplyGeneratedBlog, onShowToast, categories = [] }) {
+  const applyCallback = onApplyContent || onApplyGeneratedBlog;
   const [topic, setTopic] = useState('');
   const [targetAudience, setTargetAudience] = useState('CTOs, VPs of Engineering, Enterprise Decision-Makers');
   const [tone, setTone] = useState('Authoritative, Strategic & Practical');
@@ -104,8 +105,8 @@ export function GeminiBlogGeneratorModal({ isOpen, onClose, onApplyContent, onSh
 
   const handleApply = () => {
     if (!generatedData) return;
-    if (onApplyContent) {
-      onApplyContent(generatedData);
+    if (applyCallback) {
+      applyCallback(generatedData);
     }
     onClose();
   };

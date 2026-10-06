@@ -274,15 +274,15 @@ export default function AiSettingsView({ onShowToast, currentUser }) {
                       Cancel
                     </button>
                   )}
-                  <p className="text-[10px] text-slate-400">
-                    Get an API key from Google AI Studio at{' '}
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    Google AI Studio keys start with <code className="bg-slate-100 text-purple-700 px-1 py-0.5 rounded font-mono font-bold">AIzaSy...</code>.{' '}
                     <a
                       href="https://aistudio.google.com/app/apikey"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[#0070ba] font-bold hover:underline inline-flex items-center gap-0.5"
                     >
-                      aistudio.google.com <ExternalLink className="w-2.5 h-2.5" />
+                      Get Free API Key <ExternalLink className="w-2.5 h-2.5" />
                     </a>
                   </p>
                 </div>
@@ -299,12 +299,12 @@ export default function AiSettingsView({ onShowToast, currentUser }) {
                 onChange={(e) => setModel(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold focus:outline-none focus:border-[#0070ba] cursor-pointer"
               >
-                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Ultra Fast & Recommended)</option>
-                <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep Architecture & High Reasoning)</option>
-                <option value="gemini-2.0-flash">Gemini 2.0 Flash (Next-Gen Preview)</option>
+                <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash (Ultra Fast & Recommended)</option>
+                <option value="gemini-2.0-flash">Gemini 2.0 Flash (Next-Gen Performance)</option>
+                <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro (Deep Architecture Reasoning)</option>
               </select>
               <p className="text-[10px] text-slate-400 mt-1">
-                Gemini 1.5 Flash provides optimal response latency (&lt; 2s) with comprehensive content generation.
+                Automatic multi-model cascade enabled with enterprise synthesis fallback.
               </p>
             </div>
           </div>

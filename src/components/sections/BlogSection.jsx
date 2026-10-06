@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { blogPosts } from '../../data/blogData';
+import { crmApi } from '../../data/crmApi';
 import { Calendar, User, ArrowRight, Search } from 'lucide-react';
 import { 
   CinematicReveal, 
@@ -10,10 +11,34 @@ import {
 export function BlogSection({ onSelectArticle }) {
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [posts, setPosts] = useState(blogPosts);
+
+  useEffect(() => {
+    let isMounted = true;
+    crmApi.getBlogs({ status: 'Published' }).then(live => {
+      if (isMounted && Array.isArray(live) && live.length > 0) {
+        const publishedOnly = live.filter(b => b.status === 'Published');
+        if (publishedOnly.length > 0) {
+          const formatted = publishedOnly.map(b => ({
+            ...b,
+            id: b.id || b.slug,
+            slug: b.slug || b.id,
+            readTime: b.read_time || b.readTime || '5 min read',
+            authorRole: b.author_role || b.authorRole || 'Growth & Marketing Lead',
+            date: b.published_at ? new Date(b.published_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : (b.date || 'March 2026'),
+            image: b.image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+            tags: Array.isArray(b.tags) ? b.tags : []
+          }));
+          setPosts(formatted);
+        }
+      }
+    }).catch(() => {});
+    return () => { isMounted = false; };
+  }, []);
 
   const filterCategories = ['All', 'Insights', 'Newsroom', 'Autonomous AI', 'Data Engineering', 'Cloud Platform', 'Quantum Computing'];
 
-  const filteredPosts = blogPosts.filter((post) => {
+  const filteredPosts = posts.filter((post) => {
     const matchesTab = activeTab === 'All' 
       ? true 
       : activeTab === 'Insights' 
@@ -24,8 +49,8 @@ export function BlogSection({ onSelectArticle }) {
 
     const matchesSearch = searchQuery === '' 
       ? true 
-      : post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      : (post.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (post.excerpt || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         (post.tags && post.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())));
 
     return matchesTab && matchesSearch;
@@ -85,7 +110,7 @@ export function BlogSection({ onSelectArticle }) {
         {/* Article Grid */}
         {filteredPosts.length === 0 ? (
           <div className="text-center py-16 text-slate-400 text-sm">
-            No articles found matching your criteria.
+            {searchQuery ? `No articles found matching "${searchQuery}".` : 'No articles published yet. Insights will appear here once published from the Admin CMS.'}
           </div>
         ) : (
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
